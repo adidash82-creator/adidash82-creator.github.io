@@ -1,0 +1,253 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>מסלול השייכות</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: a six-stop route across the top, one stop's card below with its own clock */
+:root{
+  --bg:#f1efe9; --panel:#ffffff; --ink:#22213a; --muted:#64627e; --line:#dcd8cc;
+  --chip:#e9e5f3; --accent:#5b3fd1; --accent-ink:#ffffff;
+  --ok:#1f8a5b; --ok-bg:#e2f4ea; --bad:#c23b3b; --bad-bg:#fbe7e6; --warn:#b26a00;
+  --display:"Suez One","Assistant",Arial,sans-serif;
+  --body:"Assistant","Arial Hebrew",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16152a; --panel:#211f3d; --ink:#efedf9; --muted:#a8a5c6; --line:#36335c; --chip:#2c2950;
+  --accent:#a891ff; --accent-ink:#17142c; --ok:#4fd197; --ok-bg:#16382c; --bad:#ff7d7d; --bad-bg:#3d1d24; --warn:#ffb54d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16152a; --panel:#211f3d; --ink:#efedf9; --muted:#a8a5c6; --line:#36335c; --chip:#2c2950;
+  --accent:#a891ff; --accent-ink:#17142c; --ok:#4fd197; --ok-bg:#16382c; --bad:#ff7d7d; --bad-bg:#3d1d24; --warn:#ffb54d; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:18px;line-height:1.5;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+.wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.9rem,6vw,2.6rem);line-height:1.1}
+header{display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap}
+.sub{color:var(--muted);margin:2px 0 0}
+.score{font-family:var(--display);background:var(--chip);border-radius:999px;padding:6px 14px;font-variant-numeric:tabular-nums}
+.route{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.stop{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:8px 6px;border-radius:10px;border:2px solid var(--line);background:var(--panel);text-align:center;font-size:.85rem;min-width:0}
+.stop b{font-family:var(--display);font-weight:400;font-size:1rem}
+.stop span{color:var(--muted);font-variant-numeric:tabular-nums}
+.stop.now{border-color:var(--accent);background:var(--chip)}
+.stop.done b{color:var(--ok)}
+.stop:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (max-width:560px){.route{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.cardtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.clock{display:flex;align-items:center;gap:8px}
+.time{font-family:var(--display);font-size:1.5rem;font-variant-numeric:tabular-nums;min-width:3.2em;text-align:center}
+.time.low{color:var(--warn)} .time.out{color:var(--bad)}
+.tbtn{all:unset;cursor:pointer;border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-size:.95rem}
+.tbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lead{margin:0;color:var(--muted)}
+.prompt{font-family:var(--display);font-size:clamp(1.6rem,6.5vw,2.3rem);line-height:1.35;text-align:center;padding:14px;background:var(--chip);border-radius:14px}
+.prompt small{display:block;font-family:var(--body);font-size:1rem;color:var(--muted)}
+.opts{display:grid;gap:10px}
+.opt{all:unset;cursor:pointer;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:13px 16px;font-size:1.4rem;text-align:center;font-weight:600}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt[disabled]{cursor:default}
+.fb{border-radius:12px;padding:12px 16px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)} .fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb b{font-family:var(--display);font-weight:400}
+.btn{all:unset;cursor:pointer;align-self:flex-start;background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:999px;padding:10px 24px;font-size:1.05rem}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.qcount{color:var(--muted);font-variant-numeric:tabular-nums}
+.persons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:480px){.persons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.p{all:unset;cursor:pointer;text-align:center;border:2px solid var(--line);border-radius:10px;padding:8px;font-weight:700;font-size:1.1rem}
+.p.on{border-color:var(--accent);background:var(--chip)}
+.p:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.pair{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:480px){.pair{grid-template-columns:1fr}}
+.box{border:2px dashed var(--line);border-radius:12px;padding:12px;text-align:center}
+.box .k{color:var(--muted);font-size:.95rem}
+.box .v{font-family:var(--display);font-size:1.9rem;color:var(--accent);min-height:1.5em}
+.think{background:var(--chip);border-radius:12px;padding:12px 16px}
+.think summary{cursor:pointer;font-weight:700}
+.task{display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:var(--chip);border-radius:12px}
+.task ol{margin:0;padding-inline-start:1.3em}
+.big{font-family:var(--display);font-size:3rem;color:var(--accent);text-align:center}
+@keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+.pop{animation:pop .25s ease}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}}
+</style>
+
+<div class="wrap">
+ <header><div><h1>מסלול השייכות</h1><p class="sub">שיעור לשון לרוני · 45 דקות · שש תחנות</p></div>
+ <span class="score" id="score">נקודות: 0</span></header>
+ <nav class="route" id="route" aria-label="תחנות השיעור"></nav>
+ <main id="stage"></main>
+</div>
+
+<script>
+const R=[
+ ["סִפְרִיָּה <small>מה השורש?</small>","ס.פ.ר",["ס.פ.י","פ.ר.י"],"יָּה בסוף היא תוספת."],
+ ["מַחְשֵׁב <small>מה השורש?</small>","ח.ש.ב",["מ.ח.ש","מ.ש.ב"],"מ' בהתחלה היא תוספת."],
+ ["ל.מ.ד · עתיד · אנחנו","נִלְמַד",["לָמַדְנוּ","יִלְמְדוּ"],"עתיד + אנחנו = נ' בהתחלה."],
+ ["ש.ב.ר · עבר · את","שָׁבַרְתְּ",["שָׁבַרְתָּ","תִּשְׁבְּרִי"],"את = ־תְּ. אתה = ־תָּ."],
+ ["אֲרוּחָה + עֶרֶב","אֲרוּחַת עֶרֶב",["אֲרוּחָה עֶרֶב","הָאֲרוּחַת עֶרֶב"],"־ה בנסמך הופכת ל־ת."],
+ ["בֵּית סֵפֶר + ה' הידיעה","בֵּית הַסֵּפֶר",["הַבַּיִת סֵפֶר","הַבֵּית הַסֵּפֶר"],"מיידעים רק את הסומך."],
+ ["כִּתַּת הַמַּדָּעִים ___ (חָדָשׁ)","הַחֲדָשָׁה",["הַחֲדָשִׁים","חֲדָשָׁה"],"מתאימים לנסמך: כיתה – נקבה, יחידה, מיודעת."],
+ ["שַׂחְקָנֵי הַקְּבוּצָה ___ (טוֹב)","הַטּוֹבִים",["הַטּוֹבָה","טוֹבִים"],"השחקנים טובים: זכר, רבים, מיודע."]
+];
+const K=[
+ ["הַסֵּפֶר שֶׁלִּי","סִפְרִי",["סְפָרַי","סֵפֶרִי"],"סִפְרִי = ספר אחד. סְפָרַי = הספרים שלי."],
+ ["הַבַּיִת שֶׁלָּנוּ","בֵּיתֵנוּ",["בָּתֵּינוּ","בַּיִתֵנוּ"],"כינוי \"אנחנו\" = ־נוּ. בָּתֵּינוּ = הבתים שלנו."],
+ ["הַמַּחְבֶּרֶת שֶׁלָּהּ","מַחְבַּרְתָּהּ",["מַחְבַּרְתּוֹ","מַחְבֶּרֶתָהּ"],"מתחברים לצורת הנסמך מַחְבֶּרֶת־ ← מַחְבַּרְתָּהּ."],
+ ["הַכִּתָּה שֶׁלָּכֶם","כִּתַּתְכֶם",["כִּתָּתָם","כִּתָּהכֶם"],"כמו בסמיכות: כִּתָּה ← כִּתַּת־ ← כִּתַּתְכֶם."],
+ ["הַחֶדֶר שֶׁלּוֹ","חַדְרוֹ",["חַדְרָהּ","חֲדָרָיו"],"הוא = ־וֹ. חֲדָרָיו = החדרים שלו."],
+ ["הַשִּׁיר שֶׁלָּךְ <small>(את)</small>","שִׁירֵךְ",["שִׁירְךָ","שִׁירָהּ"],"את = ־ֵךְ. אתה = ־ְךָ."],
+ ["מִשְׁפַּחְתּוֹ = הַמִּשְׁפָּחָה ___","שֶׁלּוֹ",["שֶׁלָּהּ","שֶׁלָּהֶם"],"הסיומת ־וֹ = הוא."],
+ ["עִירָם = הָעִיר ___","שֶׁלָּהֶם",["שֶׁלָּהֶן","שֶׁלָּנוּ"],"־ָם = הם. ־ָן = הן."]
+];
+const Y=[
+ ["רוני נתנה ___ את הספר. <small>(לְ + הוּא)</small>","לוֹ",["לָהּ","לָהֶם"],"לְ + הוּא = לוֹ."],
+ ["דיברתי ___ אתמול. <small>(עִם + אַתֶּם)</small>","אִתְּכֶם",["אִתָּם","אִתָּנוּ"],"עִם + אַתֶּם = אִתְּכֶם."],
+ ["הספר נמצא ___. <small>(אֵצֶל + אֲנִי)</small>","אֶצְלִי",["אֶצְלֵנוּ","אֶצְלְךָ"],"אֵצֶל + אֲנִי = אֶצְלִי."],
+ ["קיבלנו מכתב ___. <small>(מִן + הִיא)</small>","מִמֶּנָּה",["מִמֶּנּוּ","מֵהֶן"],"מִן + הִיא = מִמֶּנָּה. מִמֶּנּוּ = ממנו (הוא)."],
+ ["אני חושבת ___ כל הזמן. <small>(עַל + אַתָּה)</small>","עָלֶיךָ",["עָלַיִךְ","עָלָיו"],"אתה = עָלֶיךָ. את = עָלַיִךְ."],
+ ["הם הגיעו ___ בערב. <small>(אֶל + אֲנַחְנוּ)</small>","אֵלֵינוּ",["אֵלַי","אֲלֵיהֶם"],"אֶל + אֲנַחְנוּ = אֵלֵינוּ."],
+ ["המורה גאה ___. <small>(בְּ + הֵם)</small>","בָּהֶם",["בָּהֶן","בָּנוּ"],"הֵם = בָּהֶם. הֵן = בָּהֶן."],
+ ["זה התיק ___. <small>(שֶׁל + הִיא)</small>","שֶׁלָּהּ",["שֶׁלּוֹ","שֶׁלָּהֶן"],"שֶׁל + הִיא = שֶׁלָּהּ."]
+];
+const X=[
+ ["מְכוֹנִיתָם = הַמְּכוֹנִית ___","שֶׁלָּהֶם",["שֶׁלָּהּ","שֶׁלָּנוּ"],"הסיומת ־ָם = הם."],
+ ["שלחתי ___ הודעה. <small>(לְ + אַתְּ)</small>","לָךְ",["לְךָ","לָכֶן"],"את = לָךְ. אתה = לְךָ."],
+ ["סְפָרֵינוּ ___ <small>(חָדָשׁ)</small>","הַחֲדָשִׁים",["חֲדָשִׁים","הֶחָדָשׁ"],"שם עם כינוי שייכות הוא מיודע, ולכן התואר מיודע: הַחֲדָשִׁים."]
+];
+const P=["אֲנִי","אַתָּה","אַתְּ","הוּא","הִיא","אֲנַחְנוּ","אַתֶּם","אַתֶּן","הֵם","הֵן"];
+const SHEL=["שֶׁלִּי","שֶׁלְּךָ","שֶׁלָּךְ","שֶׁלּוֹ","שֶׁלָּהּ","שֶׁלָּנוּ","שֶׁלָּכֶם","שֶׁלָּכֶן","שֶׁלָּהֶם","שֶׁלָּהֶן"];
+const SEFER=["סִפְרִי","סִפְרְךָ","סִפְרֵךְ","סִפְרוֹ","סִפְרָהּ","סִפְרֵנוּ","סִפְרְכֶם","סִפְרְכֶן","סִפְרָם","סִפְרָן"];
+const MAHB=["מַחְבַּרְתִּי","מַחְבַּרְתְּךָ","מַחְבַּרְתֵּךְ","מַחְבַּרְתּוֹ","מַחְבַּרְתָּהּ","מַחְבַּרְתֵּנוּ","מַחְבַּרְתְּכֶם","מַחְבַּרְתְּכֶן","מַחְבַּרְתָּם","מַחְבַּרְתָּן"];
+
+const STAGES=[
+ {name:"חזרת בזק",min:7,type:"quiz",qs:R,lead:"שמונה שאלות מהשיעורים הקודמים. מהר ובדיוק."},
+ {name:"גילוי",min:8,type:"discover",lead:"לחצי על כל גוף וראי מה קורה לסֵפֶר ולמַחְבֶּרֶת."},
+ {name:"של מי?",min:7,type:"quiz",qs:K,lead:"הפכי צירוף עם \"של\" למילה אחת, ובחזרה."},
+ {name:"מילות יחס",min:10,type:"quiz",qs:Y,lead:"השלימי את מילת היחס הנטויה. אחרי השאלות: משחק \"קפיצות גוף\" על הרצפה.",after:"עכשיו קומי! משחק \"קפיצות גוף\" עם הכרטיסים על הרצפה, 5 דקות."},
+ {name:"ליד השולחן",min:8,type:"desk",lead:"משימה על הדף. הטיימר ממשיך לרוץ."},
+ {name:"כרטיס יציאה",min:5,type:"quiz",qs:X,lead:"שלוש שאלות אחרונות, ואז סיכום.",exit:true}
+];
+
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const state={cur:0,score:0,max:0,done:new Set(),clock:{left:STAGES[0].min*60,run:false,id:null},results:{}};
+const $=s=>document.querySelector(s);
+const fmt=t=>{const s=Math.max(0,t);return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`};
+
+function route(){
+  $("#route").innerHTML=STAGES.map((s,i)=>`<button class="stop ${i===state.cur?"now":""} ${state.done.has(i)?"done":""}" data-i="${i}" ${i===state.cur?'aria-current="step"':""}><b>${state.done.has(i)?"✓ ":""}${s.name}</b><span>${s.min} דק'</span></button>`).join("");
+  $("#route").querySelectorAll(".stop").forEach(b=>b.onclick=()=>go(+b.dataset.i));
+  $("#score").textContent=`נקודות: ${state.score}`;
+}
+function setClock(min){clearInterval(state.clock.id);state.clock={left:min*60,run:false,id:null};}
+function tick(){
+  const c=state.clock; if(!c.run)return; c.left--; drawClock();
+  if(c.left<=0){c.run=false;clearInterval(c.id);drawClock();}
+}
+function drawClock(){
+  const t=$("#time"),b=$("#tbtn"); if(!t)return;
+  const l=state.clock.left;
+  t.textContent=l<=0?"הזמן!":fmt(l);
+  t.className="time"+(l<=0?" out":l<=60?" low":"");
+  b.textContent=state.clock.run?"השהיה":l<=0?"אפס":"התחלה";
+}
+function toggleClock(){
+  const c=state.clock;
+  if(c.left<=0){setClock(STAGES[state.cur].min);drawClock();return;}
+  c.run=!c.run; clearInterval(c.id); if(c.run)c.id=setInterval(tick,1000); drawClock();
+}
+function go(i){state.cur=i;setClock(STAGES[i].min);render();state.clock.run=true;state.clock.id=setInterval(tick,1000);drawClock();}
+
+function shell(s,inner){
+  return `<section class="card pop">
+   <div class="cardtop"><h2>${s.name}</h2>
+    <div class="clock"><span class="time" id="time" role="timer" aria-live="off"></span><button class="tbtn" id="tbtn"></button></div></div>
+   <p class="lead">${s.lead}</p>${inner}</section>`;
+}
+function render(){
+  route(); const s=STAGES[state.cur];
+  if(s.type==="quiz") quiz(s,shuffle(s.qs),0,0);
+  if(s.type==="discover") discover(s);
+  if(s.type==="desk") desk(s);
+  $("#tbtn") && ($("#tbtn").onclick=toggleClock); drawClock();
+}
+function bindClock(){ $("#tbtn").onclick=toggleClock; drawClock(); }
+function nextStage(){ state.done.add(state.cur); if(state.cur<STAGES.length-1) go(state.cur+1); else summary(); }
+
+function quiz(s,qs,i,got){
+  const [p,right,wrongs,why]=qs[i]; const opts=shuffle([right,...wrongs]);
+  $("#stage").innerHTML=shell(s,`
+   <span class="qcount">שאלה ${i+1} מתוך ${qs.length}</span>
+   <div class="prompt">${p}</div>
+   <div class="opts">${opts.map((o,k)=>`<button class="opt" id="o${k}" data-v="${o}">${o}</button>`).join("")}</div>
+   <div id="fb" aria-live="polite"></div>`);
+  bindClock();
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const ok=b.dataset.v===right;
+    document.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.dataset.v===right)x.classList.add("right")});
+    if(!ok)b.classList.add("wrong");
+    state.max++; if(ok){state.score++;got++;} route();
+    const last=i===qs.length-1;
+    $("#fb").innerHTML=`<div class="fb ${ok?"ok":"bad"}"><b>${ok?"נכון!":"כמעט. התשובה: "+right}</b> ${why}</div>
+     <div style="margin-top:12px"><button class="btn" id="nx">${last?(s.exit?"לסיכום":"לתחנה הבאה"):"הבאה"}</button></div>`;
+    $("#nx").focus();
+    $("#nx").onclick=()=>{
+      if(!last) return quiz(s,qs,i+1,got);
+      state.results[state.cur]=`${got}/${qs.length}`;
+      if(s.after){ $("#stage").innerHTML=shell(s,`<div class="task"><b>${got} מתוך ${qs.length} נכונות.</b><span>${s.after}</span></div><button class="btn" id="nx2">לתחנה הבאה</button>`); bindClock(); $("#nx2").onclick=nextStage; }
+      else nextStage();
+    };
+  });
+}
+function discover(s){
+  $("#stage").innerHTML=shell(s,`
+   <div class="persons">${P.map((p,i)=>`<button class="p" data-i="${i}">${p}</button>`).join("")}</div>
+   <div class="pair">
+    <div class="box"><div class="k">הַ... שֶׁל</div><div class="v" id="v0">?</div></div>
+    <div class="box"><div class="k">הַסֵּפֶר ← מילה אחת</div><div class="v" id="v1">?</div></div>
+    <div class="box"><div class="k">הַמַּחְבֶּרֶת ← מילה אחת</div><div class="v" id="v2">?</div></div>
+   </div>
+   <details class="think"><summary>שאלה לחשיבה: למה מַחְבֶּרֶת הופכת למַחְבַּרְתִּי?</summary>
+    <p>כינוי השייכות מתחבר לצורת הנסמך, בדיוק כמו בסמיכות: מַחְבֶּרֶת ← מַחְבֶּרֶת־ ← מַחְבַּרְתִּי. גם כִּתָּה ← כִּתַּת־ ← כִּתָּתִי.</p></details>
+   <details class="think"><summary>ועוד גילוי: האם סִפְרִי מיודע?</summary>
+    <p>כן. סִפְרִי = הַסֵּפֶר שֶׁלִּי. לכן שם התואר אחריו מיודע: סִפְרִי הֶחָדָשׁ.</p></details>
+   <button class="btn" id="nx">לתחנה הבאה</button>`);
+  bindClock();
+  document.querySelectorAll(".p").forEach(b=>b.onclick=()=>{
+    document.querySelectorAll(".p").forEach(x=>x.classList.toggle("on",x===b));
+    const i=+b.dataset.i; $("#v0").textContent=SHEL[i]; $("#v1").textContent=SEFER[i]; $("#v2").textContent=MAHB[i];
+  });
+  $("#nx").onclick=nextStage;
+}
+function desk(s){
+  $("#stage").innerHTML=shell(s,`
+   <div class="task"><b>דף העבודה, תרגילים 2–3</b>
+    <ol><li>תרגיל 2: השלימי את מילות היחס בסיפור על סבתא.</li>
+    <li>תרגיל 3: המשפט \"סְפָרֵינוּ הַחֲדָשִׁים\" – מצאי כינוי שייכות, סמיכות ושורש.</li></ol>
+    <span>כשמסיימות, בודקות יחד עם המורה.</span></div>
+   <button class="btn" id="nx">סיימנו, לכרטיס היציאה</button>`);
+  bindClock(); $("#nx").onclick=nextStage;
+}
+function summary(){
+  clearInterval(state.clock.id); route();
+  const pct=state.max?Math.round(state.score/state.max*100):0;
+  const rows=STAGES.map((s,i)=>state.results[i]?`<li>${s.name}: ${state.results[i]}</li>`:"").join("");
+  $("#stage").innerHTML=`<section class="card pop">
+   <h2>סיימת את המסלול!</h2>
+   <div class="big">${state.score} / ${state.max}</div>
+   <p class="lead" style="text-align:center">${pct>=85?"שליטה מצוינת בחומר.":pct>=65?"עבודה טובה. כדאי לחזור על מה שהיה קשה.":"נחזור על זה בשיעור הבא, צעד אחר צעד."}</p>
+   <ul>${rows}</ul>
+   <div class="task"><b>שיעורי בית</b><span>הדף \"שיעורי בית\": 4 תרגילים, כולל משימת אתגר.</span></div>
+   <button class="btn" id="again">להתחיל מחדש</button></section>`;
+  $("#again").onclick=()=>{state.score=0;state.max=0;state.done.clear();state.results={};state.cur=0;setClock(STAGES[0].min);render();};
+}
+setClock(STAGES[0].min); render();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

@@ -1,0 +1,576 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>משימת החלל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Varela+Round&family=Rubik:wght@700;800&display=swap">
+<style>
+/* Layout: a night-sky "mission console" — one stage card at a time under a fuel-bar route; deliberately one dark space look */
+:root {
+  --space: #121838;      /* page ground */
+  --panel: #1E2757;      /* card surface */
+  --panel-2: #283270;    /* raised tiles */
+  --ink: #F4F6FF;        /* text */
+  --ink-soft: #AEB6E3;
+  --line: #3E4A8C;
+  --flame: #FF8A3D;
+  --gold: #FFC83D;
+  --cyan: #4FD1E8;
+  --pink: #FF6FA5;
+  --mint: #6EE7A8;
+  --shadow: #0A0E24;
+  --display: "Secular One", "Rubik", "Arial Hebrew", sans-serif;
+  --body: "Varela Round", "Rubik", "Arial Hebrew", sans-serif;
+  --num: "Rubik", "Arial", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background-color: var(--space);
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #ffffffcc 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 9%, #ffffffaa 50%, transparent 51%),
+    radial-gradient(2px 2px at 88% 42%, #ffffff99 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 64%, #ffffff88 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 85%, #ffffffaa 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 92%, #ffffff77 50%, transparent 51%);
+  background-attachment: fixed;
+  color: var(--ink); font-family: var(--body); font-size: 18px; direction: rtl;
+}
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+header { display: flex; flex-direction: column; gap: 12px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand h1 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 5.4vw, 32px); margin: 0; text-wrap: balance; color: var(--gold); }
+.brand .avatar { width: 46px; height: 46px; flex: none; }
+.boost { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-size: 17px; background: var(--pink); color: var(--shadow); border: 3px solid var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; box-shadow: 0 4px 0 var(--shadow); }
+.boost svg { width: 20px; height: 20px; }
+.boost:disabled { opacity: .45; cursor: default; }
+
+.fuel { display: flex; align-items: center; gap: 10px; }
+.fuel .lbl { font-family: var(--display); font-size: 15px; color: var(--ink-soft); flex: none; }
+.fuel .bar { flex: 1; height: 18px; border-radius: 999px; background: var(--panel); border: 2px solid var(--line); overflow: hidden; }
+.fuel .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--flame)); border-radius: 999px; transition: width .5s; margin-inline-start: 0; }
+
+.route { display: flex; align-items: center; padding: 4px 2px; overflow-x: auto; }
+.route .stop { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); background: var(--panel); font-family: var(--num); font-weight: 800; font-size: 15px; display: grid; place-items: center; cursor: pointer; color: var(--ink); padding: 0; }
+.route .stop.done { background: var(--mint); color: var(--shadow); border-color: var(--mint); }
+.route .stop.now { background: var(--gold); color: var(--shadow); border-color: var(--ink); transform: scale(1.15); }
+.route .path { flex: 1 1 14px; min-width: 10px; height: 0; border-top: 3px dotted var(--line); }
+
+.stage { background: var(--panel); border: 3px solid var(--line); border-radius: 26px; padding: clamp(18px, 4vw, 30px); box-shadow: 0 8px 0 var(--shadow); display: flex; flex-direction: column; gap: 18px; min-height: 420px; }
+.stage h2 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 6.4vw, 38px); margin: 0; text-wrap: balance; }
+.lead { font-size: clamp(19px, 4.4vw, 22px); line-height: 1.8; margin: 0; }
+.eyebrow { font-family: var(--display); font-size: 15px; letter-spacing: .03em; color: var(--cyan); }
+.teacher { font-size: 14px; color: var(--ink-soft); border-inline-start: 3px solid var(--line); padding-inline-start: 10px; }
+
+.btn { font-family: var(--display); font-weight: 400; font-size: 21px; border: 3px solid var(--ink); border-radius: 16px; padding: 11px 22px; background: var(--gold); color: var(--shadow); cursor: pointer; box-shadow: 0 5px 0 var(--shadow); transition: transform .08s; }
+.btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--shadow); }
+.btn.alt { background: var(--panel-2); color: var(--ink); border-color: var(--line); }
+.btn.go { background: var(--mint); }
+.btn:disabled { opacity: .4; cursor: default; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 4px solid var(--cyan); outline-offset: 3px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+nav.bottom { display: flex; justify-content: space-between; gap: 12px; }
+nav.bottom .btn { font-size: 17px; padding: 9px 18px; }
+
+/* hero pick */
+.heroes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.hero { border: 3px solid var(--line); border-radius: 20px; background: var(--panel-2); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; color: var(--ink); font-family: var(--display); font-size: clamp(16px, 4vw, 20px); min-width: 0; }
+.hero svg { width: 100%; max-width: 110px; height: auto; }
+.hero.on { border-color: var(--gold); background: #3A3F7E; transform: translateY(-4px); box-shadow: 0 6px 0 var(--shadow); }
+
+/* power meter */
+.meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.cell { border: 3px solid var(--line); border-radius: 18px; background: var(--panel-2); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; color: var(--ink); font-size: 14px; min-width: 0; }
+.cell .n { font-family: var(--num); font-weight: 800; font-size: 22px; }
+.cell svg { width: 100%; max-width: 46px; height: auto; }
+.cell.on { border-color: var(--gold); background: #3A3F7E; transform: translateY(-4px); }
+@media (max-width: 460px) { .cell .t { font-size: 12px; } }
+
+/* message */
+.msg { border: 3px dashed var(--cyan); border-radius: 22px; padding: 18px 22px; background: #182150; font-size: clamp(22px, 5vw, 27px); line-height: 2; font-family: var(--body); }
+.msg .from { font-family: var(--display); color: var(--cyan); font-size: 18px; }
+.yourword { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.bigword { font-family: var(--display); font-size: clamp(54px, 15vw, 84px); line-height: 1; color: var(--gold); background: var(--panel-2); border: 4px solid var(--gold); border-radius: 24px; padding: 14px 30px; cursor: pointer; box-shadow: 0 6px 0 var(--shadow); }
+
+/* planets */
+.planet-head { display: flex; align-items: center; gap: 14px; }
+.planet-head svg { width: 64px; height: 64px; flex: none; }
+.who { display: flex; gap: 10px; flex-wrap: wrap; }
+.who button { font-family: var(--display); font-size: 17px; border: 3px solid var(--line); border-radius: 999px; padding: 6px 14px; background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.who button.on { background: var(--cyan); color: var(--shadow); border-color: var(--ink); }
+.word-card { align-self: center; font-family: var(--display); font-size: clamp(64px, 18vw, 104px); line-height: 1.15; background: #FFFBEF; color: #1A2150; border-radius: 26px; padding: 12px 40px; border: 5px solid var(--gold); box-shadow: 0 8px 0 var(--shadow); text-align: center; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.opt { border: 3px solid var(--line); border-radius: 20px; background: var(--panel-2); padding: 12px 6px; cursor: pointer; display: grid; place-items: center; min-width: 0; }
+.opt svg { width: 100%; max-width: 104px; height: auto; }
+.opt.wrong { animation: wobble .45s; border-color: var(--pink); }
+.opt.right { border-color: var(--mint); background: #24555A; }
+.feedback { font-family: var(--display); font-size: 22px; min-height: 1.4em; margin: 0; color: var(--gold); }
+.move { background: #24305F; border: 3px solid var(--mint); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.move .big { font-family: var(--display); font-size: clamp(24px, 5.6vw, 30px); color: var(--mint); }
+.move .act { font-size: clamp(21px, 4.8vw, 25px); line-height: 1.7; }
+.crystals { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 3px dotted var(--line); padding-top: 14px; }
+.crystals svg { width: 34px; height: 40px; }
+
+/* turbo code */
+.syl-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.syl { font-family: var(--display); font-size: clamp(56px, 15vw, 88px); line-height: 1.1; padding: 10px 26px; border-radius: 22px; border: 4px solid var(--cyan); background: var(--panel-2); color: var(--ink); cursor: pointer; box-shadow: 0 6px 0 var(--shadow); }
+.syl.lit { background: var(--cyan); color: var(--shadow); }
+.turbo { text-align: center; font-family: var(--display); font-size: clamp(56px, 16vw, 96px); color: var(--flame); animation: pop .6s; }
+.rocket-fly { display: block; margin: 0 auto; width: 120px; height: 120px; animation: fly 1.4s ease-in; }
+
+/* garage */
+.garage { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.garage .pic { width: 130px; height: 130px; background: var(--panel-2); border-radius: 24px; border: 3px solid var(--line); display: grid; place-items: center; }
+.garage .pic svg { width: 100px; height: 100px; }
+.slots { display: flex; gap: 10px; }
+.slots .s { width: clamp(64px, 18vw, 86px); height: clamp(76px, 21vw, 100px); border: 4px dashed var(--ink-soft); border-radius: 18px; background: #182150; display: grid; place-items: center; font-family: var(--display); font-size: clamp(44px, 12vw, 60px); }
+.slots .s.full { border-style: solid; border-color: var(--gold); background: var(--panel-2); }
+.slots.win .s { border-color: var(--mint); animation: pop .5s; }
+.tiles { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.tile { width: clamp(62px, 16vw, 80px); height: clamp(62px, 16vw, 80px); border: 4px solid var(--ink); border-radius: 18px; background: #FFFBEF; color: #1A2150; font-family: var(--display); font-size: clamp(36px, 9vw, 48px); cursor: pointer; box-shadow: 0 5px 0 var(--shadow); }
+.tile[disabled] { visibility: hidden; }
+.done-word { text-align: center; font-family: var(--display); font-size: clamp(40px, 11vw, 60px); color: var(--mint); }
+
+/* drawing */
+.hero-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; border: 4px solid var(--gold); border-radius: 22px; padding: 14px; background: #182150; }
+.hero-card canvas { display: block; width: 100%; height: 280px; touch-action: none; background: #0F1533; border-radius: 14px; cursor: crosshair; }
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); cursor: pointer; }
+.swatch.on { box-shadow: 0 0 0 4px var(--panel), 0 0 0 7px var(--gold); }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.chip { border: 3px solid var(--line); border-radius: 999px; padding: 8px 18px; background: var(--panel-2); font-family: var(--display); font-size: 22px; cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
+.chip svg { width: 30px; height: 30px; }
+.chip.on { background: var(--gold); color: var(--shadow); border-color: var(--ink); }
+.power-name { font-family: var(--display); font-size: clamp(30px, 8vw, 44px); color: var(--gold); text-align: center; }
+
+/* commander */
+.order { border: 4px solid var(--flame); background: #2A2350; border-radius: 22px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; animation: pop .5s; }
+.order .t { font-family: var(--display); color: var(--flame); font-size: 20px; }
+.order .w { font-family: var(--display); font-size: clamp(54px, 15vw, 80px); background: #FFFBEF; color: #1A2150; border-radius: 20px; padding: 4px 30px; }
+.order .m { font-size: clamp(21px, 5vw, 26px); }
+.score { font-family: var(--display); font-size: 20px; color: var(--mint); }
+
+/* license */
+.license { border: 5px solid var(--gold); border-radius: 26px; background: linear-gradient(160deg, #26306B, #1A2150); padding: 24px 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.license h3 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 6.6vw, 36px); margin: 0; color: var(--gold); }
+.license .name { font-family: var(--display); font-size: clamp(50px, 14vw, 72px); color: var(--ink); line-height: 1.1; }
+.license .avatar { width: 110px; height: 110px; }
+.license p { font-size: 20px; line-height: 1.8; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 480px; }
+.stats div { background: #121838; border: 2px solid var(--line); border-radius: 14px; padding: 8px 4px; font-size: 15px; color: var(--ink-soft); }
+.stats b { display: block; font-family: var(--num); font-weight: 800; font-size: 26px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* power break overlay */
+.overlay { position: fixed; inset: 0; background: #0A0E24E6; display: grid; place-items: center; padding: 16px; z-index: 5; }
+.overlay .box { background: var(--panel); border: 4px solid var(--pink); border-radius: 26px; padding: 26px; max-width: 420px; width: 100%; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.overlay .count { font-family: var(--num); font-weight: 800; font-size: 76px; color: var(--pink); font-variant-numeric: tabular-nums; line-height: 1; }
+.overlay .act { font-size: 24px; line-height: 1.7; }
+
+/* teacher guide */
+details.guide { background: #182150; border: 2px solid var(--line); border-radius: 18px; padding: 12px 16px; }
+details.guide summary { font-family: var(--display); font-size: 18px; cursor: pointer; color: var(--cyan); }
+.guide .tbl { overflow-x: auto; margin-top: 10px; }
+.guide table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.guide th, .guide td { border-bottom: 1px solid var(--line); padding: 7px 6px; text-align: right; vertical-align: top; }
+.guide th { color: var(--gold); font-family: var(--display); font-weight: 400; }
+.guide td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.guide ul { margin: 10px 0 0 0; padding-inline-start: 20px; line-height: 1.8; font-size: 15px; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; width: 100%; height: 100%; z-index: 6; }
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes wobble { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+@keyframes fly { 0% { transform: translateY(0); } 30% { transform: translateY(6px); } 100% { transform: translateY(-160px); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="topbar">
+      <div class="brand"><span id="avatar"></span><h1>מְשִׂימַת הֶחָלָל שֶׁל נֹעַם</h1></div>
+      <button type="button" class="boost" id="boost"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 L4 14 H11 L10 22 L20 9 H13 Z" fill="#121838"/></svg><span id="boostTxt">הַפְסָקַת כֹּחַ · 3</span></button>
+    </div>
+    <div class="fuel"><span class="lbl">דֶּלֶק</span><div class="bar"><i id="fuelbar"></i></div></div>
+    <div class="route" id="route" aria-label="שלבי השיעור"></div>
+  </header>
+  <main class="stage" id="stage" aria-live="polite"></main>
+  <nav class="bottom">
+    <button class="btn alt" id="prev" type="button">→ הַקּוֹדֵם</button>
+    <button class="btn alt" id="next" type="button">הַבָּא ←</button>
+  </nav>
+  <details class="guide">
+    <summary>למורה: מהלך השיעור (45 דק')</summary>
+    <div class="tbl"><table>
+      <thead><tr><th>זמן</th><th>שלב</th><th>מה קורה</th></tr></thead>
+      <tbody>
+        <tr><td>0–4</td><td>בוחרים גיבור</td><td>בלי קריאה בכלל. בחירת גיבור + מד כוח. נותן לנעם שליטה מהרגע הראשון.</td></tr>
+        <tr><td>4–7</td><td>הודעה מהבסיס</td><td>המורה מקריאה את ההודעה. התלמיד קורא מילה אחת בלבד: "צֵא!"</td></tr>
+        <tr><td>7–20</td><td>5 כוכבי לכת</td><td>מילה קצרה עם ניקוד ובחירת תמונה, ואחריה משימת תנועה. התלמיד בוחר מי מתחיל לקרוא.</td></tr>
+        <tr><td>20–25</td><td>קוד טורבו</td><td>קריאה בהברות: טוּר + בּוֹ. לוחצים על כל הברה בזמן הקריאה.</td></tr>
+        <tr><td>25–31</td><td>מוסך המילים</td><td>בונים מילה מאותיות לפי תמונה (דָּג, לֵב, יָם). אין כתיבה ביד.</td></tr>
+        <tr><td>31–37</td><td>כרטיס גיבור</td><td>ציור הגיבור ובחירת שם כוח מתוך 3 מילים.</td></tr>
+        <tr><td>37–42</td><td>אתה המפקד</td><td>התלמיד נותן פקודה למורה. המורה "טועה" בכוונה, ונעם מתקן.</td></tr>
+        <tr><td>42–45</td><td>רישיון טייס</td><td>מד כוח שוב + רישיון עם הנתונים של השיעור.</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>הפסקות כוח: 3 בלבד לכל השיעור, 30 שניות כל אחת. כשמתחיל משא ומתן, מפנים אליהן: "רוצה להשתמש בהפסקת כוח?"</li>
+      <li>בהתנגדות להתחלה: "אני קוראת ראשונה, אתה אחריי." המשימה הבאה תמיד מילה אחת.</li>
+      <li>בוויכוח: לא נכנסים לדיון. נותנים שתי אפשרויות שתיהן בסדר ("עכשיו או אחרי הקפיצה?").</li>
+      <li>טעות בקריאה: "כמעט! בוא נקרא יחד", בלי לתקן מילה מילה.</li>
+    </ul>
+  </details>
+</div>
+<div class="overlay" id="overlay" hidden>
+  <div class="box">
+    <div class="eyebrow">הַפְסָקַת כֹּחַ</div>
+    <div class="count" id="count">30</div>
+    <div class="act" id="breakAct">קְפֹץ כְּמוֹ גִּבּוֹר!</div>
+    <button class="btn go" type="button" id="endBreak">חוֹזְרִים לַמְּשִׂימָה ←</button>
+  </div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  "use strict";
+  const S = (inner) => '<svg viewBox="0 0 100 100" aria-hidden="true">' + inner + '</svg>';
+  const K = 'stroke="#0A0E24" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
+
+  const HEROES = {
+    rocket: { name: "חֲלָלִית", title: "טַיָּס", svg: S('<path d="M50 6 C66 20 70 44 66 66 H34 C30 44 34 20 50 6 Z" fill="#F4F6FF" ' + K + '/><circle cx="50" cy="36" r="9" fill="#4FD1E8" ' + K + '/><path d="M34 52 L18 70 L34 70 Z" fill="#FF6FA5" ' + K + '/><path d="M66 52 L82 70 L66 70 Z" fill="#FF6FA5" ' + K + '/><path d="M40 66 L50 92 L60 66 Z" fill="#FF8A3D" ' + K + '/>') },
+    dino: { name: "דִּינוֹזָאוּר", title: "רוֹכֵב דִּינוֹ", svg: S('<path d="M18 70 C18 48 34 40 50 42 L60 20 C64 12 82 12 84 24 C86 32 78 36 70 34 L66 48 C76 54 80 66 78 78 H64 L62 70 H40 L38 78 H24 Z" fill="#6EE7A8" ' + K + '/><circle cx="76" cy="22" r="3.5" fill="#0A0E24"/><path d="M18 70 L6 60" ' + K + ' fill="none"/><path d="M44 42 L48 34 L52 42 M52 42 L56 34" fill="none" ' + K + '/>') },
+    car: { name: "מְכוֹנִית מֵרוֹץ", title: "נֶהָג מֵרוֹץ", svg: S('<path d="M8 66 L14 50 L36 46 L48 32 H70 L80 46 L92 50 L94 66 Z" fill="#FF8A3D" ' + K + '/><path d="M52 36 H68 L74 46 H46 Z" fill="#4FD1E8" ' + K + '/><circle cx="28" cy="68" r="11" fill="#F4F6FF" ' + K + '/><circle cx="76" cy="68" r="11" fill="#F4F6FF" ' + K + '/><path d="M58 52 h8 M54 58 h14" stroke="#FFC83D" stroke-width="5" stroke-linecap="round"/>') }
+  };
+  const PIC = {
+    "דָּג": S('<path d="M14 50 C30 28 62 28 76 50 C62 72 30 72 14 50 Z" fill="#4FD1E8" ' + K + '/><path d="M76 50 L94 34 L94 66 Z" fill="#4FD1E8" ' + K + '/><circle cx="30" cy="46" r="4" fill="#0A0E24"/>'),
+    "עֵץ": S('<rect x="42" y="56" width="16" height="36" rx="3" fill="#B07A4A" ' + K + '/><circle cx="50" cy="38" r="28" fill="#6EE7A8" ' + K + '/>'),
+    "בַּיִת": S('<path d="M14 48 L50 16 L86 48" fill="none" ' + K + '/><rect x="22" y="46" width="56" height="44" fill="#FFC83D" ' + K + '/><rect x="42" y="62" width="16" height="28" fill="#FF6FA5" ' + K + '/><path d="M14 48 L50 16 L86 48 Z" fill="#FF8A3D" ' + K + '/>'),
+    "שֶׁמֶשׁ": S('<circle cx="50" cy="50" r="20" fill="#FFC83D" ' + K + '/><g stroke="#FFC83D" stroke-width="7" stroke-linecap="round"><line x1="50" y1="8" x2="50" y2="20"/><line x1="50" y1="80" x2="50" y2="92"/><line x1="8" y1="50" x2="20" y2="50"/><line x1="80" y1="50" x2="92" y2="50"/><line x1="20" y1="20" x2="28" y2="28"/><line x1="72" y1="72" x2="80" y2="80"/><line x1="80" y1="20" x2="72" y2="28"/><line x1="20" y1="80" x2="28" y2="72"/></g>'),
+    "כּוֹכָב": S('<polygon points="50,8 61,38 94,40 68,60 77,92 50,74 23,92 32,60 6,40 39,38" fill="#FFC83D" ' + K + '/>'),
+    "לֵב": S('<path d="M50 86 C20 64 8 46 14 30 C20 14 42 12 50 30 C58 12 80 14 86 30 C92 46 80 64 50 86 Z" fill="#FF6FA5" ' + K + '/>'),
+    "יָם": S('<path d="M6 44 Q20 30 34 44 T62 44 T94 44 V90 H6 Z" fill="#4FD1E8" ' + K + '/><path d="M6 64 Q20 52 34 64 T62 64 T94 64" fill="none" stroke="#F4F6FF" stroke-width="4" stroke-linecap="round"/>'),
+    "יָרֵחַ": S('<path d="M64 10 C38 14 24 36 28 58 C32 80 56 94 80 84 C58 82 44 64 46 44 C48 28 56 16 64 10 Z" fill="#F4F6FF" ' + K + '/>'),
+    "אוֹטוֹ": S('<path d="M10 64 L16 48 L32 44 L42 30 H66 L76 44 L90 48 V64 Z" fill="#FF8A3D" ' + K + '/><circle cx="28" cy="66" r="10" fill="#F4F6FF" ' + K + '/><circle cx="74" cy="66" r="10" fill="#F4F6FF" ' + K + '/>')
+  };
+  const PLANET = (c1, c2) => S('<circle cx="50" cy="50" r="28" fill="' + c1 + '" ' + K + '/><ellipse cx="50" cy="52" rx="46" ry="12" fill="none" stroke="' + c2 + '" stroke-width="6"/><circle cx="40" cy="42" r="5" fill="#ffffff66"/>');
+  const CRYSTAL = (on) => '<svg viewBox="0 0 34 40" aria-hidden="true"><polygon points="17,2 32,14 17,38 2,14" fill="' + (on ? '#4FD1E8' : 'none') + '" stroke="' + (on ? '#F4F6FF' : '#3E4A8C') + '" stroke-width="3" stroke-linejoin="round"/></svg>';
+
+  const PLANETS = [
+    { name: "כּוֹכַב הַדָּגִים", word: "דָּג", decoys: ["עֵץ", "לֵב"], c: ["#4FD1E8", "#FFC83D"], move: "שְׂחֵה כְּמוֹ דָּג עַד הַדֶּלֶת!" },
+    { name: "כּוֹכַב הַיַּעַר", word: "עֵץ", decoys: ["יָם", "דָּג"], c: ["#6EE7A8", "#FF8A3D"], move: "צְעַד 5 צְעָדִים כְּמוֹ דִּינוֹזָאוּר!" },
+    { name: "כּוֹכַב הַבָּתִּים", word: "בַּיִת", decoys: ["אוֹטוֹ", "כּוֹכָב"], c: ["#FF8A3D", "#4FD1E8"], move: "רוּץ בַּמָּקוֹם כְּמוֹ מְכוֹנִית מֵרוֹץ!" },
+    { name: "כּוֹכַב הָאוֹר", word: "שֶׁמֶשׁ", decoys: ["יָרֵחַ", "לֵב"], c: ["#FFC83D", "#FF6FA5"], move: "קְפֹץ 3 קְפִיצוֹת לַחָלָל!" },
+    { name: "כּוֹכַב הַגִּבּוֹרִים", word: "כּוֹכָב", decoys: ["שֶׁמֶשׁ", "בַּיִת"], c: ["#FF6FA5", "#6EE7A8"], move: "הַרְאֵה שְׁרִירִים שֶׁל גִּבּוֹר-עַל!" }
+  ];
+  const GARAGE = [
+    { word: "דָּג", letters: ["ד", "ג"], extra: ["ב", "ל"] },
+    { word: "לֵב", letters: ["ל", "ב"], extra: ["ג", "מ"] },
+    { word: "יָם", letters: ["י", "ם"], extra: ["ד", "ש"] }
+  ];
+  const POWERS = ["סוּפֶּר", "טוּרְבּוֹ", "רַעַם"];
+  const BREAKS = ["קְפֹץ כְּמוֹ גִּבּוֹר-עַל!", "עוּף כְּמוֹ חֲלָלִית סְבִיב הַחֶדֶר!", "שָׁאֵג כְּמוֹ טִירָנוֹזָאוּרוּס!"];
+  const ORDERS_W = ["דָּג", "עֵץ", "לֵב", "יָם", "בַּיִת", "שֶׁמֶשׁ"];
+  const ORDERS_M = ["בִּקְפִיצוֹת", "כְּמוֹ רוֹבּוֹט", "בִּזְחִילָה"];
+
+  const state = {
+    step: 0, hero: "", powerStart: 0, powerEnd: 0, readGo: false,
+    planet: 0, who: "", solved: false, moved: false, crystals: 0,
+    syl: [false, false], turbo: false,
+    gar: 0, garFill: [], garWin: false,
+    power: "", orderW: "", orderM: "", orderOn: false, fixes: 0,
+    breaks: 3
+  };
+  const STEPS = ["hero", "message", "planets", "turbo", "garage", "card", "commander", "license"];
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let audio = null;
+  function chime(good) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const notes = good ? [523, 659, 784, 1046] : [300, 260];
+      notes.forEach((f, i) => {
+        const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * 0.09;
+        o.type = good ? "square" : "triangle"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.08, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+        o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.25);
+      });
+    } catch (e) { /* optional */ }
+  }
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const stage = $("#stage");
+  const h = (x) => { stage.innerHTML = x; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const orders = {};
+  const shuffle = (key, arr) => orders[key] || (orders[key] = arr.slice().sort(() => Math.random() - 0.5));
+
+  function fuelPct() {
+    let p = 0;
+    if (state.hero) p += 5; if (state.readGo) p += 5;
+    p += state.crystals * 10; if (state.turbo) p += 10;
+    p += Math.min(state.gar + (state.garWin ? 1 : 0), 3) * 5; if (state.power) p += 5; if (state.fixes) p += 5; if (state.powerEnd) p += 5;
+    return Math.min(100, p);
+  }
+  function battery(n) {
+    const cols = ["#FF6FA5", "#FF8A3D", "#FFC83D", "#A8E06A", "#6EE7A8"];
+    let bars = "";
+    for (let i = 0; i < 5; i++) bars += '<rect x="22" y="' + (78 - i * 14) + '" width="56" height="10" rx="3" fill="' + (i < n ? cols[n - 1] : "#283270") + '"/>';
+    return '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="16" y="8" width="68" height="88" rx="10" fill="none" stroke="#F4F6FF" stroke-width="5"/><rect x="38" y="2" width="24" height="8" rx="3" fill="#F4F6FF"/>' + bars + '</svg>';
+  }
+  function meter(key) {
+    const t = ["בִּכְלָל לֹא", "קְצָת", "בְּאֶמְצַע", "הַרְבֵּה", "מָלֵא!"];
+    return '<div class="meter" role="group" aria-label="מד כוח">' + [1, 2, 3, 4, 5].map(n =>
+      '<button type="button" class="cell' + (state[key] === n ? ' on' : '') + '" data-n="' + n + '" aria-pressed="' + (state[key] === n) + '">' + battery(n) + '<span class="n">' + n + '</span><span class="t">' + t[n - 1] + '</span></button>').join("") + '</div>';
+  }
+  function bindMeter(key, after) {
+    stage.querySelectorAll(".cell").forEach(b => b.addEventListener("click", () => { state[key] = +b.dataset.n; chime(true); render(); if (after) after(); }));
+  }
+  function crystals() {
+    return '<div class="crystals"><span class="eyebrow">גְּבִישֵׁי דֶּלֶק:</span>' + [0, 1, 2, 3, 4].map(i => CRYSTAL(i < state.crystals)).join("") + '</div>';
+  }
+
+  const VIEWS = {
+    hero() {
+      let b = '<div class="eyebrow">שָׁלָב 1 · מִי אַתָּה הַיּוֹם?</div><h2>בְּחַר אֶת הַגִּבּוֹר שֶׁלְּךָ</h2>' +
+        '<div class="heroes">' + Object.keys(HEROES).map(k => '<button type="button" class="hero' + (state.hero === k ? ' on' : '') + '" data-h="' + k + '" aria-pressed="' + (state.hero === k) + '">' + HEROES[k].svg + '<span>' + HEROES[k].name + '</span></button>').join("") + '</div>';
+      if (state.hero) {
+        b += '<p class="lead">כַּמָּה כֹּחַ יֵשׁ לְךָ לִקְרֹא הַיּוֹם?</p>' + meter("powerStart");
+        if (state.powerStart) b += '<p class="feedback">כָּל תְּשׁוּבָה בְּסֵדֶר. יוֹצְאִים!</p><div class="row"><button class="btn go" type="button" id="go">לַבָּסִיס ←</button></div>';
+      }
+      h(b);
+      stage.querySelectorAll(".hero").forEach(x => x.addEventListener("click", () => { state.hero = x.dataset.h; chime(true); render(); }));
+      if (state.hero) bindMeter("powerStart");
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(1));
+    },
+    message() {
+      let b = '<div class="eyebrow">שָׁלָב 2 · הוֹדָעָה מֵהַבָּסִיס</div><h2>הוֹדָעָה דְּחוּפָה!</h2>' +
+        '<div class="msg"><div class="from">מֵהַבָּסִיס אֶל ' + (HEROES[state.hero] ? HEROES[state.hero].title : "טַיָּס") + ' נֹעַם:</div>' +
+        'הַחֲלָלִית צְרִיכָה דֶּלֶק.<br>בְּכָל כּוֹכַב לֶכֶת יֵשׁ מִלָּה.<br>קְרָא מִלָּה – קַבֵּל דֶּלֶק!</div>' +
+        '<p class="teacher">המורה מקריאה את ההודעה. התלמיד קורא רק את המילה הגדולה.</p>';
+      b += '<div class="yourword"><span class="lead"><b>הַמִּלָּה שֶׁלְּךָ:</b></span><button type="button" class="bigword" id="tsa">צֵא!</button></div>';
+      if (state.readGo) b += '<p class="feedback">קָרָאתָ! הַמָּנוֹעַ נִדְלַק.</p><div class="row"><button class="btn go" type="button" id="go">לַכּוֹכָב הָרִאשׁוֹן ←</button></div>';
+      h(b);
+      $("#tsa").addEventListener("click", () => { state.readGo = true; chime(true); burst(); render(); });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(2));
+    },
+    planets() {
+      const i = state.planet, p = PLANETS[i];
+      let b = '<div class="eyebrow">שָׁלָב 3 · כּוֹכָב ' + (i + 1) + ' מִתּוֹךְ 5</div>' +
+        '<div class="planet-head">' + PLANET(p.c[0], p.c[1]) + '<h2>' + p.name + '</h2></div>';
+      if (!state.who) {
+        b += '<p class="lead">מִי קוֹרֵא רִאשׁוֹן?</p><div class="who"><button type="button" data-w="me">אֲנִי קוֹרֵא</button><button type="button" data-w="t">קֹדֶם הַמּוֹרָה, אַחַר כָּךְ אֲנִי</button></div>';
+      } else if (!state.solved) {
+        b += '<div class="word-card">' + p.word + '</div>' +
+          (state.who === "t" ? '<p class="teacher">המורה קוראת פעם אחת, ונעם קורא אחריה.</p>' : '') +
+          '<p class="lead"><b>אֵיזוֹ תְּמוּנָה?</b></p><div class="opts">' +
+          shuffle("p" + i, [p.word].concat(p.decoys)).map(w => '<button type="button" class="opt" data-w="' + w + '" aria-label="תמונה">' + PIC[w] + '</button>').join("") +
+          '</div><p class="feedback" id="fb"></p>';
+      } else if (!state.moved) {
+        b += '<div class="move"><span class="big">נָכוֹן! ' + p.word + '</span><span class="act">מְשִׂימַת תְּנוּעָה: ' + p.move + '</span><span class="teacher">המורה יכולה להקריא את משימת התנועה.</span><button class="btn go" type="button" id="moved">עָשִׂיתִי! ✓</button></div>';
+      } else {
+        const last = i === PLANETS.length - 1;
+        b += '<div class="move"><span class="big">קִבַּלְתָּ גָּבִישׁ דֶּלֶק!</span><button class="btn go" type="button" id="nx">' + (last ? 'לְקוֹד הַטּוּרְבּוֹ ←' : 'לַכּוֹכָב הַבָּא ←') + '</button></div>';
+      }
+      b += crystals();
+      h(b);
+      stage.querySelectorAll(".who button").forEach(x => x.addEventListener("click", () => { state.who = x.dataset.w; render(); }));
+      stage.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => {
+        if (x.dataset.w === p.word) { x.classList.add("right"); chime(true); setTimeout(() => { state.solved = true; render(); }, reduced ? 0 : 350); }
+        else { x.classList.remove("wrong"); void x.offsetWidth; x.classList.add("wrong"); chime(false); $("#fb").textContent = "כִּמְעַט! נִקְרָא שׁוּב יַחַד."; }
+      }));
+      const mv = $("#moved"); if (mv) mv.addEventListener("click", () => { state.moved = true; if (state.crystals <= i) state.crystals = i + 1; chime(true); render(); });
+      const nx = $("#nx"); if (nx) nx.addEventListener("click", () => {
+        if (i === PLANETS.length - 1) { goto(3); return; }
+        state.planet++; state.who = ""; state.solved = false; state.moved = false; render();
+      });
+    },
+    turbo() {
+      let b = '<div class="eyebrow">שָׁלָב 4 · קוֹד טוּרְבּוֹ</div><h2>פִּתְחוּ אֶת הַמָּנוֹעַ!</h2>';
+      if (state.crystals < 5) {
+        b += '<p class="lead">צָרִיךְ עוֹד גְּבִישֵׁי דֶּלֶק. חֲזֹר לַכּוֹכָבִים.</p><div class="row"><button class="btn" type="button" id="back">לַכּוֹכָבִים</button></div>' + crystals();
+        h(b); $("#back").addEventListener("click", () => goto(2)); return;
+      }
+      if (state.turbo) {
+        b += '<svg class="rocket-fly" viewBox="0 0 100 100" aria-hidden="true">' + HEROES.rocket.svg.replace(/^<svg[^>]*>|<\/svg>$/g, "") + '</svg><div class="turbo">טוּרְבּוֹ!</div><div class="row" style="justify-content:center"><button class="btn go" type="button" id="go">לַמּוּסָךְ ←</button></div>';
+        h(b); $("#go").addEventListener("click", () => goto(4)); return;
+      }
+      b += '<p class="lead">קְרָא כָּל חֵלֶק וּלְחַץ עָלָיו. מִתְחִילִים מִיָּמִין.</p>' +
+        '<div class="syl-row"><button type="button" class="syl' + (state.syl[0] ? ' lit' : '') + '" data-s="0">טוּר</button><button type="button" class="syl' + (state.syl[1] ? ' lit' : '') + '" data-s="1">בּוֹ</button></div>';
+      if (state.syl[0] && state.syl[1]) b += '<p class="lead" style="text-align:center">עַכְשָׁו בְּיַחַד, מַהֵר!</p><div class="row" style="justify-content:center"><button class="btn" type="button" id="fire">טוּרְבּוֹ!</button></div>';
+      h(b);
+      stage.querySelectorAll(".syl").forEach(x => x.addEventListener("click", () => {
+        const k = +x.dataset.s;
+        if (k === 1 && !state.syl[0]) { chime(false); return; }
+        state.syl[k] = true; chime(true); render();
+      }));
+      const f = $("#fire"); if (f) f.addEventListener("click", () => { state.turbo = true; chime(true); burst(); render(); });
+    },
+    garage() {
+      const g = GARAGE[state.gar];
+      let b = '<div class="eyebrow">שָׁלָב 5 · מוּסַךְ הַמִּלִּים · ' + (state.gar + 1) + ' מִתּוֹךְ 3</div><h2>בְּנֵה אֶת הַמִּלָּה</h2>' +
+        '<p class="lead">מָה בַּתְּמוּנָה? לְחַץ עַל הָאוֹתִיּוֹת לְפִי הַסֵּדֶר.</p>' +
+        '<div class="garage"><div class="pic">' + PIC[g.word] + '</div><div class="slots' + (state.garWin ? ' win' : '') + '">' +
+        g.letters.map((_, k) => '<div class="s' + (state.garFill[k] ? ' full' : '') + '">' + (state.garFill[k] || '') + '</div>').join("") + '</div></div>';
+      if (state.garWin) {
+        const last = state.gar === GARAGE.length - 1;
+        b += '<div class="done-word">' + g.word + '</div><div class="row" style="justify-content:center"><button class="btn go" type="button" id="nx">' + (last ? 'לְכַרְטִיס הַגִּבּוֹר ←' : 'לַמִּלָּה הַבָּאָה ←') + '</button></div>';
+      } else {
+        const pool = shuffle("g" + state.gar, g.letters.concat(g.extra));
+        const used = state.garFill.slice();
+        b += '<div class="tiles">' + pool.map(l => { const ix = used.indexOf(l); const off = ix > -1; if (off) used[ix] = null; return '<button type="button" class="tile" data-l="' + l + '"' + (off ? ' disabled' : '') + '>' + l + '</button>'; }).join("") +
+          '</div><p class="feedback" id="fb" style="text-align:center"></p><div class="row" style="justify-content:center"><button class="btn alt" type="button" id="hint">רֶמֶז: הָאוֹת הָרִאשׁוֹנָה</button></div>';
+      }
+      h(b);
+      stage.querySelectorAll(".tile").forEach(x => x.addEventListener("click", () => {
+        const k = state.garFill.length;
+        if (x.dataset.l !== g.letters[k]) { chime(false); $("#fb").textContent = "כִּמְעַט! אֵיזֶה צְלִיל שׁוֹמְעִים?"; return; }
+        state.garFill.push(x.dataset.l); chime(true);
+        if (state.garFill.length === g.letters.length) { state.garWin = true; burst(); }
+        render();
+      }));
+      const hi = $("#hint"); if (hi) hi.addEventListener("click", () => { $("#fb").textContent = "הַמִּלָּה מַתְחִילָה בָּאוֹת " + g.letters[0]; });
+      const nx = $("#nx"); if (nx) nx.addEventListener("click", () => {
+        if (state.gar === GARAGE.length - 1) { goto(5); return; }
+        state.gar++; state.garFill = []; state.garWin = false; render();
+      });
+    },
+    card() {
+      h('<div class="eyebrow">שָׁלָב 6 · כַּרְטִיס גִּבּוֹר</div><h2>צַיֵּר אֶת הַגִּבּוֹר שֶׁלְּךָ</h2>' +
+        '<div class="hero-card"><div class="swatches" id="sw"></div><canvas id="pad" aria-label="לוח ציור"></canvas>' +
+        '<div class="row"><button class="btn alt" type="button" id="clear">מְחַק</button></div>' +
+        '<p class="lead"><b>בְּחַר שֵׁם כֹּחַ:</b> (קְרָא אֶת הַמִּלָּה וּלְחַץ)</p>' +
+        '<div class="chips">' + POWERS.map(w => '<button type="button" class="chip' + (state.power === w ? ' on' : '') + '" data-p="' + w + '" aria-pressed="' + (state.power === w) + '">' + w + '</button>').join("") + '</div>' +
+        (state.power ? '<div class="power-name">' + 'כֹּחַ ' + state.power + '!</div>' : '') +
+        '</div><div class="row"><button class="btn go" type="button" id="go"' + (state.power ? '' : ' disabled') + '>הַכַּרְטִיס מוּכָן ←</button></div>');
+      const pad = makePad($("#pad"), 7);
+      swatches($("#sw"), pad);
+      $("#clear").addEventListener("click", () => pad.clear());
+      stage.querySelectorAll(".chip").forEach(x => x.addEventListener("click", () => {
+        state.power = x.dataset.p; chime(true);
+        stage.querySelectorAll(".chip").forEach(c => { const on = c === x; c.classList.toggle("on", on); c.setAttribute("aria-pressed", on); });
+        let pn = $(".power-name"); if (!pn) { pn = document.createElement("div"); pn.className = "power-name"; $(".hero-card").appendChild(pn); }
+        pn.textContent = "כֹּחַ " + state.power + "!";
+        $("#go").disabled = false; updateFuel();
+      }));
+      $("#go").addEventListener("click", () => goto(6));
+    },
+    commander() {
+      let b = '<div class="eyebrow">שָׁלָב 7 · אַתָּה הַמְּפַקֵּד</div><h2>תֵּן פְּקֻדָּה לַמּוֹרָה!</h2>';
+      if (state.orderOn) {
+        b += '<div class="order"><div class="t">פְּקֻדָּה מֵהַמְּפַקֵּד נֹעַם</div><div class="w">' + esc(state.orderW) + '</div><div class="m">קִרְאִי אֶת הַמִּלָּה וְזוּזִי ' + esc(state.orderM) + '!</div></div>' +
+          '<p class="teacher">המורה קוראת בקול ו"טועה" במילה. התלמיד מתקן ולוחץ על "טָעִית!"</p>' +
+          '<div class="row"><button class="btn" type="button" id="fix">טָעִית! תִּקַּנְתִּי ✓</button><button class="btn alt" type="button" id="again">פְּקֻדָּה חֲדָשָׁה</button></div>' +
+          '<p class="score">תִּקּוּנִים שֶׁל הַמְּפַקֵּד: ' + state.fixes + '</p>' +
+          '<div class="row"><button class="btn go" type="button" id="go">לָרִשְׁיוֹן ←</button></div>';
+      } else {
+        b += '<p class="lead">1. בְּחַר מִלָּה (אֶת הַמָּקוֹם אוֹ הַדָּבָר):</p><div class="chips">' +
+          ORDERS_W.map(w => '<button type="button" class="chip' + (state.orderW === w ? ' on' : '') + '" data-w="' + w + '">' + PIC[w] + w + '</button>').join("") + '</div>' +
+          '<p class="lead">2. אֵיךְ הַמּוֹרָה תָּזוּז?</p><div class="chips">' +
+          ORDERS_M.map(m => '<button type="button" class="chip' + (state.orderM === m ? ' on' : '') + '" data-m="' + m + '">' + m + '</button>').join("") + '</div>' +
+          '<div class="row"><button class="btn go" type="button" id="send"' + (state.orderW && state.orderM ? '' : ' disabled') + '>שְׁלַח פְּקֻדָּה ←</button></div>' +
+          (state.fixes ? '<p class="score">תִּקּוּנִים שֶׁל הַמְּפַקֵּד: ' + state.fixes + '</p>' : '');
+      }
+      h(b);
+      stage.querySelectorAll(".chip[data-w]").forEach(x => x.addEventListener("click", () => { state.orderW = x.dataset.w; chime(true); render(); }));
+      stage.querySelectorAll(".chip[data-m]").forEach(x => x.addEventListener("click", () => { state.orderM = x.dataset.m; chime(true); render(); }));
+      const s = $("#send"); if (s) s.addEventListener("click", () => { state.orderOn = true; chime(true); render(); });
+      const f = $("#fix"); if (f) f.addEventListener("click", () => { state.fixes++; chime(true); burst(); render(); });
+      const a = $("#again"); if (a) a.addEventListener("click", () => { state.orderOn = false; state.orderW = ""; state.orderM = ""; render(); });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(7));
+    },
+    license() {
+      let b = '<div class="eyebrow">שָׁלָב 8 · נְחִיתָה</div>';
+      if (!state.powerEnd) {
+        b += '<h2>מַד הַכֹּחַ – עַכְשָׁו</h2><p class="lead">אַחֲרֵי הַמְּשִׂימָה, כַּמָּה כֹּחַ יֵשׁ לְךָ לִקְרֹא?</p>' + meter("powerEnd");
+        h(b); bindMeter("powerEnd", burst); return;
+      }
+      const hero = HEROES[state.hero] || HEROES.rocket;
+      b += '<div class="license"><div class="avatar">' + hero.svg + '</div><h3>רִשְׁיוֹן ' + hero.title + ' חָלָל</h3><p>מוּעָנָק לַגִּבּוֹר</p><div class="name">נֹעַם</div>' +
+        '<p>עַל שֶׁקָּרָא מִלִּים, בָּנָה מִלִּים<br>וְהִפְעִיל אֶת קוֹד הַטּוּרְבּוֹ!</p>' +
+        '<div class="stats"><div><b>' + state.crystals + '</b>גְּבִישִׁים</div><div><b>' + (state.powerStart || "-") + ' ← ' + state.powerEnd + '</b>מַד כֹּחַ</div><div><b>' + state.fixes + '</b>תִּקּוּנִים</div></div>' +
+        (state.power ? '<p>שֵׁם הַכֹּחַ: <b>' + state.power + '</b></p>' : '') +
+        '</div><div class="row" style="justify-content:center"><button class="btn alt" type="button" id="redo">לְשַׁנּוֹת אֶת הַמַּד</button><button class="btn" type="button" id="party">עוֹד זִקּוּקִים!</button></div>';
+      h(b);
+      $("#redo").addEventListener("click", () => { state.powerEnd = 0; render(); });
+      $("#party").addEventListener("click", () => { chime(true); burst(); });
+    }
+  };
+
+  function makePad(canvas, width) {
+    const ctx = canvas.getContext("2d");
+    let color = "#FFC83D", drawing = false, last = null;
+    const r = canvas.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(r.width * d)); canvas.height = Math.max(1, Math.round(r.height * d)); ctx.setTransform(d, 0, 0, d, 0, 0);
+    const pt = (e) => { const b = canvas.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+    const style = () => { ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width; ctx.lineCap = "round"; ctx.lineJoin = "round"; };
+    canvas.addEventListener("pointerdown", e => { drawing = true; last = pt(e); try { canvas.setPointerCapture(e.pointerId); } catch (x) {} style(); ctx.beginPath(); ctx.arc(last.x, last.y, width / 2, 0, 7); ctx.fill(); });
+    canvas.addEventListener("pointermove", e => { if (!drawing) return; const p = pt(e); style(); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => canvas.addEventListener(t, () => { drawing = false; }));
+    return { setColor(c) { color = c; }, clear() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore(); } };
+  }
+  function swatches(el, pad) {
+    const cols = ["#FFC83D", "#FF8A3D", "#FF6FA5", "#4FD1E8", "#6EE7A8", "#F4F6FF"];
+    const names = ["צהוב", "כתום", "ורוד", "תכלת", "ירוק", "לבן"];
+    el.innerHTML = cols.map((c, i) => '<button type="button" class="swatch' + (i === 0 ? ' on' : '') + '" style="background:' + c + '" data-c="' + c + '" aria-label="' + names[i] + '"></button>').join("");
+    el.querySelectorAll(".swatch").forEach(b => b.addEventListener("click", () => { el.querySelectorAll(".swatch").forEach(x => x.classList.remove("on")); b.classList.add("on"); pad.setColor(b.dataset.c); }));
+  }
+
+  /* confetti */
+  const cf = $("#confetti"), cx = cf.getContext("2d");
+  let parts = [], raf = 0;
+  function burst() {
+    if (reduced) return;
+    const d = window.devicePixelRatio || 1;
+    cf.width = innerWidth * d; cf.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0);
+    const cols = ["#FFC83D", "#FF8A3D", "#FF6FA5", "#4FD1E8", "#6EE7A8"];
+    for (let i = 0; i < 130; i++) parts.push({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 12, vy: Math.random() * -12 - 3, r: Math.random() * 6 + 4, c: cols[i % 5], a: Math.random() * 6, life: 0 });
+    if (!raf) tick();
+  }
+  function tick() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => { p.vy += .35; p.x += p.vx; p.y += p.vy; p.a += .2; p.life++; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.a); cx.fillStyle = p.c; cx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); cx.restore(); });
+    parts = parts.filter(p => p.y < innerHeight + 20 && p.life < 240);
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  /* power breaks */
+  let timer = 0;
+  function updateBoost() {
+    $("#boostTxt").textContent = state.breaks ? "הַפְסָקַת כֹּחַ · " + state.breaks : "נִגְמְרוּ הַהַפְסָקוֹת";
+    $("#boost").disabled = state.breaks === 0;
+  }
+  $("#boost").addEventListener("click", () => {
+    if (!state.breaks) return;
+    state.breaks--; updateBoost(); chime(true);
+    $("#breakAct").textContent = BREAKS[(2 - state.breaks) % BREAKS.length];
+    let left = 30; $("#count").textContent = left; $("#overlay").hidden = false; $("#endBreak").focus();
+    clearInterval(timer);
+    timer = setInterval(() => { left--; $("#count").textContent = Math.max(0, left); if (left <= 0) { clearInterval(timer); chime(true); } }, 1000);
+  });
+  $("#endBreak").addEventListener("click", () => { clearInterval(timer); $("#overlay").hidden = true; });
+
+  function updateFuel() { $("#fuelbar").style.width = fuelPct() + "%"; }
+  function goto(n) { state.step = Math.max(0, Math.min(STEPS.length - 1, n)); render(); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); }
+  function render() {
+    const r = $("#route");
+    r.innerHTML = STEPS.map((s, i) => (i ? '<span class="path" aria-hidden="true"></span>' : '') +
+      '<button type="button" class="stop' + (i < state.step ? ' done' : '') + (i === state.step ? ' now' : '') + '" data-i="' + i + '" aria-label="שלב ' + (i + 1) + '"' + (i === state.step ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>').join("");
+    r.querySelectorAll(".stop").forEach(b => b.addEventListener("click", () => goto(+b.dataset.i)));
+    $("#avatar").innerHTML = '<span class="avatar" style="display:block">' + (HEROES[state.hero] || HEROES.rocket).svg + '</span>';
+    VIEWS[STEPS[state.step]]();
+    $("#prev").disabled = state.step === 0;
+    $("#next").disabled = state.step === STEPS.length - 1;
+    updateFuel(); updateBoost();
+  }
+  $("#prev").addEventListener("click", () => goto(state.step - 1));
+  $("#next").addEventListener("click", () => goto(state.step + 1));
+  render();
+})();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

@@ -1,0 +1,618 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>משלחת הדינוזאורים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Varela+Round&family=Rubik:wght@700;800&display=swap">
+<style>
+/* Layout: a daylight jungle "field journal" — one stage card at a time under a footprint trail; deliberately one bright look */
+:root {
+  --jungle: #DCEFD2;     /* page ground */
+  --paper: #FFFFFF;      /* card */
+  --sand: #FFF3D6;       /* tiles, word cards */
+  --ink: #233522;        /* text + outlines */
+  --ink-soft: #5D7258;
+  --leaf: #3FA34D;
+  --leaf-dark: #2B7A37;
+  --lava: #FF7A2F;
+  --sun: #FFC53D;
+  --sky: #47B6D6;
+  --berry: #E5487A;
+  --line: #B9D6AE;
+  --display: "Secular One", "Rubik", "Arial Hebrew", sans-serif;
+  --body: "Varela Round", "Rubik", "Arial Hebrew", sans-serif;
+  --num: "Rubik", "Arial", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background-color: var(--jungle);
+  background-image:
+    radial-gradient(ellipse 60px 26px at 8% 12%, #C6E5B8 60%, transparent 61%),
+    radial-gradient(ellipse 80px 30px at 92% 30%, #C6E5B8 60%, transparent 61%),
+    radial-gradient(ellipse 70px 28px at 14% 70%, #C6E5B8 60%, transparent 61%),
+    radial-gradient(ellipse 90px 32px at 86% 88%, #C6E5B8 60%, transparent 61%);
+  background-attachment: fixed;
+  color: var(--ink); font-family: var(--body); font-size: 18px; direction: rtl;
+}
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+header { display: flex; flex-direction: column; gap: 12px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand h1 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 5.4vw, 32px); margin: 0; text-wrap: balance; color: var(--leaf-dark); }
+.brand .avatar { width: 50px; height: 50px; flex: none; display: block; }
+.roar { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-size: 17px; background: var(--lava); color: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; box-shadow: 0 4px 0 var(--ink); }
+.roar:disabled { opacity: .45; cursor: default; }
+
+.trail { display: flex; align-items: center; gap: 8px; }
+.trail .lbl { font-family: var(--display); font-size: 15px; color: var(--ink-soft); flex: none; }
+.bones { display: flex; gap: 6px; flex-wrap: wrap; }
+.bones svg { width: 34px; height: 20px; }
+
+.route { display: flex; align-items: center; padding: 4px 2px; overflow-x: auto; }
+.route .stop { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); font-family: var(--num); font-weight: 800; font-size: 15px; display: grid; place-items: center; cursor: pointer; color: var(--ink); padding: 0; }
+.route .stop.done { background: var(--leaf); color: #fff; border-color: var(--leaf-dark); }
+.route .stop.now { background: var(--sun); transform: scale(1.15); }
+.route .path { flex: 1 1 14px; min-width: 10px; height: 0; border-top: 3px dashed var(--ink-soft); }
+
+.stage { background: var(--paper); border: 3px solid var(--ink); border-radius: 28px; padding: clamp(18px, 4vw, 30px); box-shadow: 0 7px 0 var(--ink); display: flex; flex-direction: column; gap: 18px; min-height: 440px; }
+.stage h2 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 6.4vw, 38px); margin: 0; text-wrap: balance; }
+.lead { font-size: clamp(19px, 4.4vw, 22px); line-height: 1.8; margin: 0; }
+.eyebrow { font-family: var(--display); font-size: 15px; letter-spacing: .03em; color: var(--leaf-dark); }
+.teacher { font-size: 14px; color: var(--ink-soft); border-inline-start: 3px solid var(--line); padding-inline-start: 10px; margin: 0; }
+
+.btn { font-family: var(--display); font-weight: 400; font-size: 21px; border: 3px solid var(--ink); border-radius: 16px; padding: 11px 22px; background: var(--sun); color: var(--ink); cursor: pointer; box-shadow: 0 5px 0 var(--ink); transition: transform .08s; }
+.btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+.btn.alt { background: var(--paper); }
+.btn.go { background: var(--leaf); color: #fff; }
+.btn:disabled { opacity: .4; cursor: default; }
+button:focus-visible, summary:focus-visible { outline: 4px solid var(--sky); outline-offset: 3px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.center { justify-content: center; }
+nav.bottom { display: flex; justify-content: space-between; gap: 12px; }
+nav.bottom .btn { font-size: 17px; padding: 9px 18px; }
+.feedback { font-family: var(--display); font-size: 22px; min-height: 1.4em; margin: 0; color: var(--lava); }
+
+/* pick partner */
+.pick3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.card-btn { border: 3px solid var(--ink); border-radius: 20px; background: var(--sand); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; color: var(--ink); font-family: var(--display); font-size: clamp(15px, 3.8vw, 19px); min-width: 0; text-align: center; }
+.card-btn svg { width: 100%; max-width: 110px; height: auto; }
+.card-btn.on { background: #FFE39A; transform: translateY(-4px); box-shadow: 0 6px 0 var(--ink); }
+
+/* roar meter */
+.meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.cell { border: 3px solid var(--ink); border-radius: 18px; background: var(--paper); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; color: var(--ink); font-size: 14px; min-width: 0; }
+.cell .n { font-family: var(--num); font-weight: 800; font-size: 22px; }
+.cell .prints { display: flex; flex-wrap: wrap; justify-content: center; gap: 1px; min-height: 30px; }
+.cell .prints svg { width: 14px; height: 14px; }
+.cell.on { background: #FFE39A; transform: translateY(-4px); }
+@media (max-width: 460px) { .cell .t { font-size: 12px; } }
+
+/* egg */
+.egg-wrap { display: grid; place-items: center; }
+.egg { border: 0; background: none; cursor: pointer; padding: 0; width: min(240px, 70%); }
+.egg svg { width: 100%; height: auto; display: block; }
+.egg.shake { animation: shake .4s; }
+.syl-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.syl { font-family: var(--display); font-size: clamp(56px, 15vw, 86px); line-height: 1.1; padding: 8px 26px; border-radius: 22px; border: 4px solid var(--ink); background: var(--sand); color: var(--ink); box-shadow: 0 6px 0 var(--ink); }
+.syl.new { animation: pop .5s; }
+.big-say { text-align: center; font-family: var(--display); font-size: clamp(56px, 16vw, 92px); color: var(--lava); animation: pop .6s; }
+.msg { border: 3px dashed var(--leaf); border-radius: 22px; padding: 16px 20px; background: #F1F9EC; font-size: clamp(21px, 4.8vw, 25px); line-height: 1.95; }
+
+/* footprints */
+.station { display: flex; align-items: center; gap: 12px; }
+.station svg { width: 56px; height: 56px; flex: none; }
+.who { display: flex; gap: 10px; flex-wrap: wrap; }
+.who button { font-family: var(--display); font-size: 18px; border: 3px solid var(--ink); border-radius: 999px; padding: 7px 16px; background: var(--paper); color: var(--ink); cursor: pointer; }
+.word-card { align-self: center; font-family: var(--display); font-size: clamp(66px, 18vw, 104px); line-height: 1.15; background: var(--sand); color: var(--ink); border-radius: 26px; padding: 10px 42px; border: 5px solid var(--lava); box-shadow: 0 7px 0 var(--ink); text-align: center; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.opt { border: 3px solid var(--ink); border-radius: 20px; background: var(--paper); padding: 12px 6px; cursor: pointer; display: grid; place-items: center; min-width: 0; }
+.opt svg { width: 100%; max-width: 100px; height: auto; }
+.opt.wrong { animation: shake .45s; background: #FFEDEA; }
+.opt.right { background: #E2F4DD; border-color: var(--leaf); }
+.move { background: #F1F9EC; border: 3px solid var(--leaf); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.move .big { font-family: var(--display); font-size: clamp(24px, 5.6vw, 30px); color: var(--leaf-dark); }
+.move .act { font-size: clamp(21px, 4.8vw, 25px); line-height: 1.7; }
+.move .pose { width: 90px; height: 90px; }
+
+/* feeding */
+.feed-word { align-self: center; font-family: var(--display); font-size: clamp(58px, 16vw, 90px); background: var(--sand); border: 5px solid var(--sun); border-radius: 24px; padding: 6px 38px; box-shadow: 0 6px 0 var(--ink); }
+.mouths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.mouth { border: 3px solid var(--ink); border-radius: 22px; background: var(--paper); padding: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: var(--display); font-size: 18px; color: var(--ink); min-width: 0; }
+.mouth svg { width: 100%; max-width: 140px; height: auto; }
+.mouth .belly { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; min-height: 34px; }
+.mouth .belly span { font-size: 16px; background: var(--sand); border: 2px solid var(--line); border-radius: 10px; padding: 2px 8px; }
+.mouth.wrong { animation: shake .45s; }
+.mouth.yum { background: #E2F4DD; }
+
+/* builder */
+.builder { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.builder .pic { width: 130px; height: 130px; background: var(--sand); border-radius: 24px; border: 3px solid var(--ink); display: grid; place-items: center; }
+.builder .pic svg { width: 100px; height: 100px; }
+.slots { display: flex; gap: 10px; }
+.slots .s { width: clamp(62px, 17vw, 84px); height: clamp(74px, 20vw, 98px); border: 4px dashed var(--ink-soft); border-radius: 18px; background: #F4F9F1; display: grid; place-items: center; font-family: var(--display); font-size: clamp(42px, 11vw, 58px); }
+.slots .s.full { border-style: solid; border-color: var(--ink); background: var(--sand); }
+.slots.win .s { border-color: var(--leaf); background: #E2F4DD; animation: pop .5s; }
+.tiles { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.tile { width: clamp(62px, 16vw, 80px); height: clamp(62px, 16vw, 80px); border: 4px solid var(--ink); border-radius: 18px; background: var(--paper); color: var(--ink); font-family: var(--display); font-size: clamp(36px, 9vw, 48px); cursor: pointer; box-shadow: 0 5px 0 var(--ink); }
+.tile[disabled] { visibility: hidden; }
+.done-word { text-align: center; font-family: var(--display); font-size: clamp(42px, 11vw, 60px); color: var(--leaf-dark); }
+
+/* museum card */
+.museum { border: 4px solid var(--ink); border-radius: 22px; padding: 14px; background: var(--sand); display: flex; flex-direction: column; gap: 12px; }
+.pad-wrap { position: relative; border: 3px solid var(--ink); border-radius: 16px; overflow: hidden; background: #fff; }
+.pad-wrap canvas { display: block; width: 100%; touch-action: none; cursor: crosshair; }
+.pad-wrap.draw canvas { height: 230px; }
+.pad-wrap.trace canvas { height: 200px; }
+.ghost { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(80px, 22vw, 140px); color: #E7E1CF; pointer-events: none; -webkit-text-stroke: 2px #C9BE9C; }
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); cursor: pointer; }
+.swatch.on { box-shadow: 0 0 0 4px var(--sand), 0 0 0 7px var(--ink); }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.chip { border: 3px solid var(--ink); border-radius: 999px; padding: 8px 18px; background: var(--paper); font-family: var(--display); font-size: 22px; cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
+.chip svg { width: 32px; height: 32px; }
+.chip.on { background: var(--sun); }
+
+/* commander */
+.order { border: 4px solid var(--lava); background: #FFF4EC; border-radius: 22px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; animation: pop .5s; }
+.order .t { font-family: var(--display); color: var(--lava); font-size: 20px; }
+.order .w { font-family: var(--display); font-size: clamp(54px, 15vw, 80px); background: var(--paper); border: 3px solid var(--ink); border-radius: 20px; padding: 2px 30px; }
+.order .m { font-size: clamp(21px, 5vw, 26px); }
+.score { font-family: var(--display); font-size: 20px; color: var(--leaf-dark); margin: 0; }
+
+/* certificate */
+.cert { border: 6px solid var(--leaf); border-radius: 28px; background: #F6FBF2; padding: 24px 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.cert h3 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 6.6vw, 36px); margin: 0; color: var(--leaf-dark); }
+.cert .name { font-family: var(--display); font-size: clamp(52px, 14vw, 74px); color: var(--lava); line-height: 1.1; }
+.cert .avatar { width: 120px; height: 120px; }
+.cert p { font-size: 20px; line-height: 1.8; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 480px; }
+.stats div { background: var(--paper); border: 2px solid var(--line); border-radius: 14px; padding: 8px 4px; font-size: 15px; color: var(--ink-soft); }
+.stats b { display: block; font-family: var(--num); font-weight: 800; font-size: 26px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* roar break */
+.overlay { position: fixed; inset: 0; background: #233522D9; display: grid; place-items: center; padding: 16px; z-index: 5; }
+.overlay .box { background: var(--paper); border: 4px solid var(--lava); border-radius: 26px; padding: 26px; max-width: 420px; width: 100%; text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.overlay .count { font-family: var(--num); font-weight: 800; font-size: 76px; color: var(--lava); font-variant-numeric: tabular-nums; line-height: 1; }
+.overlay .act { font-size: 24px; line-height: 1.7; }
+
+details.guide { background: var(--paper); border: 2px solid var(--line); border-radius: 18px; padding: 12px 16px; }
+details.guide summary { font-family: var(--display); font-size: 18px; cursor: pointer; color: var(--leaf-dark); }
+.guide .tbl { overflow-x: auto; margin-top: 10px; }
+.guide table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.guide th, .guide td { border-bottom: 1px solid var(--line); padding: 7px 6px; text-align: right; vertical-align: top; }
+.guide th { color: var(--leaf-dark); font-family: var(--display); font-weight: 400; }
+.guide td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.guide ul { margin: 10px 0 0 0; padding-inline-start: 20px; line-height: 1.8; font-size: 15px; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; width: 100%; height: 100%; z-index: 6; }
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes shake { 0%,100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-7px) rotate(-3deg); } 75% { transform: translateX(7px) rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="topbar">
+      <div class="brand"><span id="avatar"></span><h1>מִשְׁלַחַת הַדִּינוֹזָאוּרִים שֶׁל נֹעַם</h1></div>
+      <button type="button" class="roar" id="roar"><span id="roarTxt">הַפְסָקַת שְׁאָגָה · 3</span></button>
+    </div>
+    <div class="trail"><span class="lbl">עֲצָמוֹת:</span><div class="bones" id="bones"></div></div>
+    <div class="route" id="route" aria-label="שלבי השיעור"></div>
+  </header>
+  <main class="stage" id="stage" aria-live="polite"></main>
+  <nav class="bottom">
+    <button class="btn alt" id="prev" type="button">→ הַקּוֹדֵם</button>
+    <button class="btn alt" id="next" type="button">הַבָּא ←</button>
+  </nav>
+  <details class="guide">
+    <summary>למורה: מהלך השיעור (45 דק')</summary>
+    <div class="tbl"><table>
+      <thead><tr><th>זמן</th><th>שלב</th><th>מה קורה</th></tr></thead>
+      <tbody>
+        <tr><td>0–4</td><td>בוחרים שותף</td><td>בלי קריאה. התלמיד בוחר דינוזאור שותף ומסמן במד השאגה כמה הוא מוכן לקרוא.</td></tr>
+        <tr><td>4–9</td><td>הביצה המסתורית</td><td>המורה מקריאה את ההודעה. כל לחיצה סודקת את הביצה ומגלה הברה: דִּי + נוֹ. התלמיד קורא, הביצה בוקעת והוא שואג.</td></tr>
+        <tr><td>9–21</td><td>5 תחנות עקבות</td><td>מילה קצרה עם ניקוד ובחירת תמונה, ואחריה תנועת דינוזאור. כל תחנה נותנת עצם. התלמיד בוחר מי קורא ראשון.</td></tr>
+        <tr><td>21–27</td><td>מאכילים דינוזאורים</td><td>קורא מילת אוכל ומחליט מי אוכל אותה: אוכל הצמחים או הטי-רקס. זה גם תרגול של הבנת הנקרא.</td></tr>
+        <tr><td>27–32</td><td>בונים מילים מעצמות</td><td>בונה מילים מאותיות לפי תמונה: שֵׁן, עֵץ, זָנָב.</td></tr>
+        <tr><td>32–38</td><td>כרטיס מוזיאון</td><td>מצייר דינוזאור, בוחר לו שם ועובר באצבע על השם. זה החלק של הכתיבה.</td></tr>
+        <tr><td>38–42</td><td>אתה הטי-רקס הראשי</td><td>התלמיד נותן פקודה למורה. המורה טועה בכוונה, ונעם מתקן.</td></tr>
+        <tr><td>42–45</td><td>תעודת חוקר</td><td>מד שאגה שוב, ותעודה עם הנתונים של השיעור.</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>הפסקות שאגה: 3 בלבד, 30 שניות כל אחת. במקום ויכוח: "רוצה להשתמש בהפסקת שאגה?"</li>
+      <li>התנגדות להתחלה: המורה קוראת ראשונה ונעם אחריה. המשימה תמיד מילה אחת בלבד.</li>
+      <li>ויכוח: לא נכנסים לדיון. נותנים שתי אפשרויות שתיהן מקובלות ("לקרוא עכשיו או אחרי הקפיצה?").</li>
+      <li>טעות בקריאה: "כמעט! בוא נקרא יחד", בלי תיקון של כל מילה.</li>
+    </ul>
+  </details>
+</div>
+<div class="overlay" id="overlay" hidden>
+  <div class="box">
+    <div class="eyebrow">הַפְסָקַת שְׁאָגָה</div>
+    <div class="count" id="count">30</div>
+    <div class="act" id="breakAct">שְׁאַג כְּמוֹ טִי-רֶקְס!</div>
+    <button class="btn go" type="button" id="endBreak">חוֹזְרִים לַמִּשְׁלַחַת ←</button>
+  </div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  "use strict";
+  const S = (inner, vb) => '<svg viewBox="' + (vb || "0 0 100 100") + '" aria-hidden="true">' + inner + '</svg>';
+  const K = 'stroke="#233522" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
+
+  /* dinosaurs */
+  const DINO = {
+    rex: { name: "טִי-רֶקְס", svg: S('<path d="M16 72 C16 50 32 42 48 44 L58 20 C62 10 84 10 86 24 C88 34 78 38 70 36 L66 50 C76 56 80 68 78 80 H64 L62 72 H40 L38 80 H24 Z" fill="#FF7A2F" ' + K + '/><circle cx="76" cy="22" r="3.5" fill="#233522"/><path d="M72 32 L84 30" ' + K + ' fill="none"/><path d="M16 72 L4 62" ' + K + ' fill="none"/><path d="M60 52 L68 58" ' + K + ' fill="none"/>') },
+    neck: { name: "צַוָּארוֹן", svg: S('<path d="M14 74 C14 56 30 50 46 50 L60 50 L66 18 C68 8 84 8 86 16 C88 22 80 26 74 24 L72 54 C80 60 82 70 80 80 H68 L66 74 H34 L32 80 H20 Z" fill="#3FA34D" ' + K + '/><circle cx="80" cy="15" r="3" fill="#233522"/><path d="M14 74 L2 80" ' + K + ' fill="none"/><circle cx="40" cy="60" r="4" fill="#2B7A37"/><circle cx="54" cy="62" r="3" fill="#2B7A37"/>') },
+    tri: { name: "שְׁלוֹשׁ-קַרְנַיִם", svg: S('<path d="M10 70 C10 52 26 44 44 44 H62 C66 34 76 28 86 32 C92 40 92 52 86 60 L80 64 L78 80 H66 L64 72 H34 L32 80 H20 Z" fill="#47B6D6" ' + K + '/><path d="M62 44 C60 30 70 22 80 22 C78 30 74 36 70 40" fill="#FFC53D" ' + K + '/><path d="M86 40 L98 34" ' + K + ' fill="none"/><path d="M78 30 L84 18" ' + K + ' fill="none"/><circle cx="80" cy="44" r="3.5" fill="#233522"/><path d="M10 70 L2 62" ' + K + ' fill="none"/>') }
+  };
+  /* pictures */
+  const PIC = {
+    "שֵׁן": S('<path d="M26 16 C40 10 60 10 74 16 C84 22 82 40 76 54 C72 66 70 88 62 88 C54 88 56 66 50 66 C44 66 46 88 38 88 C30 88 28 66 24 54 C18 40 16 22 26 16 Z" fill="#FFFFFF" ' + K + '/>'),
+    "עֵץ": S('<rect x="42" y="56" width="16" height="36" rx="3" fill="#B07A4A" ' + K + '/><circle cx="50" cy="38" r="28" fill="#3FA34D" ' + K + '/>'),
+    "עָלֶה": S('<path d="M18 82 C18 40 46 14 86 14 C86 54 60 82 18 82 Z" fill="#7CCB5E" ' + K + '/><path d="M18 82 L70 30" ' + K + ' fill="none"/>'),
+    "זָנָב": S('<path d="M90 30 C70 30 60 40 54 56 C48 72 34 84 10 86 C30 76 36 62 40 50 C46 32 62 18 90 18 Z" fill="#FF7A2F" ' + K + '/><path d="M70 22 L74 14 M58 30 L60 20 M48 42 L46 32" ' + K + ' fill="none"/>'),
+    "בֵּיצָה": S('<path d="M50 8 C72 8 86 42 86 60 C86 80 70 92 50 92 C30 92 14 80 14 60 C14 42 28 8 50 8 Z" fill="#FFF3D6" ' + K + '/><circle cx="38" cy="44" r="6" fill="#47B6D6"/><circle cx="60" cy="64" r="8" fill="#47B6D6"/><circle cx="62" cy="34" r="4" fill="#47B6D6"/>'),
+    "אֶבֶן": S('<path d="M12 74 C10 56 24 36 44 32 C62 28 84 40 88 58 C92 76 76 84 50 84 C28 84 14 84 12 74 Z" fill="#A9B3A4" ' + K + '/><path d="M40 52 C46 48 52 50 56 46" ' + K + ' fill="none"/>'),
+    "הַר": S('<path d="M6 88 L40 22 L58 50 L68 36 L94 88 Z" fill="#8BA27F" ' + K + '/><path d="M32 38 L40 22 L48 38 L42 34 Z" fill="#FFFFFF" ' + K + '/>'),
+    "מַיִם": S('<path d="M50 8 C62 30 78 46 78 64 C78 80 66 92 50 92 C34 92 22 80 22 64 C22 46 38 30 50 8 Z" fill="#47B6D6" ' + K + '/><path d="M36 66 C36 76 42 80 48 80" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>'),
+    "עֵשֶׂב": S('<path d="M10 88 L22 40 L30 88 M30 88 L40 24 L50 88 M50 88 L60 34 L68 88 M68 88 L80 44 L90 88" fill="#7CCB5E" ' + K + '/><line x1="6" y1="88" x2="94" y2="88" ' + K + '/>'),
+    "פְּרִי": S('<path d="M50 30 C70 20 90 34 86 58 C82 82 62 92 50 84 C38 92 18 82 14 58 C10 34 30 20 50 30 Z" fill="#E5487A" ' + K + '/><path d="M50 30 C50 20 54 14 60 10" ' + K + ' fill="none"/><path d="M54 18 C64 12 74 14 78 20 C68 24 60 24 54 18 Z" fill="#3FA34D" ' + K + '/>'),
+    "בָּשָׂר": S('<path d="M30 70 C14 62 14 34 34 22 C54 10 82 22 82 44 C82 66 58 76 44 70 Z" fill="#E86A4A" ' + K + '/><path d="M44 70 L30 84" ' + K + ' fill="none"/><circle cx="26" cy="88" r="7" fill="#FFFFFF" ' + K + '/><circle cx="20" cy="80" r="6" fill="#FFFFFF" ' + K + '/>'),
+    "דָּג": S('<path d="M14 50 C30 28 62 28 76 50 C62 72 30 72 14 50 Z" fill="#47B6D6" ' + K + '/><path d="M76 50 L94 34 L94 66 Z" fill="#47B6D6" ' + K + '/><circle cx="30" cy="46" r="4" fill="#233522"/>')
+  };
+  const FOOT = (c) => S('<ellipse cx="50" cy="64" rx="20" ry="22" fill="' + c + '"/><ellipse cx="26" cy="30" rx="9" ry="14" fill="' + c + '" transform="rotate(-25 26 30)"/><ellipse cx="50" cy="20" rx="9" ry="15" fill="' + c + '"/><ellipse cx="74" cy="30" rx="9" ry="14" fill="' + c + '" transform="rotate(25 74 30)"/>');
+  const BONE = (on) => '<svg viewBox="0 0 68 40" aria-hidden="true"><path d="M14 8 C6 6 2 16 8 20 C2 24 6 34 14 32 C18 30 20 26 22 24 H46 C48 26 50 30 54 32 C62 34 66 24 60 20 C66 16 62 6 54 8 C50 10 48 14 46 16 H22 C20 14 18 10 14 8 Z" fill="' + (on ? '#FFFFFF' : 'none') + '" stroke="' + (on ? '#233522' : '#9FBF94') + '" stroke-width="3.5" stroke-linejoin="round"/></svg>';
+  const EGG = (cracks) => {
+    const lines = [
+      '<path d="M30 70 L40 62 L36 54 L46 48" fill="none" ' + K + '/>',
+      '<path d="M62 40 L70 48 L64 56 L74 62" fill="none" ' + K + '/>',
+      '<path d="M44 24 L52 32 L48 38 L58 42" fill="none" ' + K + '/>'
+    ];
+    return S('<path d="M50 6 C74 6 90 44 90 64 C90 84 72 96 50 96 C28 96 10 84 10 64 C10 44 26 6 50 6 Z" fill="#FFF3D6" ' + K + '/><circle cx="34" cy="40" r="6" fill="#3FA34D"/><circle cx="66" cy="74" r="8" fill="#3FA34D"/><circle cx="64" cy="26" r="4" fill="#3FA34D"/><circle cx="28" cy="78" r="5" fill="#3FA34D"/>' + lines.slice(0, cracks).join(""));
+  };
+  const BABY = S('<path d="M10 92 C22 70 30 66 34 70 C40 60 52 60 56 70 C62 62 74 66 90 92 Z" fill="#FFF3D6" ' + K + '/><path d="M30 76 C30 52 42 40 56 40 L60 22 C62 12 80 12 82 24 C84 32 76 36 70 34 L66 48 C72 54 72 66 70 76 Z" fill="#FF7A2F" ' + K + '/><circle cx="74" cy="22" r="3.5" fill="#233522"/>');
+
+  const STATIONS = [
+    { word: "שֵׁן", decoys: ["עָלֶה", "אֶבֶן"], color: "#FF7A2F", move: "שְׁאַג 3 פְּעָמִים כְּמוֹ טִי-רֶקְס!", dino: "rex" },
+    { word: "עֵץ", decoys: ["הַר", "מַיִם"], color: "#3FA34D", move: "מְתַח צַוָּאר אָרֹךְ וְאֱכֹל מֵהָעֵץ – עַל קְצוֹת הָאֶצְבָּעוֹת!", dino: "neck" },
+    { word: "עָלֶה", decoys: ["שֵׁן", "בֵּיצָה"], color: "#7CCB5E", move: "צְעַד 5 צְעָדִים כְּבֵדִים כְּמוֹ דִּינוֹזָאוּר עֲנָק!", dino: "neck" },
+    { word: "זָנָב", decoys: ["עֵץ", "אֶבֶן"], color: "#47B6D6", move: "נַעְנֵעַ זָנָב – יָמִינָה וּשְׂמֹאלָה 5 פְּעָמִים!", dino: "tri" },
+    { word: "בֵּיצָה", decoys: ["מַיִם", "הַר"], color: "#E5487A", move: "הִתְכַּרְבֵּל כְּמוֹ בֵּיצָה – וּקְפֹץ הַחוּצָה!", dino: "rex" }
+  ];
+  const FOODS = [["עָלֶה", "neck"], ["בָּשָׂר", "rex"], ["עֵשֶׂב", "neck"], ["דָּג", "rex"], ["פְּרִי", "neck"]];
+  const BUILD = [
+    { word: "שֵׁן", letters: ["ש", "ן"], extra: ["ג", "ל"] },
+    { word: "עֵץ", letters: ["ע", "ץ"], extra: ["ב", "ד"] },
+    { word: "זָנָב", letters: ["ז", "נ", "ב"], extra: ["מ", "ר"] }
+  ];
+  const NAMES = ["רֶקְס", "דִּינִי", "גּוּגוּ"];
+  const BREAKS = ["שְׁאַג כְּמוֹ טִי-רֶקְס!", "קְפֹץ כְּמוֹ רַפְּטוֹר מָהִיר!", "פְּרֹשׂ כְּנָפַיִם כְּמוֹ פְּטֵרוֹדַקְטִיל!"];
+  const ORDER_W = ["שֵׁן", "עֵץ", "עָלֶה", "אֶבֶן", "בֵּיצָה", "מַיִם"];
+  const ORDER_M = ["כְּמוֹ טִי-רֶקְס", "כְּמוֹ פְּטֵרוֹדַקְטִיל", "כְּמוֹ דִּינוֹ קָטָן"];
+
+  const state = {
+    step: 0, partner: "", roarStart: 0, roarEnd: 0,
+    cracks: 0, hatched: false, saidDino: false,
+    st: 0, who: "", solved: false, moved: false, bones: 0,
+    food: 0, fed: { neck: [], rex: [] }, foodDone: false,
+    b: 0, fill: [], bWin: false,
+    dname: "", traced: false,
+    orderW: "", orderM: "", orderOn: false, fixes: 0,
+    breaks: 3
+  };
+  const STEPS = ["partner", "egg", "tracks", "feed", "build", "museum", "commander", "cert"];
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let audio = null;
+  function chime(good) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const notes = good ? [392, 523, 659, 784] : [220, 196];
+      notes.forEach((f, i) => {
+        const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * 0.09;
+        o.type = "triangle"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+        o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.26);
+      });
+    } catch (e) { /* optional */ }
+  }
+  function roarSound() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+      o.type = "sawtooth"; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(60, t + 0.8);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.2, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+      o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.95);
+    } catch (e) { /* optional */ }
+  }
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const stage = $("#stage");
+  const h = (x) => { stage.innerHTML = x; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const memo = {};
+  const shuffle = (key, arr) => memo[key] || (memo[key] = arr.slice().sort(() => Math.random() - 0.5));
+
+  function meter(key) {
+    const t = ["לְחִישָׁה", "קְצָת", "בְּאֶמְצַע", "חָזָק", "שְׁאָגָה!"];
+    const cols = ["#9FBF94", "#7CCB5E", "#FFC53D", "#FF9A4F", "#FF7A2F"];
+    return '<div class="meter" role="group" aria-label="מד שאגה">' + [1, 2, 3, 4, 5].map(n =>
+      '<button type="button" class="cell' + (state[key] === n ? ' on' : '') + '" data-n="' + n + '" aria-pressed="' + (state[key] === n) + '"><span class="prints">' + Array(n).fill(FOOT(cols[n - 1])).join("") + '</span><span class="n">' + n + '</span><span class="t">' + t[n - 1] + '</span></button>').join("") + '</div>';
+  }
+  function bindMeter(key, after) {
+    stage.querySelectorAll(".cell").forEach(b => b.addEventListener("click", () => { state[key] = +b.dataset.n; if (n5(key)) roarSound(); else chime(true); render(); if (after) after(); }));
+  }
+  const n5 = (key) => state[key] === 5;
+
+  const VIEWS = {
+    partner() {
+      let b = '<div class="eyebrow">שָׁלָב 1 · מִי יוֹצֵא אִתְּךָ לַמִּשְׁלַחַת?</div><h2>בְּחַר דִּינוֹזָאוּר שֻׁתָּף</h2>' +
+        '<div class="pick3">' + Object.keys(DINO).map(k => '<button type="button" class="card-btn' + (state.partner === k ? ' on' : '') + '" data-k="' + k + '" aria-pressed="' + (state.partner === k) + '">' + DINO[k].svg + '<span>' + DINO[k].name + '</span></button>').join("") + '</div>';
+      if (state.partner) {
+        b += '<p class="lead">כַּמָּה חָזָק אַתָּה מוּכָן לִקְרֹא הַיּוֹם? (מַד הַשְּׁאָגָה)</p>' + meter("roarStart");
+        if (state.roarStart) b += '<p class="feedback">כָּל תְּשׁוּבָה בְּסֵדֶר. יוֹצְאִים לַג\'וּנְגֶּל!</p><div class="row"><button class="btn go" type="button" id="go">לַמִּשְׁלַחַת ←</button></div>';
+      }
+      h(b);
+      stage.querySelectorAll(".card-btn").forEach(x => x.addEventListener("click", () => { state.partner = x.dataset.k; chime(true); render(); }));
+      if (state.partner) bindMeter("roarStart");
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(1));
+    },
+    egg() {
+      const syls = ["דִּי", "נוֹ"];
+      let b = '<div class="eyebrow">שָׁלָב 2 · הַבֵּיצָה הַמִּסְתּוֹרִית</div><h2>מָצָאנוּ בֵּיצָה!</h2>';
+      if (!state.hatched) {
+        b += '<div class="msg">חוֹקֵר נֹעַם,<br>בַּג\'וּנְגֶּל נִמְצְאָה בֵּיצָה עֲנָקִית.<br>מִי יוֹשֵׁב בִּפְנִים? סְדֹק וְתִקְרָא!</div>' +
+          '<p class="teacher">המורה מקריאה את ההודעה. כל לחיצה על הביצה מגלה הברה שנעם קורא.</p>' +
+          '<div class="egg-wrap"><button type="button" class="egg" id="egg" aria-label="לסדוק את הביצה">' + EGG(state.cracks) + '</button></div>' +
+          '<div class="syl-row">' + syls.slice(0, state.cracks).map((s, i) => '<span class="syl' + (i === state.cracks - 1 ? ' new' : '') + '">' + s + '</span>').join("") + '</div>' +
+          (state.cracks === 0 ? '<p class="lead" style="text-align:center">לְחַץ עַל הַבֵּיצָה!</p>' : '') +
+          (state.cracks === 2 ? '<p class="lead" style="text-align:center">קְרָא אֶת שְׁנֵי הַחֲלָקִים בְּיַחַד – וּלְחַץ פַּעַם אַחֲרוֹנָה!</p>' : '');
+      } else {
+        b += '<div class="egg-wrap" style="width:min(240px,70%);margin:0 auto">' + BABY + '</div><div class="big-say">דִּינוֹ!</div>' +
+          (state.saidDino ? '<p class="feedback" style="text-align:center">אֵיזוֹ שְׁאָגָה! דִּינוֹ הַקָּטָן מַצְטָרֵף לַמִּשְׁלַחַת.</p><div class="row center"><button class="btn go" type="button" id="go">לְעִקְּבוֹת הַדִּינוֹזָאוּרִים ←</button></div>'
+            : '<div class="row center"><button class="btn" type="button" id="roarNow">שָׁאַגְתִּי לַתִּינוֹק! ✓</button></div><p class="teacher" style="text-align:center">התלמיד שואג "שלום" לדינו הקטן.</p>');
+      }
+      h(b);
+      const egg = $("#egg");
+      if (egg) egg.addEventListener("click", () => {
+        egg.classList.remove("shake"); void egg.offsetWidth; egg.classList.add("shake");
+        if (state.cracks < 2) { state.cracks++; chime(true); render(); }
+        else { state.cracks = 3; chime(true); burst(); setTimeout(() => { state.hatched = true; render(); }, reduced ? 0 : 350); }
+      });
+      const rn = $("#roarNow"); if (rn) rn.addEventListener("click", () => { state.saidDino = true; roarSound(); render(); });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(2));
+    },
+    tracks() {
+      const i = state.st, s = STATIONS[i];
+      let b = '<div class="eyebrow">שָׁלָב 3 · תַּחֲנַת עֲקֵבוֹת ' + (i + 1) + ' מִתּוֹךְ 5</div>' +
+        '<div class="station">' + FOOT(s.color) + '<h2>מָה הִשְׁאִיר הַדִּינוֹזָאוּר?</h2></div>';
+      if (!state.who) {
+        b += '<p class="lead">מִי קוֹרֵא רִאשׁוֹן?</p><div class="who"><button type="button" data-w="me">אֲנִי קוֹרֵא</button><button type="button" data-w="t">קֹדֶם הַמּוֹרָה, אַחַר כָּךְ אֲנִי</button></div>';
+      } else if (!state.solved) {
+        b += '<div class="word-card">' + s.word + '</div>' +
+          (state.who === "t" ? '<p class="teacher">המורה קוראת פעם אחת, ונעם קורא אחריה.</p>' : '') +
+          '<p class="lead"><b>אֵיזוֹ תְּמוּנָה?</b></p><div class="opts">' +
+          shuffle("s" + i, [s.word].concat(s.decoys)).map(w => '<button type="button" class="opt" data-w="' + w + '" aria-label="תמונה">' + PIC[w] + '</button>').join("") +
+          '</div><p class="feedback" id="fb"></p>';
+      } else if (!state.moved) {
+        b += '<div class="move"><span class="big">נָכוֹן! ' + s.word + '</span><div class="row"><span class="pose">' + DINO[s.dino].svg + '</span><span class="act">' + s.move + '</span></div><p class="teacher">המורה יכולה להקריא את משימת התנועה.</p><button class="btn go" type="button" id="moved">עָשִׂיתִי! ✓</button></div>';
+      } else {
+        const last = i === STATIONS.length - 1;
+        b += '<div class="move"><span class="big">מָצָאתָ עֶצֶם שֶׁל דִּינוֹזָאוּר!</span><div style="width:110px">' + BONE(true) + '</div><button class="btn go" type="button" id="nx">' + (last ? 'לְהַאֲכִיל אֶת הַדִּינוֹזָאוּרִים ←' : 'לַתַּחֲנָה הַבָּאָה ←') + '</button></div>';
+      }
+      h(b);
+      stage.querySelectorAll(".who button").forEach(x => x.addEventListener("click", () => { state.who = x.dataset.w; render(); }));
+      stage.querySelectorAll(".opt").forEach(x => x.addEventListener("click", () => {
+        if (x.dataset.w === s.word) { x.classList.add("right"); chime(true); setTimeout(() => { state.solved = true; render(); }, reduced ? 0 : 350); }
+        else { x.classList.remove("wrong"); void x.offsetWidth; x.classList.add("wrong"); chime(false); $("#fb").textContent = "כִּמְעַט! נִקְרָא שׁוּב יַחַד."; }
+      }));
+      const mv = $("#moved"); if (mv) mv.addEventListener("click", () => { state.moved = true; if (state.bones <= i) state.bones = i + 1; chime(true); render(); });
+      const nx = $("#nx"); if (nx) nx.addEventListener("click", () => {
+        if (i === STATIONS.length - 1) { goto(3); return; }
+        state.st++; state.who = ""; state.solved = false; state.moved = false; render();
+      });
+    },
+    feed() {
+      let b = '<div class="eyebrow">שָׁלָב 4 · זְמַן אֹכֶל</div><h2>מִי אוֹכֵל אֶת זֶה?</h2>';
+      const belly = (k) => '<div class="belly">' + state.fed[k].map(w => '<span>' + w + '</span>').join("") + '</div>';
+      const mouths = '<div class="mouths"><button type="button" class="mouth" data-k="neck">' + DINO.neck.svg + '<span>' + DINO.neck.name + ' – אוֹכֵל צְמָחִים</span>' + belly("neck") + '</button>' +
+        '<button type="button" class="mouth" data-k="rex">' + DINO.rex.svg + '<span>' + DINO.rex.name + ' – אוֹכֵל בָּשָׂר</span>' + belly("rex") + '</button></div>';
+      if (state.foodDone) {
+        b += '<p class="feedback">כֻּלָּם שְׂבֵעִים! כָּל הַכָּבוֹד, חוֹקֵר.</p>' + mouths.replace(/<button type="button" class="mouth"/g, '<button type="button" class="mouth yum" disabled') +
+          '<div class="row"><button class="btn go" type="button" id="go">לִבְנוֹת מִלִּים ←</button></div>';
+        h(b); $("#go").addEventListener("click", () => goto(4)); return;
+      }
+      const f = FOODS[state.food];
+      b += '<p class="lead">קְרָא אֶת הַמִּלָּה וּלְחַץ עַל הַדִּינוֹזָאוּר שֶׁאוֹכֵל אוֹתָהּ. (' + (state.food + 1) + ' מִתּוֹךְ 5)</p>' +
+        '<div class="feed-word">' + f[0] + '</div>' + mouths + '<p class="feedback" id="fb"></p>' +
+        '<p class="teacher">אם התלמיד לא בטוח, אפשר לשאול: "מה זה? מה הטי-רקס אוהב לאכול?" ולתת לו לבחור שוב.</p>';
+      h(b);
+      stage.querySelectorAll(".mouth").forEach(x => x.addEventListener("click", () => {
+        if (x.dataset.k === f[1]) {
+          state.fed[f[1]].push(f[0]); if (f[1] === "rex") roarSound(); else chime(true);
+          if (state.food === FOODS.length - 1) { state.foodDone = true; burst(); } else state.food++;
+          render();
+        } else { x.classList.remove("wrong"); void x.offsetWidth; x.classList.add("wrong"); chime(false); $("#fb").textContent = "אוֹי, הוּא לֹא אוֹכֵל אֶת זֶה! נַסֵּה אֶת הַשֵּׁנִי."; }
+      }));
+    },
+    build() {
+      const g = BUILD[state.b];
+      let b = '<div class="eyebrow">שָׁלָב 5 · מַעְבַּדַת הָעֲצָמוֹת · ' + (state.b + 1) + ' מִתּוֹךְ 3</div><h2>בְּנֵה אֶת הַמִּלָּה</h2>' +
+        '<p class="lead">מָה בַּתְּמוּנָה? לְחַץ עַל הָאוֹתִיּוֹת לְפִי הַסֵּדֶר.</p>' +
+        '<div class="builder"><div class="pic">' + PIC[g.word] + '</div><div class="slots' + (state.bWin ? ' win' : '') + '">' +
+        g.letters.map((_, k) => '<div class="s' + (state.fill[k] ? ' full' : '') + '">' + (state.fill[k] || '') + '</div>').join("") + '</div></div>';
+      if (state.bWin) {
+        const last = state.b === BUILD.length - 1;
+        b += '<div class="done-word">' + g.word + '</div><div class="row center"><button class="btn go" type="button" id="nx">' + (last ? 'לְכַרְטִיס הַמּוּזֵיאוֹן ←' : 'לַמִּלָּה הַבָּאָה ←') + '</button></div>';
+      } else {
+        const pool = shuffle("b" + state.b, g.letters.concat(g.extra));
+        const used = state.fill.slice();
+        b += '<div class="tiles">' + pool.map(l => { const ix = used.indexOf(l); const off = ix > -1; if (off) used[ix] = null; return '<button type="button" class="tile" data-l="' + l + '"' + (off ? ' disabled' : '') + '>' + l + '</button>'; }).join("") +
+          '</div><p class="feedback" id="fb" style="text-align:center"></p><div class="row center"><button class="btn alt" type="button" id="hint">רֶמֶז: הָאוֹת הָרִאשׁוֹנָה</button></div>' +
+          (g.word === "שֵׁן" || g.word === "עֵץ" ? '<p class="teacher">שימו לב: האות האחרונה היא אות סופית (' + g.letters[g.letters.length - 1] + ').</p>' : '');
+      }
+      h(b);
+      stage.querySelectorAll(".tile").forEach(x => x.addEventListener("click", () => {
+        const k = state.fill.length;
+        if (x.dataset.l !== g.letters[k]) { chime(false); $("#fb").textContent = "כִּמְעַט! אֵיזֶה צְלִיל שׁוֹמְעִים?"; return; }
+        state.fill.push(x.dataset.l); chime(true);
+        if (state.fill.length === g.letters.length) { state.bWin = true; burst(); }
+        render();
+      }));
+      const hi = $("#hint"); if (hi) hi.addEventListener("click", () => { $("#fb").textContent = "הַמִּלָּה מַתְחִילָה בָּאוֹת " + g.letters[0]; });
+      const nx = $("#nx"); if (nx) nx.addEventListener("click", () => {
+        if (state.b === BUILD.length - 1) { goto(5); return; }
+        state.b++; state.fill = []; state.bWin = false; render();
+      });
+    },
+    museum() {
+      h('<div class="eyebrow">שָׁלָב 6 · כַּרְטִיס לַמּוּזֵיאוֹן</div><h2>הַדִּינוֹזָאוּר שֶׁגִּלִּיתָ</h2>' +
+        '<div class="museum">' +
+        '<p class="lead"><b>1. צַיֵּר אֶת הַדִּינוֹזָאוּר שֶׁלְּךָ:</b></p><div class="swatches" id="sw"></div>' +
+        '<div class="pad-wrap draw"><canvas id="pad" aria-label="לוח ציור"></canvas></div>' +
+        '<div class="row"><button class="btn alt" type="button" id="clear">מְחַק</button></div>' +
+        '<p class="lead"><b>2. בְּחַר לוֹ שֵׁם:</b> (קְרָא וּלְחַץ)</p>' +
+        '<div class="chips">' + NAMES.map(w => '<button type="button" class="chip' + (state.dname === w ? ' on' : '') + '" data-n="' + w + '" aria-pressed="' + (state.dname === w) + '">' + w + '</button>').join("") + '</div>' +
+        '<div id="traceBox"></div>' +
+        '</div><div class="row"><button class="btn go" type="button" id="go"' + (state.dname ? '' : ' disabled') + '>הַכַּרְטִיס מוּכָן ←</button></div>');
+      const pad = makePad($("#pad"), 7, "#2B7A37");
+      swatches($("#sw"), pad);
+      $("#clear").addEventListener("click", () => pad.clear());
+      const showTrace = () => {
+        if (!state.dname) return;
+        $("#traceBox").innerHTML = '<p class="lead"><b>3. כְּתֹב אֶת הַשֵּׁם – עֲבֹר עִם הָאֶצְבַּע עַל הָאוֹתִיּוֹת:</b></p>' +
+          '<div class="pad-wrap trace"><div class="ghost">' + state.dname + '</div><canvas id="tpad" aria-label="לוח כתיבה"></canvas></div>' +
+          '<div class="row"><button class="btn alt" type="button" id="tclear">מְחַק</button><button class="btn" type="button" id="tdone">כָּתַבְתִּי! ✓</button></div><p class="feedback" id="tfb"></p>';
+        const tp = makePad($("#tpad"), 10, "#FF7A2F");
+        $("#tclear").addEventListener("click", () => tp.clear());
+        $("#tdone").addEventListener("click", () => { state.traced = true; chime(true); burst(); $("#tfb").textContent = "כָּתַבְתָּ אֶת הַשֵּׁם " + state.dname + "!"; });
+      };
+      showTrace();
+      stage.querySelectorAll(".chip").forEach(x => x.addEventListener("click", () => {
+        state.dname = x.dataset.n; chime(true);
+        stage.querySelectorAll(".chip").forEach(c => { const on = c === x; c.classList.toggle("on", on); c.setAttribute("aria-pressed", on); });
+        $("#go").disabled = false; showTrace();
+      }));
+      $("#go").addEventListener("click", () => goto(6));
+    },
+    commander() {
+      let b = '<div class="eyebrow">שָׁלָב 7 · אַתָּה הַטִּי-רֶקְס הָרָאשִׁי</div><h2>תֵּן פְּקֻדָּה לַמּוֹרָה!</h2>';
+      if (state.orderOn) {
+        b += '<div class="order"><div class="t">פְּקֻדָּה מֵהַטִּי-רֶקְס נֹעַם</div><div class="w">' + esc(state.orderW) + '</div><div class="m">קִרְאִי אֶת הַמִּלָּה וְזוּזִי ' + esc(state.orderM) + '!</div></div>' +
+          '<p class="teacher">המורה קוראת בקול ו"טועה" במילה. התלמיד מתקן ולוחץ על "טָעִית!"</p>' +
+          '<div class="row"><button class="btn" type="button" id="fix">טָעִית! תִּקַּנְתִּי ✓</button><button class="btn alt" type="button" id="again">פְּקֻדָּה חֲדָשָׁה</button></div>' +
+          '<p class="score">תִּקּוּנִים שֶׁל הַטִּי-רֶקְס: ' + state.fixes + '</p>' +
+          '<div class="row"><button class="btn go" type="button" id="go">לַתְּעוּדָה ←</button></div>';
+      } else {
+        b += '<p class="lead">1. בְּחַר מִלָּה:</p><div class="chips">' +
+          ORDER_W.map(w => '<button type="button" class="chip' + (state.orderW === w ? ' on' : '') + '" data-w="' + w + '">' + PIC[w] + w + '</button>').join("") + '</div>' +
+          '<p class="lead">2. אֵיךְ הַמּוֹרָה תָּזוּז?</p><div class="chips">' +
+          ORDER_M.map(m => '<button type="button" class="chip' + (state.orderM === m ? ' on' : '') + '" data-m="' + m + '">' + m + '</button>').join("") + '</div>' +
+          '<div class="row"><button class="btn go" type="button" id="send"' + (state.orderW && state.orderM ? '' : ' disabled') + '>שְׁלַח פְּקֻדָּה ←</button></div>' +
+          (state.fixes ? '<p class="score">תִּקּוּנִים שֶׁל הַטִּי-רֶקְס: ' + state.fixes + '</p>' : '');
+      }
+      h(b);
+      stage.querySelectorAll(".chip[data-w]").forEach(x => x.addEventListener("click", () => { state.orderW = x.dataset.w; chime(true); render(); }));
+      stage.querySelectorAll(".chip[data-m]").forEach(x => x.addEventListener("click", () => { state.orderM = x.dataset.m; chime(true); render(); }));
+      const s = $("#send"); if (s) s.addEventListener("click", () => { state.orderOn = true; roarSound(); render(); });
+      const f = $("#fix"); if (f) f.addEventListener("click", () => { state.fixes++; chime(true); burst(); render(); });
+      const a = $("#again"); if (a) a.addEventListener("click", () => { state.orderOn = false; state.orderW = ""; state.orderM = ""; render(); });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(7));
+    },
+    cert() {
+      let b = '<div class="eyebrow">שָׁלָב 8 · חוֹזְרִים מֵהַמִּשְׁלַחַת</div>';
+      if (!state.roarEnd) {
+        b += '<h2>מַד הַשְּׁאָגָה – עַכְשָׁו</h2><p class="lead">אַחֲרֵי הַמִּשְׁלַחַת, כַּמָּה חָזָק אַתָּה מוּכָן לִקְרֹא?</p>' + meter("roarEnd");
+        h(b); bindMeter("roarEnd", burst); return;
+      }
+      const d = DINO[state.partner] || DINO.rex;
+      b += '<div class="cert"><div class="avatar">' + d.svg + '</div><h3>תְּעוּדַת חוֹקֵר דִּינוֹזָאוּרִים</h3><p>מוּעֶנֶקֶת לַחוֹקֵר</p><div class="name">נֹעַם</div>' +
+        '<p>עַל שֶׁקָּרָא מִלִּים, מָצָא עֲצָמוֹת,<br>הֶאֱכִיל דִּינוֹזָאוּרִים וְכָתַב שֵׁם!</p>' +
+        '<div class="stats"><div><b>' + state.bones + '</b>עֲצָמוֹת</div><div><b>' + (state.roarStart || "-") + ' ← ' + state.roarEnd + '</b>מַד שְׁאָגָה</div><div><b>' + state.fixes + '</b>תִּקּוּנִים</div></div>' +
+        (state.dname ? '<p>הַדִּינוֹזָאוּר שֶׁגִּלִּיתָ: <b>' + state.dname + '</b></p>' : '') +
+        '</div><div class="row center"><button class="btn alt" type="button" id="redo">לְשַׁנּוֹת אֶת הַמַּד</button><button class="btn" type="button" id="party">שְׁאָגַת נִצָּחוֹן!</button></div>';
+      h(b);
+      $("#redo").addEventListener("click", () => { state.roarEnd = 0; render(); });
+      $("#party").addEventListener("click", () => { roarSound(); burst(); });
+    }
+  };
+
+  function makePad(canvas, width, start) {
+    const ctx = canvas.getContext("2d");
+    let color = start, drawing = false, last = null;
+    const r = canvas.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(r.width * d)); canvas.height = Math.max(1, Math.round(r.height * d)); ctx.setTransform(d, 0, 0, d, 0, 0);
+    const pt = (e) => { const b = canvas.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+    const style = () => { ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width; ctx.lineCap = "round"; ctx.lineJoin = "round"; };
+    canvas.addEventListener("pointerdown", e => { drawing = true; last = pt(e); try { canvas.setPointerCapture(e.pointerId); } catch (x) {} style(); ctx.beginPath(); ctx.arc(last.x, last.y, width / 2, 0, 7); ctx.fill(); });
+    canvas.addEventListener("pointermove", e => { if (!drawing) return; const p = pt(e); style(); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => canvas.addEventListener(t, () => { drawing = false; }));
+    return { setColor(c) { color = c; }, clear() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore(); } };
+  }
+  function swatches(el, pad) {
+    const cols = ["#2B7A37", "#7CCB5E", "#FF7A2F", "#FFC53D", "#47B6D6", "#E5487A"];
+    const names = ["ירוק כהה", "ירוק", "כתום", "צהוב", "תכלת", "ורוד"];
+    el.innerHTML = cols.map((c, i) => '<button type="button" class="swatch' + (i === 0 ? ' on' : '') + '" style="background:' + c + '" data-c="' + c + '" aria-label="' + names[i] + '"></button>').join("");
+    el.querySelectorAll(".swatch").forEach(b => b.addEventListener("click", () => { el.querySelectorAll(".swatch").forEach(x => x.classList.remove("on")); b.classList.add("on"); pad.setColor(b.dataset.c); }));
+  }
+
+  const cf = $("#confetti"), cx = cf.getContext("2d");
+  let parts = [], raf = 0;
+  function burst() {
+    if (reduced) return;
+    const d = window.devicePixelRatio || 1;
+    cf.width = innerWidth * d; cf.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0);
+    const cols = ["#3FA34D", "#FFC53D", "#FF7A2F", "#47B6D6", "#E5487A"];
+    for (let i = 0; i < 130; i++) parts.push({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 12, vy: Math.random() * -12 - 3, r: Math.random() * 7 + 5, c: cols[i % 5], a: Math.random() * 6, life: 0 });
+    if (!raf) tick();
+  }
+  function tick() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => { p.vy += .35; p.x += p.vx; p.y += p.vy; p.a += .15; p.life++; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.a); cx.fillStyle = p.c; cx.beginPath(); cx.ellipse(0, 0, p.r, p.r / 2.4, 0, 0, 7); cx.fill(); cx.restore(); });
+    parts = parts.filter(p => p.y < innerHeight + 20 && p.life < 240);
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  let timer = 0;
+  function updateRoar() {
+    $("#roarTxt").textContent = state.breaks ? "הַפְסָקַת שְׁאָגָה · " + state.breaks : "נִגְמְרוּ הַהַפְסָקוֹת";
+    $("#roar").disabled = state.breaks === 0;
+  }
+  $("#roar").addEventListener("click", () => {
+    if (!state.breaks) return;
+    state.breaks--; updateRoar(); roarSound();
+    $("#breakAct").textContent = BREAKS[(2 - state.breaks) % BREAKS.length];
+    let left = 30; $("#count").textContent = left; $("#overlay").hidden = false; $("#endBreak").focus();
+    clearInterval(timer);
+    timer = setInterval(() => { left--; $("#count").textContent = Math.max(0, left); if (left <= 0) { clearInterval(timer); chime(true); } }, 1000);
+  });
+  $("#endBreak").addEventListener("click", () => { clearInterval(timer); $("#overlay").hidden = true; });
+
+  function goto(n) { state.step = Math.max(0, Math.min(STEPS.length - 1, n)); render(); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); }
+  function render() {
+    const r = $("#route");
+    r.innerHTML = STEPS.map((s, i) => (i ? '<span class="path" aria-hidden="true"></span>' : '') +
+      '<button type="button" class="stop' + (i < state.step ? ' done' : '') + (i === state.step ? ' now' : '') + '" data-i="' + i + '" aria-label="שלב ' + (i + 1) + '"' + (i === state.step ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>').join("");
+    r.querySelectorAll(".stop").forEach(b => b.addEventListener("click", () => goto(+b.dataset.i)));
+    $("#avatar").innerHTML = '<span class="avatar">' + (DINO[state.partner] || DINO.rex).svg + '</span>';
+    $("#bones").innerHTML = [0, 1, 2, 3, 4].map(i => BONE(i < state.bones)).join("");
+    VIEWS[STEPS[state.step]]();
+    $("#prev").disabled = state.step === 0;
+    $("#next").disabled = state.step === STEPS.length - 1;
+    updateRoar();
+  }
+  $("#prev").addEventListener("click", () => goto(state.step - 1));
+  $("#next").addEventListener("click", () => goto(state.step + 1));
+  render();
+})();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

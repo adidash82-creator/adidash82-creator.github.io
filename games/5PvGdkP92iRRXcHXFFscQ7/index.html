@@ -1,0 +1,91 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>בינגו שורשים</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap">
+<style>
+/* layout: one centered column — called-root tile on top, 4x4 board, controls below */
+:root{--bg:#f3f6fa;--card:#ffffff;--fg:#1f2a44;--muted:#5b6782;--accent:#1d6fb8;--hit:#2e9a5b;--miss:#d1493f;--line:#c9d6e6;--font:"Rubik","Arial Hebrew","Arial",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121826;--card:#1c2436;--fg:#e8edf6;--muted:#9aa6bf;--accent:#5aa6ea;--hit:#45c07a;--miss:#f07067;--line:#2f3b55;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121826;--card:#1c2436;--fg:#e8edf6;--muted:#9aa6bf;--accent:#5aa6ea;--hit:#45c07a;--miss:#f07067;--line:#2f3b55;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);direction:rtl;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;text-align:center;font-weight:800;font-size:2rem;color:var(--accent)}
+.call{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.call small{color:var(--muted)}
+#root{font-size:2.6rem;font-weight:800;letter-spacing:.15em;min-height:3.2rem}
+#msg{min-height:1.4em;font-weight:600}
+#msg.ok{color:var(--hit)}#msg.bad{color:var(--miss)}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{aspect-ratio:1;max-width:100%;border:2px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;font:600 clamp(.95rem,4.2vw,1.35rem) var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px}
+.cell:hover{border-color:var(--accent)}
+.cell:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.cell.on{background:var(--hit);border-color:var(--hit);color:#fff}
+.cell.shake{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+button.b{font:600 1.05rem var(--font);padding:10px 18px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+button.b.alt{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.stats{text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.win{text-align:center;font-size:1.8rem;font-weight:800;color:var(--hit)}
+@media (prefers-reduced-motion:reduce){.cell.shake{animation:none}}
+</style>
+<div class="wrap">
+  <h1>בינגו שורשים</h1>
+  <div class="call">
+    <small>השורש שהוגרל</small>
+    <div id="root">—</div>
+    <div id="msg">לחצו "שורש חדש" כדי להתחיל</div>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="btns">
+    <button class="b" id="next">שורש חדש</button>
+    <button class="b alt" id="none" disabled>אין בלוח!</button>
+    <button class="b alt" id="reset">משחק חדש</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="win" id="win" hidden>🎉 בינגו! 🎉</div>
+</div>
+<script>
+const WORDS=[["מכתב","כתב"],["ריקוד","רקד"],["מקום","קום"],["מפתח","פתח"],["מגדל","גדל"],["תלמיד","למד"],["שליח","שלח"],["בניין","בנה"],["מראה","ראה"],["עבודה","עבד"],["ספרייה","ספר"],["מזכרת","זכר"],["שומר","שמר"],["דיבור","דבר"],["ריצה","רוץ"],["מסגרת","סגר"]];
+const TRAPS=["חשב","צחק","לבש","שאל"];
+const fmt=r=>r.split("").join("-");
+let deck,cur,marked,hits,errs,done;
+const B=document.getElementById("board"),R=document.getElementById("root"),M=document.getElementById("msg"),S=document.getElementById("stats"),W=document.getElementById("win"),N=document.getElementById("next"),X=document.getElementById("none");
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function say(t,c){M.textContent=t;M.className=c||""}
+function stats(){S.textContent=`נכונים: ${hits} · טעויות: ${errs} · נשארו: ${deck.length} שורשים`}
+function start(){
+  deck=shuffle(WORDS.map(w=>w[1]).concat(TRAPS));cur=null;marked=new Set();hits=0;errs=0;done=false;
+  B.innerHTML="";W.hidden=true;
+  WORDS.forEach(([w,r],i)=>{const b=document.createElement("button");b.className="cell";b.id="c"+i;b.textContent=w;b.onclick=()=>pick(i);B.appendChild(b)});
+  R.textContent="—";say('לחצו "שורש חדש" כדי להתחיל');N.disabled=false;X.disabled=true;stats();
+}
+function next(){
+  if(done)return;
+  if(!deck.length){say("נגמרו השורשים!");N.disabled=true;X.disabled=true;return}
+  cur=deck.pop();R.textContent=fmt(cur);say("מצאו מילה מהשורש הזה, או לחצו 'אין בלוח!'");N.disabled=true;X.disabled=false;stats();
+}
+function ok(t){hits++;say(t,"ok");cur=null;N.disabled=false;X.disabled=true;stats();check()}
+function bad(t,el){errs++;say(t,"bad");if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}stats()}
+function pick(i){
+  if(done||!cur||marked.has(i))return;
+  const el=document.getElementById("c"+i);
+  if(WORDS[i][1]===cur){marked.add(i);el.classList.add("on");ok(`נכון! ${WORDS[i][0]} מהשורש ${fmt(cur)}`)}
+  else bad(`לא, ${WORDS[i][0]} לא מהשורש הזה. נסו שוב`,el);
+}
+function none(){
+  if(!cur)return;
+  if(TRAPS.includes(cur))ok(`נכון! אין בלוח מילה מהשורש ${fmt(cur)}`);
+  else bad("יש בלוח מילה מהשורש הזה. חפשו שוב");
+}
+function check(){
+  const L=[];for(let r=0;r<4;r++){L.push([0,1,2,3].map(c=>r*4+c));L.push([0,1,2,3].map(c=>c*4+r))}
+  L.push([0,5,10,15],[3,6,9,12]);
+  if(L.some(l=>l.every(i=>marked.has(i)))){done=true;W.hidden=false;say("כל הכבוד!","ok");N.disabled=true;X.disabled=true}
+}
+N.onclick=next;X.onclick=none;document.getElementById("reset").onclick=start;start();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

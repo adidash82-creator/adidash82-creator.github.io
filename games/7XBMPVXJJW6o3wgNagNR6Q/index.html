@@ -1,0 +1,102 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>קוביית קריאה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Frank+Ruhl+Libre:wght@900&display=swap">
+<style>
+/* Layout: one big 3D die centered on a felt stage, roll button and the result card below. */
+:root{
+  --bg:#E8F3FA; --surface:#FFFFFF; --ink:#1E2A4A; --muted:#5B6787; --line:#CFDDEA; --felt:#D7EBF6;
+  --f1:#E5443F; --f2:#7445E0; --f3:#18975F; --f4:#E08B00; --f5:#1F78D1; --f6:#D6337E;
+  --ui:"Varela Round","Arial Hebrew",Arial,sans-serif;
+  --letter:"Frank Ruhl Libre","David","Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141B2E;--surface:#1E2740;--ink:#EEF2FB;--muted:#A9B4CF;--line:#36426A;--felt:#1A2A47;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B2E;--surface:#1E2740;--ink:#EEF2FB;--muted:#A9B4CF;--line:#36426A;--felt:#1A2A47;color-scheme:dark}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--ui);font-size:17px;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px;align-items:center}
+h1{margin:0;font-size:clamp(26px,5vw,36px);align-self:stretch}
+.stage{align-self:stretch;background:var(--felt);border-radius:28px;padding-block:48px;display:grid;place-items:center;perspective:900px}
+.scene{--s:min(220px,56vw);width:var(--s);height:var(--s);cursor:pointer}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1.6s cubic-bezier(.2,.7,.2,1);transform:rotateX(-20deg) rotateY(25deg)}
+.face{position:absolute;inset:0;border-radius:18%;background:var(--c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6%;
+  text-align:center;padding:10%;box-sizing:border-box;box-shadow:inset 0 0 0 6px rgba(255,255,255,.35);backface-visibility:hidden}
+.face .ic{font-size:calc(var(--s)*.26);line-height:1}
+.face .tx{font-family:var(--letter);font-weight:900;font-size:calc(var(--s)*.11);line-height:1.25}
+.f0{transform:rotateY(0deg) translateZ(calc(var(--s)/2))}
+.f1{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
+.f2{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}
+.f3{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}
+.f4{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}
+.f5{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
+.btn{font:inherit;font-size:22px;cursor:pointer;border:0;border-radius:999px;padding:14px 34px;background:var(--ink);color:var(--bg)}
+.btn.ghost{font-size:17px;padding:10px 20px;background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,.scene:focus-visible{outline:3px solid var(--f5);outline-offset:4px}
+.result{align-self:stretch;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:6px;min-height:84px;justify-content:center}
+.result .tx{font-family:var(--letter);font-weight:900;font-size:clamp(28px,6vw,40px);color:var(--c,var(--ink))}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+@media (prefers-reduced-motion:reduce){.cube{transition-duration:.01s}}
+.note{font-size:14px;color:var(--muted);text-align:center}
+</style>
+
+<div class="wrap">
+  <h1>קוביית קריאה</h1>
+  <div class="stage">
+    <div class="scene" id="scene" tabindex="0" role="button" aria-label="הטלת הקובייה">
+      <div class="cube" id="cube"></div>
+    </div>
+  </div>
+  <div class="row">
+    <button class="btn" id="roll">🎲 מטילים!</button>
+    <button class="btn ghost" id="hear" disabled>🔊 שמיעה</button>
+  </div>
+  <div class="result" id="result"><span class="muted">לחצו על הקובייה או על "מטילים" כדי לקבל משימה</span></div>
+  <p class="note" id="voice-note" hidden>במכשיר הזה אין קול בעברית, לכן ההשמעה לא תעבוד.</p>
+</div>
+
+<script>
+const F=[
+  {ic:'🤪',tx:'קְרָא בְּצוּרָה מַצְחִיקָה',c:'--f1',v:{pitch:2,rate:1.1,volume:1}},
+  {ic:'👻',tx:'קְרָא בְּקוֹל מַפְחִיד',c:'--f2',v:{pitch:.1,rate:.65,volume:1}},
+  {ic:'🤫',tx:'קְרָא בְּקוֹל חַלָּשׁ',c:'--f3',v:{pitch:1,rate:.85,volume:.25}},
+  {ic:'📣',tx:'קְרָא בְּקוֹל חָזָק',c:'--f4',v:{pitch:1.2,rate:.95,volume:1}},
+  {ic:'🐢',tx:'קְרָא לְאַט',c:'--f5',v:{pitch:1,rate:.45,volume:1}},
+  {ic:'🐇',tx:'קְרָא מַהֵר',c:'--f6',v:{pitch:1.1,rate:1.7,volume:1}}
+];
+// rotation that brings each face to the front
+const POS=[[0,0],[0,180],[0,-90],[0,90],[-90,0],[90,0]];
+const $=id=>document.getElementById(id);
+$('cube').innerHTML=F.map((f,i)=>`<div class="face f${i}" style="--c:var(${f.c})"><span class="ic">${f.ic}</span><span class="tx">${f.tx}</span></div>`).join('');
+
+let heVoice=null;
+function loadVoices(){try{const v=speechSynthesis.getVoices();heVoice=v.find(x=>/^he|^iw/i.test(x.lang))||null;if(v.length&&!heVoice)$('voice-note').hidden=false;}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function speak(f){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(f.tx);u.lang='he-IL';if(heVoice)u.voice=heVoice;Object.assign(u,f.v);speechSynthesis.speak(u);}catch(e){}}
+
+let rx=-20,ry=25,last=-1,cur=null,rolling=false;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function roll(){
+  if(rolling)return; rolling=true; $('roll').disabled=true;
+  let i; do{i=Math.floor(Math.random()*6);}while(i===last); last=i;
+  const [tx,ty]=POS[i];
+  const spinX=360*(2+Math.floor(Math.random()*2)), spinY=360*(2+Math.floor(Math.random()*2));
+  rx=Math.ceil((rx+spinX)/360)*360+tx; ry=Math.ceil((ry+spinY)/360)*360+ty;
+  $('cube').style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+  $('result').innerHTML='<span class="muted">מתגלגלת...</span>';
+  setTimeout(()=>{
+    cur=F[i]; rolling=false; $('roll').disabled=false; $('hear').disabled=false;
+    $('result').style.setProperty('--c',`var(${cur.c})`);
+    $('result').innerHTML=`<span class="tx">${cur.ic} ${cur.tx}</span>`;
+    speak(cur);
+  }, reduce?50:1650);
+}
+$('roll').onclick=roll; $('scene').onclick=roll;
+$('scene').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();roll();}};
+$('hear').onclick=()=>cur&&speak(cur);
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

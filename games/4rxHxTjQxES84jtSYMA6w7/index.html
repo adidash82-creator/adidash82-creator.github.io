@@ -1,0 +1,313 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>חמישיות ניקוד</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Frank+Ruhl+Libre:wght@900&display=swap">
+<style>
+/* Layout: table-top game. Opponent row on top, status line, player's hand fanned at the bottom. Tabs: play / build words. */
+:root{
+  --bg:#E8F3FA; --surface:#FFFFFF; --ink:#1E2A4A; --muted:#5B6787; --line:#CFDDEA; --felt:#D7EBF6;
+  --card:#FFFFFF; --card-ink:#1E2A4A; --card-muted:#6B7590; --back:#2D4A8A;
+  --kamatz:#E5443F; --tsere:#E08B00; --hiriq:#18975F; --holam:#7445E0; --shuruk:#1F78D1;
+  --good:#18975F; --bad:#D9443C;
+  --ui:"Varela Round","Arial Hebrew",Arial,sans-serif;
+  --letter:"Frank Ruhl Libre","David","Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141B2E;--surface:#1E2740;--ink:#EEF2FB;--muted:#A9B4CF;--line:#36426A;--felt:#1A2A47;--back:#3E63B5;
+  --good:#3FCB8E;--bad:#FF6B63;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141B2E;--surface:#1E2740;--ink:#EEF2FB;--muted:#A9B4CF;--line:#36426A;--felt:#1A2A47;--back:#3E63B5;
+  --good:#3FCB8E;--bad:#FF6B63;color-scheme:dark}
+
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--ui);font-size:17px;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 32px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:clamp(26px,5vw,34px)}
+h2{margin:0;font-size:20px}
+.tabs{display:flex;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:5px}
+.tab{font:inherit;border:0;background:transparent;color:var(--ink);padding:8px 18px;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible{outline:3px solid var(--shuruk);outline-offset:3px}
+.btn{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:10px 20px;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.box{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+
+/* card */
+.card{--w:120px;width:var(--w);height:calc(var(--w)*1.4);flex:none;background:var(--card);color:var(--card-ink);border-radius:12px;
+  box-shadow:inset 0 0 0 3px var(--c),0 2px 6px rgba(20,30,60,.18);display:flex;flex-direction:column;overflow:hidden;
+  font-family:var(--letter);font-weight:900;position:relative;transition:transform .15s}
+.card .top{background:var(--c);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:calc(var(--w)*.04) calc(var(--w)*.06)}
+.card .fam{background:#fff;color:var(--c);width:calc(var(--w)*.2);height:calc(var(--w)*.2);border-radius:50%;display:grid;place-items:center;font-size:calc(var(--w)*.15);line-height:1}
+.card .vn{font-size:calc(var(--w)*.11)}
+.card .syl{flex:1;display:grid;place-items:center;font-size:calc(var(--w)*.5);line-height:1;color:var(--c)}
+.card .row5{display:flex;justify-content:space-around;padding:0 3px calc(var(--w)*.05);font-size:calc(var(--w)*.095)}
+.card .row5 span{padding:0 3px;border-radius:5px;color:var(--card-muted)}
+.card .row5 span.on{background:var(--c);color:#fff}
+.card.back{background:var(--back);box-shadow:0 2px 6px rgba(20,30,60,.18);display:grid;place-items:center;color:#fff;font-size:calc(var(--w)*.3)}
+.card.back::after{content:"";position:absolute;inset:6px;border:2px dashed rgba(255,255,255,.45);border-radius:8px}
+button.card{border:0;padding:0;cursor:pointer;font:inherit;font-family:var(--letter);font-weight:900;text-align:inherit}
+button.card:hover{transform:translateY(-4px)}
+button.card.sel{transform:translateY(-10px);box-shadow:inset 0 0 0 3px var(--c),0 0 0 4px var(--ink)}
+
+/* table */
+.table{background:var(--felt);border-radius:26px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.opp{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.opp-hand{display:flex}
+.opp-hand .card{--w:44px;margin-inline-start:-22px}
+.opp-hand .card:first-child{margin-inline-start:0}
+.who{display:flex;align-items:center;gap:10px}
+.avatar{width:46px;height:46px;border-radius:50%;background:var(--holam);color:#fff;display:grid;place-items:center;font-size:24px}
+.pile{display:flex;align-items:center;gap:8px}
+.pile .card{--w:52px}
+.sets{display:flex;gap:6px;flex-wrap:wrap}
+.set{font-family:var(--letter);font-weight:900;font-size:22px;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:2px 10px}
+.msg{background:var(--surface);border-radius:18px;padding:14px 16px;font-size:20px;min-height:1.5em;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.msg .big{font-family:var(--letter);font-weight:900;font-size:56px;line-height:1.1}
+.msg.good{box-shadow:inset 0 0 0 3px var(--good)} .msg.bad{box-shadow:inset 0 0 0 3px var(--bad)}
+.asks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ask{font:inherit;font-family:var(--letter);font-weight:900;font-size:30px;cursor:pointer;border:3px solid var(--c);color:var(--c);background:var(--surface);border-radius:14px;padding:2px 14px}
+.hand{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding-top:6px}
+@media (max-width:520px){.hand .card{--w:92px}}
+.label{font-size:14px;color:var(--muted);text-align:center}
+
+/* setup */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-family:var(--letter);font-weight:900;font-size:26px;width:52px;height:52px;border-radius:14px;cursor:pointer;border:2px solid var(--line);background:var(--surface);color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* words */
+.picker{display:flex;flex-wrap:wrap;gap:8px}
+.word{display:flex;flex-wrap:wrap;gap:8px;min-height:180px;align-items:center;justify-content:center;background:var(--felt);border-radius:20px;padding:14px}
+.word .card{--w:100px}
+.word-text{font-family:var(--letter);font-weight:900;font-size:54px;text-align:center;min-height:1.2em}
+.empty{color:var(--muted)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.pop{animation:pop .3s cubic-bezier(.3,1.6,.5,1)}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}.card{transition:none}}
+.task{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--ink);color:var(--bg);border-radius:18px;padding:16px;text-align:center;font-size:24px}
+.task .tk{font-size:14px;letter-spacing:.1em;opacity:.75}
+.note{font-size:14px;color:var(--muted);text-align:center}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>חמישיות ניקוד</h1>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="t-play" role="tab" aria-selected="true">משחק חמישיות</button>
+      <button class="tab" id="t-word" role="tab" aria-selected="false">בונים מילים</button>
+    </div>
+  </header>
+
+  <!-- SETUP -->
+  <section id="setup" class="box">
+    <h2>באילו אותיות נשחק?</h2>
+    <p class="muted" style="margin:0">כל אות היא חמישייה: קָמָץ, צֵירֵה, חִירִיק, חוֹלָם, שׁוּרוּק. מומלץ 4–8 אותיות למשחק.</p>
+    <div class="chips" id="chips"></div>
+    <div class="row">
+      <button class="btn ghost" id="all">כל האותיות</button>
+      <button class="btn ghost" id="none">ניקוי</button>
+      <button class="btn" id="start">מתחילים ←</button>
+      <span class="muted" id="cnt"></span>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" hidden>
+    <div class="table">
+      <div class="opp">
+        <div class="who"><div class="avatar">🦉</div><div><b>ינשופי</b><div class="muted" id="opp-n"></div></div></div>
+        <div class="opp-hand" id="opp-hand"></div>
+        <div class="pile"><div class="card back">?</div><span class="muted" id="pile-n"></span></div>
+      </div>
+      <div class="row"><span class="muted">החמישיות של ינשופי:</span><div class="sets" id="opp-sets"></div></div>
+      <div class="msg" id="msg"></div>
+      <div class="row"><span class="muted">החמישיות שלי:</span><div class="sets" id="my-sets"></div></div>
+      <div class="label" id="hand-label">הקלפים שלי</div>
+      <div class="hand" id="hand"></div>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px"><button class="btn ghost" id="restart">משחק חדש</button></div>
+  </section>
+
+  <!-- WORDS -->
+  <section id="words" class="box" hidden>
+    <h2>בונים מילים</h2>
+    <p class="muted" style="margin:0">בחרו אות, אחר כך ניקוד. כל הברה נוספת למילה.</p>
+    <div class="row"><button class="btn" id="w-draw">🎲 שליפת כרטיס משימה</button></div>
+    <div id="w-task"></div>
+    <div class="picker" id="w-letters"></div>
+    <div class="asks" id="w-vowels"></div>
+    <div class="word" id="w-row"><span class="empty">כאן תופיע המילה</span></div>
+    <div class="word-text" id="w-text"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn" id="w-say">🔊 הקראה</button>
+      <button class="btn ghost" id="w-back">מחיקת הברה אחרונה</button>
+      <button class="btn ghost" id="w-clear">ניקוי</button>
+    </div>
+  </section>
+  <p class="note" id="voice-note" hidden>במכשיר הזה אין קול בעברית, לכן ההשמעה לא תעבוד.</p>
+</div>
+
+<script>
+const LET=['א','בּ','ג','ד','ה','ו','ז','ח','ט','י','כּ','ל','מ','נ','ס','ע','פּ','צ','ק','ר','שׁ','ת'];
+const V=[{k:'kamatz',n:'קָמָץ',m:'ָ'},{k:'tsere',n:'צֵירֵה',m:'ֵ'},{k:'hiriq',n:'חִירִיק',m:'ִ'},{k:'holam',n:'חוֹלָם',m:'וֹ'},{k:'shuruk',n:'שׁוּרוּק',m:'וּ'}];
+const syl=(l,v)=>LET[l]+V[v].m;
+const $=id=>document.getElementById(id);
+
+/* speech */
+let heVoice=null;
+function loadVoices(){try{const v=speechSynthesis.getVoices();heVoice=v.find(x=>/^he|^iw/i.test(x.lang))||null;if(v.length&&!heVoice)$('voice-note').hidden=false;}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='he-IL';if(heVoice)u.voice=heVoice;u.rate=.8;speechSynthesis.speak(u);}catch(e){}}
+const sayS=s=>say(s.replace(/ָ$/,'ָה').replace(/ֵ$/,'ֵה'));
+
+function cardHTML(l,v,tag='div',extra=''){
+  const fam=V.map((_,j)=>`<span class="${j===v?'on':''}">${syl(l,j)}</span>`).join('');
+  return `<${tag} class="card ${extra}" style="--c:var(--${V[v].k})" data-l="${l}" data-v="${v}" aria-label="${syl(l,v)}"><div class="top"><span class="fam">${LET[l][0]}</span><span class="vn">${V[v].n}</span></div><div class="syl">${syl(l,v)}</div><div class="row5">${fam}</div></${tag}>`;
+}
+
+/* ---------- setup ---------- */
+let chosen=new Set([0,1,11,12,13,19]);
+function renderChips(){
+  $('chips').innerHTML=LET.map((l,i)=>`<button class="chip" data-i="${i}" aria-pressed="${chosen.has(i)}">${l[0]}</button>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const i=+c.dataset.i;chosen.has(i)?chosen.delete(i):chosen.add(i);renderChips();});
+  $('cnt').textContent=`${chosen.size} אותיות · ${chosen.size*5} קלפים`;
+  $('start').disabled=chosen.size<2;
+}
+$('all').onclick=()=>{chosen=new Set(LET.map((_,i)=>i));renderChips();};
+$('none').onclick=()=>{chosen.clear();renderChips();};
+renderChips();
+
+/* ---------- game ---------- */
+let pile,me,opp,mySets,oppSets,sel=null,turn,oppKnows,busy=false;
+const key=c=>c.l+'-'+c.v;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function start(){
+  pile=shuffle([...chosen].flatMap(l=>V.map((_,v)=>({l,v}))));
+  const n=chosen.size<=4?5:7;
+  me=pile.splice(0,n);opp=pile.splice(0,n);mySets=[];oppSets=[];sel=null;oppKnows=new Set();
+  $('setup').hidden=true;$('game').hidden=false;
+  checkSets(me,mySets);checkSets(opp,oppSets);
+  myTurn('התור שלך! בחרו קלף כדי לבקש מאותה משפחה.');
+}
+function checkSets(hand,sets){
+  const got=[];
+  [...new Set(hand.map(c=>c.l))].forEach(l=>{if(hand.filter(c=>c.l===l).length===5){got.push(l);sets.push(l);}});
+  got.forEach(l=>{for(let i=hand.length-1;i>=0;i--)if(hand[i].l===l)hand.splice(i,1);});
+  return got;
+}
+function render(){
+  $('opp-hand').innerHTML=opp.map(()=>'<div class="card back"></div>').join('');
+  $('opp-n').textContent=`${opp.length} קלפים`;
+  $('pile-n').textContent=`בקופה: ${pile.length}`;
+  $('opp-sets').innerHTML=oppSets.map(l=>`<span class="set">${LET[l][0]}</span>`).join('')||'<span class="muted">—</span>';
+  $('my-sets').innerHTML=mySets.map(l=>`<span class="set">${LET[l][0]}</span>`).join('')||'<span class="muted">—</span>';
+  me.sort((a,b)=>a.l-b.l||a.v-b.v);
+  $('hand').innerHTML=me.map(c=>cardHTML(c.l,c.v,'button',sel===c.l?'sel':'')).join('');
+  $('hand').querySelectorAll('button.card').forEach(b=>b.onclick=()=>{sayS(syl(+b.dataset.l,+b.dataset.v));if(turn==='me'&&!busy)pickFamily(+b.dataset.l);});
+}
+function setMsg(html,cls=''){$('msg').innerHTML=html;$('msg').className='msg '+cls;}
+function refill(hand){ if(hand.length===0&&pile.length) hand.push(pile.pop()); }
+function gameOver(){ return chosen.size===mySets.length+oppSets.length; }
+function finish(){
+  turn='end';render();
+  const r=mySets.length>oppSets.length?'ניצחת! 🏆':mySets.length<oppSets.length?'ינשופי ניצח הפעם 🦉':'תיקו! 🤝';
+  setMsg(`<div class="big">${r}</div><div>לך ${mySets.length} חמישיות, לינשופי ${oppSets.length}</div><button class="btn" onclick="showSetup()">משחק חדש</button>`,'good');
+}
+function myTurn(text){
+  if(gameOver())return finish();
+  refill(me); if(!me.length){ return oppTurn(); }
+  turn='me';sel=null;render();setMsg(text);
+}
+function pickFamily(l){
+  sel=l;render();
+  const missing=V.map((_,v)=>v).filter(v=>!me.some(c=>c.l===l&&c.v===v));
+  setMsg(`<div>איזה קלף לבקש מינשופי?</div><div class="asks">${missing.map(v=>`<button class="ask" style="--c:var(--${V[v].k})" data-v="${v}">${syl(l,v)}</button>`).join('')}</div>`);
+  $('msg').querySelectorAll('.ask').forEach(b=>b.onclick=()=>ask(l,+b.dataset.v));
+}
+function ask(l,v){
+  busy=true;oppKnows.add(l);const s=syl(l,v);sayS(s);
+  const i=opp.findIndex(c=>c.l===l&&c.v===v);
+  if(i>=0){
+    me.push(opp.splice(i,1)[0]);
+    const done=checkSets(me,mySets);
+    setMsg(`<div>ינשופי: "יש לי! הנה ${s}"</div>${done.length?`<div class="big pop">חמישייה! ${LET[done[0]][0]} ⭐</div>`:''}`,'good');
+    render();refill(opp);
+    setTimeout(()=>{busy=false;myTurn('עוד תור שלך! בחרו קלף.');},1400);
+  }else{
+    const d=pile.pop();
+    if(d){me.push(d);}
+    const lucky=d&&d.l===l&&d.v===v;
+    const done=checkSets(me,mySets);
+    setMsg(`<div>ינשופי: "אין לי ${s}. קחו מהקופה."</div>${d?`<div>הוצאתם: <b style="font-family:var(--letter);font-size:30px;color:var(--${V[d.v].k})">${syl(d.l,d.v)}</b>${lucky?' — בדיוק מה שביקשתם!':''}</div>`:''}${done.length?`<div class="big pop">חמישייה! ${LET[done[0]][0]} ⭐</div>`:''}`,'bad');
+    sel=null;render();
+    setTimeout(()=>{busy=false;lucky?myTurn('מזל! עוד תור שלך.'):oppTurn();},2000);
+  }
+}
+function oppTurn(){
+  if(gameOver())return finish();
+  refill(opp); if(!opp.length) return myTurn('התור שלך!');
+  turn='opp';render();
+  const fams=[...new Set(opp.map(c=>c.l))];
+  const known=fams.filter(l=>oppKnows.has(l));
+  const pool=known.length&&Math.random()<.7?known:fams;
+  const fam=pool[Math.floor(Math.random()*pool.length)];
+  const miss=V.map((_,v)=>v).filter(v=>!opp.some(c=>c.l===fam&&c.v===v));
+  const v=miss[Math.floor(Math.random()*miss.length)];
+  const s=syl(fam,v);sayS(s);
+  setMsg(`<div>🦉 ינשופי שואל: יש לך את</div><div class="big" style="color:var(--${V[v].k})">${s}</div><div class="row" style="justify-content:center"><button class="btn" id="yes">כן, יש לי</button><button class="btn ghost" id="no">אין לי</button></div>`);
+  $('yes').onclick=()=>answer(fam,v,true);$('no').onclick=()=>answer(fam,v,false);
+}
+function answer(l,v,claim){
+  const i=me.findIndex(c=>c.l===l&&c.v===v);const has=i>=0;
+  if(claim!==has){ setMsg($('msg').innerHTML.replace(/<div class="hint.*?<\/div>/,'')+`<div class="hint muted">${has?'בדקו שוב בקלפים שלכם 🙂 הקלף אצלכם':'בדקו שוב 🙂 הקלף הזה לא אצלכם'}</div>`);
+    $('yes').onclick=()=>answer(l,v,true);$('no').onclick=()=>answer(l,v,false);return; }
+  if(has){
+    opp.push(me.splice(i,1)[0]);const done=checkSets(opp,oppSets);
+    setMsg(`<div>נתתם לינשופי את ${syl(l,v)}</div>${done.length?`<div class="big pop">ינשופי השלים חמישייה ${LET[done[0]][0]}</div>`:''}`);
+    render();setTimeout(oppTurn,1600);
+  }else{
+    const d=pile.pop();if(d)opp.push(d);checkSets(opp,oppSets);
+    setMsg('<div>ינשופי לוקח קלף מהקופה.</div>');render();
+    setTimeout(()=>myTurn('התור שלך! בחרו קלף.'),1400);
+  }
+}
+function showSetup(){$('game').hidden=true;$('setup').hidden=false;}
+$('start').onclick=start;$('restart').onclick=showSetup;
+
+/* ---------- words ---------- */
+const TASKS=['מילה בת 2 הברות','מילה בת 3 הברות','מילה בת 4 הברות','מילה בת 2 אותיות','מילה בת 3 אותיות','מילה בת 4 אותיות','מילה מצחיקה','מילה מפחידה','מילה מתוקה','מילה רועשת','מילה שקטה','מילה של משהו גדול','מילה של משהו קטן','מילה בנושא בעלי חיים','מילה בנושא אוכל','מילה בנושא משפחה','מילה בנושא בבית','מילה בנושא הגוף שלנו','מילה בנושא טבע','מילה בנושא בגדים','מילה בנושא בית הספר','מילה בנושא משחקים','שם של ילד או ילדה','מילה עם חִירִיק','מילה עם שׁוּרוּק','מילה שכל ההברות בה עם אותו ניקוד','מילה שמתחילה באות של השם שלך'];
+function drawTask(){const t=TASKS[Math.floor(Math.random()*TASKS.length)];$('w-task').innerHTML=`<div class="task pop"><span class="tk">משימה</span><b>הרכיבו ${t}</b></div>`;say('הרכיבו '+t);}
+
+let wl=12,word=[];
+function renderW(){
+  $('w-letters').innerHTML=LET.map((l,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===wl}">${l[0]}</button>`).join('');
+  $('w-letters').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{wl=+c.dataset.i;renderW();});
+  $('w-vowels').innerHTML=V.map((x,v)=>`<button class="ask" style="--c:var(--${x.k})" data-v="${v}">${syl(wl,v)}</button>`).join('');
+  $('w-vowels').querySelectorAll('.ask').forEach(b=>b.onclick=()=>{word.push({l:wl,v:+b.dataset.v});sayS(syl(wl,+b.dataset.v));renderWord(true);});
+}
+function wordText(){return word.map(c=>syl(c.l,c.v)).join('');}
+function renderWord(pop){
+  $('w-row').innerHTML=word.length?word.map((c,i)=>cardHTML(c.l,c.v,'div',pop&&i===word.length-1?'pop':'')).join(''):'<span class="empty">כאן תופיע המילה</span>';
+  $('w-text').textContent=wordText();
+}
+$('w-say').onclick=()=>word.length&&say(wordText());
+$('w-back').onclick=()=>{word.pop();renderWord();};
+$('w-clear').onclick=()=>{word=[];renderWord();};
+$('w-draw').onclick=drawTask;
+word=[{l:12,v:0},{l:13,v:4}];renderW();renderWord();
+
+/* tabs */
+function tab(t){
+  $('t-play').setAttribute('aria-selected',t==='play');$('t-word').setAttribute('aria-selected',t==='word');
+  $('words').hidden=t!=='word';
+  if(t==='word'){$('setup').hidden=true;$('game').hidden=true;} else { (turn&&turn!=='end'&&pile)?$('game').hidden=false:$('setup').hidden=false; }
+}
+$('t-play').onclick=()=>tab('play');$('t-word').onclick=()=>tab('word');
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

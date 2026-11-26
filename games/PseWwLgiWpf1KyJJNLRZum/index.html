@@ -1,0 +1,220 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>בינגו שורשים</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: caller panel on top (word card + controls + history), four player boards below in a 2x2 grid */
+:root{
+  --bg:#f3f1fa; --surface:#ffffff; --ink:#1f1b33; --muted:#6b6584; --line:#ddd8ee;
+  --accent:#5b3fd1; --accent-ink:#ffffff; --hit:#1d9c6c; --miss:#d64545;
+  --p1:#e26d3d; --p2:#2f8fd8; --p3:#c2479a; --p4:#3aa35f;
+  --display:"Secular One","Assistant",system-ui,sans-serif; --body:"Assistant",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15121f; --surface:#211d31; --ink:#efecf8; --muted:#a59fbe; --line:#36304b;
+  --accent:#9b85ff; --accent-ink:#15121f; --hit:#3ccf96; --miss:#ff7070;
+  --p1:#ff9466; --p2:#62b4ff; --p3:#ee7cc7; --p4:#6bd48f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15121f; --surface:#211d31; --ink:#efecf8; --muted:#a59fbe; --line:#36304b;
+  --accent:#9b85ff; --accent-ink:#15121f; --hit:#3ccf96; --miss:#ff7070;
+  --p1:#ff9466; --p2:#62b4ff; --p3:#ee7cc7; --p4:#6bd48f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:20px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,5vw,40px);margin:0;letter-spacing:.5px}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:2px 0 0}
+button{font-family:var(--body);font-weight:700;font-size:16px;border-radius:12px;border:2px solid var(--accent);
+  background:transparent;color:var(--accent);padding:10px 18px;cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.caller{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;
+  grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.word{font-family:var(--display);font-size:clamp(48px,11vw,96px);line-height:1;min-height:1em}
+.word b{color:var(--accent);font-weight:400;text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:10px}
+.root-line{color:var(--muted);font-size:20px;min-height:1.4em;margin-top:10px}
+.root-line strong{color:var(--ink);font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:4px}
+.controls{display:flex;flex-direction:column;gap:10px}
+.history{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.history span{background:var(--bg);border-radius:8px;padding:2px 8px}
+.count{font-variant-numeric:tabular-nums}
+.boards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.board{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--pc);border-radius:18px;padding:14px;display:grid;gap:10px}
+.board.won{box-shadow:0 0 0 4px var(--pc)}
+.board-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.board-head input{font-family:var(--display);font-size:22px;border:none;background:transparent;color:var(--pc);width:100%;min-width:0;padding:2px}
+.board-head input:focus-visible{outline:2px dashed var(--pc)}
+.score{font-size:14px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{aspect-ratio:1;max-width:100%;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);
+  font-family:var(--display);font-weight:400;font-size:clamp(16px,3.2vw,24px);letter-spacing:1px;padding:0}
+.cell:hover{border-color:var(--pc)}
+.cell.on{background:var(--pc);border-color:var(--pc);color:#fff}
+.cell.bad{animation:shake .4s;border-color:var(--miss)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.banner{position:fixed;inset:auto 0 0 0;padding:16px max(16px,env(safe-area-inset-left,0px)) calc(16px + env(safe-area-inset-bottom,0px));
+  background:var(--accent);color:var(--accent-ink);text-align:center;font-family:var(--display);font-size:28px;z-index:5}
+.rules{color:var(--muted);font-size:15px;line-height:1.6;max-width:70ch}
+@media (max-width:720px){.boards{grid-template-columns:minmax(0,1fr)}.caller{grid-template-columns:minmax(0,1fr)}.controls{flex-direction:row;flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.cell.bad{animation:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>בינגו <span>שורשים</span></h1>
+      <p class="sub">שורשים שלמים · כיתה ז׳</p>
+    </div>
+    <button id="newGame">משחק חדש</button>
+  </header>
+
+  <section class="caller" aria-live="polite">
+    <div>
+      <div class="word" id="word">לחצו "שלוף מילה"</div>
+      <div class="root-line" id="rootLine"></div>
+    </div>
+    <div class="controls">
+      <button class="primary" id="draw">שלוף מילה</button>
+      <button id="reveal" disabled>הצג שורש</button>
+    </div>
+    <div class="history" id="history"><span class="count" id="count">0 מילים נשלפו</span></div>
+  </section>
+
+  <section class="boards" id="boards"></section>
+
+  <p class="rules">איך משחקים: שולפים מילה. כל שחקן מחפש בלוח שלו את השורש של המילה ולוחץ עליו. סימון נכון נצבע, סימון שגוי רועד. הראשון שמשלים שורה, טור או אלכסון – בינגו!</p>
+</div>
+<div class="banner" id="banner" hidden></div>
+
+<script>
+const DATA = {
+ "כ-ת-ב":["מכתב","כתובת","כתבה"],
+ "ל-מ-ד":["תלמיד","מלמד","לימודים"],
+ "ג-ד-ל":["מגדל","גודל","גדולה"],
+ "ש-ל-ם":["תשלום","שלמות","משלם"],
+ "ב-ש-ל":["תבשיל","מבשל","בישול"],
+ "ל-ב-ש":["תלבושת","מלבוש","לבוש"],
+ "פ-ק-ד":["תפקיד","פקיד","מפקד"],
+ "ד-ב-ק":["מדבקה","דבק","דבוק"],
+ "כ-ב-ס":["מכבסה","כביסה","כובס"],
+ "ק-ש-ב":["הקשבה","קשוב","מקשיב"],
+ "ק-ב-ץ":["קבוצה","מקבץ","קיבוץ"],
+ "ז-מ-ן":["הזמנה","מזמין","זמני"],
+ "כ-ס-ף":["כספת","כספומט","כספי"],
+ "מ-ש-ך":["המשך","משיכה","ממשיך"],
+ "ב-ד-ק":["בדיקה","מבדק","בודק"],
+ "ג-ל-ש":["מגלשה","גלישה","גולש"],
+ "ד-ל-ק":["מדליק","דליקה","דלק"],
+ "ק-פ-ץ":["קפיצה","מקפצה","קופץ"],
+ "ש-ב-ץ":["משבצת","שיבוץ","משבץ"],
+ "ס-פ-ג":["ספוג","ספיגה","סופג"],
+ "ג-ב-ל":["גבול","מגבלה","הגבלה"],
+ "ש-ל-ט":["שלט","שליט","שלטון"],
+ "פ-ס-ק":["הפסקה","פסקה","מפסיק"],
+ "ש-ת-ק":["שתיקה","שותק","שתקן"]
+};
+const ROOTS = Object.keys(DATA);
+const FIN = {"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"};
+const norm = c => FIN[c]||c;
+const COLORS = ["--p1","--p2","--p3","--p4"];
+const DEFAULT_NAMES = ["שחקן 1","שחקן 2","שחקן 3","שחקן 4"];
+const LINES = [];
+for(let i=0;i<4;i++){LINES.push([0,1,2,3].map(j=>i*4+j));LINES.push([0,1,2,3].map(j=>j*4+i));}
+LINES.push([0,5,10,15],[3,6,9,12]);
+
+const shuffle = a => {a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const $ = id => document.getElementById(id);
+let deck, current, drawn, players, revealed;
+
+function names(){ try{return JSON.parse(localStorage.getItem("rb-names"))||DEFAULT_NAMES}catch(e){return DEFAULT_NAMES} }
+function saveNames(){ try{localStorage.setItem("rb-names",JSON.stringify(players.map(p=>p.name)))}catch(e){} }
+
+function newGame(){
+  deck = shuffle(ROOTS.flatMap(r=>DATA[r].map(w=>({w,r}))));
+  current = null; drawn = new Set(); revealed=false;
+  const n = names();
+  players = [0,1,2,3].map(i=>({name:n[i]||DEFAULT_NAMES[i], cells:shuffle(ROOTS).slice(0,16), on:new Set(), won:false}));
+  $("word").textContent = 'לחצו "שלוף מילה"';
+  $("rootLine").textContent = "";
+  $("reveal").disabled = true; $("draw").disabled = false;
+  $("banner").hidden = true;
+  renderHistory(); renderBoards();
+}
+
+function highlight(word, root){
+  const letters = root.split("-").map(norm);
+  const chars = [...word], idx = new Set();
+  let k = chars.length-1;
+  for(let i=letters.length-1;i>=0;i--){
+    while(k>=0 && norm(chars[k])!==letters[i]) k--;
+    if(k>=0){idx.add(k);k--}
+  }
+  return chars.map((c,i)=>idx.has(i)?`<b>${c}</b>`:c).join("");
+}
+
+function draw(){
+  if(!deck.length) return;
+  current = deck.pop(); drawn.add(current.r); revealed=false;
+  $("word").textContent = current.w;
+  $("rootLine").textContent = "מה השורש?";
+  $("reveal").disabled = false;
+  if(!deck.length) $("draw").disabled = true;
+  renderHistory(true);
+}
+
+function reveal(){
+  if(!current) return;
+  revealed=true;
+  $("word").innerHTML = highlight(current.w,current.r);
+  $("rootLine").innerHTML = `השורש: <strong>${current.r}</strong>`;
+  $("reveal").disabled = true;
+}
+
+const past = [];
+function renderHistory(add){
+  if(add===undefined) past.length=0;
+  if(add && current) past.push(current.w);
+  $("history").innerHTML = `<span class="count">${past.length} מילים נשלפו</span>` + past.slice(0,-1).reverse().map(w=>`<span>${w}</span>`).join("");
+}
+
+function renderBoards(){
+  const box = $("boards"); box.innerHTML="";
+  players.forEach((p,pi)=>{
+    const el = document.createElement("div");
+    el.className = "board"+(p.won?" won":"");
+    el.style.setProperty("--pc",`var(${COLORS[pi]})`);
+    el.innerHTML = `<div class="board-head"><input id="name${pi}" aria-label="שם שחקן ${pi+1}" value="${p.name}"><span class="score">${p.on.size}/16</span></div>
+      <div class="grid">${p.cells.map((r,ci)=>`<button class="cell${p.on.has(ci)?" on":""}" data-p="${pi}" data-c="${ci}">${r}</button>`).join("")}</div>`;
+    box.appendChild(el);
+    el.querySelector("input").addEventListener("input",e=>{p.name=e.target.value;saveNames()});
+  });
+}
+
+$("boards").addEventListener("click",e=>{
+  const b = e.target.closest(".cell"); if(!b) return;
+  const p = players[+b.dataset.p], ci = +b.dataset.c, root = p.cells[ci];
+  if(p.on.has(ci)) return;
+  if(!drawn.has(root)){
+    b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); return;
+  }
+  p.on.add(ci);
+  if(!p.won && LINES.some(l=>l.every(i=>p.on.has(i)))){
+    p.won = true;
+    const ban=$("banner"); ban.textContent=`בינגו! 🎉 ${p.name} ניצח/ה`; ban.hidden=false;
+    setTimeout(()=>ban.hidden=true,4000);
+  }
+  renderBoards();
+});
+
+$("draw").onclick = draw;
+$("reveal").onclick = reveal;
+$("newGame").onclick = newGame;
+newGame();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

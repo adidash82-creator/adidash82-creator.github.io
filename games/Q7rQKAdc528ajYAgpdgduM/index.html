@@ -1,0 +1,148 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>מיון ביטויים: סמיכות או תואר</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one column — task strip, word pool, two bins side by side (stack on phone) */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --fg:#1d2433; --muted:#5d6678; --line:#d8dde6;
+  --a:#0f7a6c; --a-soft:#dff3ef; --b:#7a3d8f; --b-soft:#f1e5f5;
+  --ok:#1f8a3b; --bad:#c2372f;
+  --display:"Secular One","Assistant",system-ui,sans-serif;
+  --body:"Assistant",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141922; --surface:#1d2430; --fg:#e8ecf3; --muted:#9aa4b6; --line:#2f3847;
+  --a:#4cc4b2; --a-soft:#173a36; --b:#c48ad8; --b-soft:#33223b; --ok:#5fd07c; --bad:#ff7a70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141922; --surface:#1d2430; --fg:#e8ecf3; --muted:#9aa4b6; --line:#2f3847;
+  --a:#4cc4b2; --a-soft:#173a36; --b:#c48ad8; --b-soft:#33223b; --ok:#5fd07c; --bad:#ff7a70; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:18px;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
+.wrap{max-width:900px;margin:0 auto;display:grid;gap:20px}
+h1{font-family:var(--display);font-weight:400;font-size:2rem;margin:0;text-wrap:balance}
+.task{color:var(--muted);margin:4px 0 0;line-height:1.6}
+.pool{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-wrap:wrap;gap:10px;min-height:64px}
+.pool:empty::after{content:"כל הביטויים מוינו. לחצי על \"בדיקה\".";color:var(--muted)}
+.chip{font:inherit;font-weight:600;background:var(--bg);color:var(--fg);border:2px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;transition:transform .15s,border-color .15s}
+.chip:hover{border-color:var(--muted)}
+.chip:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.chip.sel{border-color:var(--fg);transform:translateY(-2px);box-shadow:0 4px 0 var(--line)}
+.chip.right{border-color:var(--ok);color:var(--ok)}
+.chip.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:600px){.bins{grid-template-columns:1fr}}
+.bin{border-radius:14px;padding:14px;display:grid;gap:10px;align-content:start;min-height:180px;border:2px dashed transparent;cursor:pointer}
+.bin.a{background:var(--a-soft);border-color:var(--a)}
+.bin.b{background:var(--b-soft);border-color:var(--b)}
+.bin h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.bin.a h2{color:var(--a)} .bin.b h2{color:var(--b)}
+.bin .list{display:flex;flex-wrap:wrap;gap:8px}
+.bin .hint{font-size:.9rem;color:var(--muted);margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{font:inherit;font-weight:700;border:none;border-radius:10px;padding:10px 22px;cursor:pointer;background:var(--fg);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--fg);border:2px solid var(--line)}
+.btn:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+#score{font-weight:700;font-variant-numeric:tabular-nums}
+.bonus{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;line-height:1.7}
+.bonus h3{font-family:var(--display);font-weight:400;margin:0 0 6px;font-size:1.15rem}
+.bonus ol{margin:0;padding-inline-start:22px}
+.part2{display:grid;gap:14px;margin-top:12px;padding-top:24px;border-top:2px solid var(--line)}
+.pairs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px}
+.pair{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:12px}
+.pair .num{font-family:var(--display);color:var(--muted);font-size:.95rem}
+.sent{display:grid;gap:6px}
+.sent p{margin:0;line-height:1.6}
+.sent mark{background:var(--a-soft);color:var(--fg);font-weight:700;padding:0 4px;border-radius:4px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:inherit;font-size:.9rem;font-weight:600;background:transparent;color:var(--fg);border:2px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.opt.right{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.opt.wrong{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.opt:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.chip{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>סמיכות או שם עצם + תואר?</h1>
+    <p class="task">לחצי על ביטוי, ואז לחצי על הקופסה שאליה הוא שייך. אפשר להחזיר ביטוי למאגר בלחיצה עליו. כשסיימת, לחצי "בדיקה".</p>
+  </header>
+
+  <div class="pool" id="pool" aria-label="מאגר ביטויים"></div>
+
+  <div class="bins">
+    <section class="bin a" id="binA" tabindex="0" aria-label="קופסת סמיכות">
+      <h2>צירוף סמיכות</h2>
+      <div class="list"></div>
+    </section>
+    <section class="bin b" id="binB" tabindex="0" aria-label="קופסת שם עצם ותואר">
+      <h2>שם עצם + שם תואר</h2>
+      <div class="list"></div>
+    </section>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="check">בדיקה</button>
+    <button class="btn ghost" id="reset">ערבוב מחדש</button>
+    <span id="score" aria-live="polite"></span>
+  </div>
+
+  <section class="part2">
+    <h1>מילה אחת, שני תפקידים</h1>
+    <p class="task">בכל זוג משפטים מופיעה אותה מילה (מודגשת). קבעי מה היא בכל משפט: שם עצם, שם תואר או פועל. כשסיימת, לחצי "בדיקה".</p>
+    <div id="pairs" class="pairs"></div>
+    <div class="bar">
+      <button class="btn" id="check2">בדיקה</button>
+      <button class="btn ghost" id="reset2">ניקוי</button>
+      <span id="score2" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="bonus">
+    <h3>אתגר בונוס (בעל־פה או במחברת)</h3>
+    <ol>
+      <li>בחרי 3 צירופי סמיכות והוסיפי להם ה' הידיעה. איפה היא נכנסת?</li>
+      <li>בחרי 3 צירופים של שם עצם + תואר והפכי אותם לרבים.</li>
+      <li>מה ההבדל בין "שולחן עבודה" ל"שולחן עגול"? הסבירי במשפט אחד.</li>
+      <li>המציאי זוג משפטים משלך עם מילה אחת שמשנה תפקיד (למשל: שם עצם ופועל).</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const DATA=[
+ ["בית ספר","a"],["עוגת שוקולד","a"],["שעון קיר","a"],["חדר אוכל","a"],["כוס מים","a"],["דלת הכניסה","a"],
+ ["שולחן עבודה","a"],["מגרש כדורגל","a"],["בגדי חורף","a"],["יום הולדת","a"],["תלמידות הכיתה","a"],["ספר היסטוריה","a"],
+ ["ילד חכם","b"],["עוגה מתוקה","b"],["בית גדול","b"],["ספרים ישנים","b"],["הכלבה הקטנה","b"],["שמלה אדומה","b"],
+ ["יום חם","b"],["החדר המסודר","b"],["מורה סבלנית","b"],["רחוב שקט","b"],["דלת פתוחה","b"],["שולחן עגול","b"]
+];
+const pool=document.getElementById('pool'),binA=document.getElementById('binA'),binB=document.getElementById('binB'),score=document.getElementById('score');
+let selected=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function build(){
+  pool.innerHTML='';binA.querySelector('.list').innerHTML='';binB.querySelector('.list').innerHTML='';score.textContent='';selected=null;
+  shuffle(DATA.slice()).forEach(([t,k],i)=>{
+    const c=document.createElement('button');c.className='chip';c.textContent=t;c.dataset.k=k;c.id='c'+i;
+    c.addEventListener('click',e=>{e.stopPropagation();clearMarks();
+      if(c.parentElement!==pool){pool.appendChild(c);c.classList.remove('sel');selected=null;return}
+      if(selected===c){c.classList.remove('sel');selected=null;return}
+      if(selected)selected.classList.remove('sel');selected=c;c.classList.add('sel');});
+    pool.appendChild(c);
+  });
+}
+function clearMarks(){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('right','wrong'));score.textContent=''}
+function drop(bin){if(!selected)return;clearMarks();selected.classList.remove('sel');bin.querySelector('.list').appendChild(selected);selected=null}
+[binA,binB].forEach(b=>{b.addEventListener('click',()=>drop(b));b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drop(b)}})});
+document.getElementById('check').addEventListener('click',()=>{
+  let ok=0;
+  [[binA,'a'],[binB,'b']].forEach(([b,k])=>b.querySelectorAll('.chip').forEach(c=>{const r=c.dataset.k===k;c.classList.toggle('right',r);c.classList.toggle('wrong',!r);if(r)ok++}));
+  const left=pool.children.length;
+  score.textContent=`${ok} מתוך ${DATA.length} נכונים`+(left?` · נשארו ${left} במאגר`:'')+(ok===DATA.length?' · מצוין!':'');
+});
+document.getElementById('reset').addEventListener('click',build);
+build();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>עולם המשחקים של עדי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, playful, clear — a toy box for kids up to 12 and their teacher
+   IDEA: a shelf of chunky 3D toy blocks; every game is a block you press
+   PICTURE: floating letter-cubes over a hill, then the block shelf itself
+   COLOUR and TYPE: sky blue ground, sunny yellow, grass green, coral accent; Secular One + Rubik
+   LAYOUT: hero band, sticky filter bar, grade "worlds" as sections of 3D cards */
+:root{color-scheme:light dark;
+--bg:light-dark(#8fd3ff,#16224a);--bg2:light-dark(#c9ecff,#1f2f5e);
+--ink:light-dark(#1b2a5e,#f5f2e8);--soft:light-dark(#3d4d80,#c7cde6);
+--card:light-dark(#ffffff,#26386e);--edge:light-dark(#d5e3f5,#121b3d);
+--sun:#ffc93c;--grass:#5cc85a;--coral:#ff6f61;--grape:#8b6cf0;--sea:#2fa8e0;
+--fs:17px}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.55 Rubik,'Arial Hebrew',Arial,sans-serif;overflow-x:clip}
+body.big{--fs:20px}
+a{color:inherit}
+.skip{position:absolute;right:-999px;top:8px;background:var(--sun);color:#1b2a5e;padding:10px 16px;border-radius:12px;z-index:50}
+.skip:focus{right:12px}
+:focus-visible{outline:4px solid var(--coral);outline-offset:3px}
+
+/* hero */
+.hero{position:relative;padding:clamp(24px,4vw,48px) max(5vw,16px) 0;background:linear-gradient(var(--bg),var(--bg2));overflow:hidden}
+.hwrap{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:center}
+h1{font:400 clamp(34px,5.4vw,58px)/1.05 'Secular One',Rubik,sans-serif;margin:0 0 14px;text-wrap:balance;text-shadow:0 4px 0 light-dark(#ffffff99,#0006)}
+.lead{font-size:1.1em;color:var(--soft);margin:0 0 20px;max-width:34ch}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.pill{background:var(--card);border-radius:999px;padding:8px 16px;font-weight:700;box-shadow:0 5px 0 var(--edge)}
+.pill b{color:var(--coral)}
+.scene{width:100%;height:auto;display:block}
+.float{animation:bob 4s ease-in-out infinite}
+.float.d2{animation-delay:-1.3s}.float.d3{animation-delay:-2.6s}
+@keyframes bob{50%{transform:translateY(-12px)}}
+
+/* filter bar */
+.bar{position:sticky;top:0;z-index:20;background:light-dark(#ffffffee,#16224aee);backdrop-filter:blur(8px);border-bottom:4px solid var(--edge);padding:12px max(5vw,16px)}
+.bwrap{max-width:1240px;margin:auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grp{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grp>span{font-weight:700;font-size:.9em;color:var(--soft)}
+.chip{font:700 .95em Rubik,sans-serif;min-height:44px;padding:8px 16px;border:0;border-radius:14px;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 5px 0 var(--edge);transition:transform .12s,box-shadow .12s}
+.chip:active{transform:translateY(4px);box-shadow:0 1px 0 var(--edge)}
+.chip[aria-pressed=true]{background:var(--c,var(--sea));color:#fff;box-shadow:0 5px 0 light-dark(#0003,#0008)}
+select,input[type=search]{font:500 16px Rubik,sans-serif;min-height:44px;padding:8px 14px;border-radius:14px;border:3px solid var(--edge);background:var(--card);color:var(--ink)}
+input[type=search]{flex:1 1 180px}
+.tools{margin-inline-start:auto;display:flex;gap:8px}
+
+/* worlds */
+main{max-width:1240px;margin:auto;padding:8px max(5vw,16px) 60px}
+.world{margin-top:36px}
+.whead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.badge{width:62px;height:62px;flex:none;border-radius:18px;display:grid;place-items:center;font:400 26px 'Secular One',sans-serif;color:#fff;background:var(--c);box-shadow:0 7px 0 light-dark(#0002,#0007),inset 0 -6px 0 #0002,inset 0 4px 0 #fff5;transform:rotate(-6deg)}
+h2{font:400 clamp(26px,3.4vw,36px)/1.1 'Secular One',sans-serif;margin:0}
+.whead p{margin:2px 0 0;color:var(--soft)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px;perspective:900px}
+
+/* 3D card */
+.card{position:relative;display:flex;flex-direction:column;text-decoration:none;background:var(--card);border-radius:24px;padding:18px 18px 16px;box-shadow:0 10px 0 var(--edge),0 18px 26px light-dark(#1b2a5e22,#0006);transform-style:preserve-3d;transition:transform .25s,box-shadow .25s;border-top:6px solid var(--c)}
+.card:hover,.card:focus-visible{transform:translateY(-6px) rotateX(6deg) rotateY(var(--ry,0deg));box-shadow:0 16px 0 var(--edge),0 28px 34px light-dark(#1b2a5e33,#0008)}
+.card:active{transform:translateY(6px);box-shadow:0 3px 0 var(--edge)}
+.ico{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:var(--c);box-shadow:inset 0 -6px 0 #0002,inset 0 4px 0 #fff6,0 6px 0 light-dark(#0002,#0006);margin-bottom:12px;transform:translateZ(30px)}
+.ico svg{width:38px;height:38px}
+.card h3{font:700 1.15em/1.25 Rubik,sans-serif;margin:0 0 6px}
+.card p{margin:0 0 12px;color:var(--soft);font-size:.95em;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:.8em;font-weight:700;padding:3px 10px;border-radius:999px;background:light-dark(#eef4fb,#1b2a56)}
+.tag.lv{background:var(--lc);color:#1b2a5e}
+.go{position:absolute;left:14px;top:14px;width:40px;height:40px;border-radius:50%;background:var(--sun);display:grid;place-items:center;box-shadow:0 4px 0 #d89c12;color:#1b2a5e;font-weight:800}
+.empty{text-align:center;padding:40px;font-size:1.2em;display:none}
+footer{text-align:center;padding:24px 16px 40px;color:var(--soft);font-size:.9em}
+
+@media(max-width:600px){.bar{position:static}}
+@media(max-width:760px){.hwrap{grid-template-columns:1fr}.scene{max-width:440px;margin:auto}.tools{margin-inline-start:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#games">דלג למשחקים</a>
+
+<header class="hero">
+ <div class="hwrap">
+  <div>
+   <h1>עוֹלַם הַמִּשְׂחָקִים</h1>
+   <p class="lead">כל המשחקים והשיעורים האינטראקטיביים במקום אחד. בוחרים כיתה, רמה או נושא – ולוחצים על קובייה כדי לשחק.</p>
+   <div class="stats" id="stats"></div>
+  </div>
+  <svg class="scene" viewBox="0 0 520 330" role="img" aria-label="קוביות אותיות צבעוניות מרחפות מעל גבעה">
+   <defs>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ddc6a"/><stop offset="1" stop-color="#3fa94a"/></linearGradient>
+    <g id="cube">
+     <path d="M0 -40 L46 -18 L46 32 L0 54 L-46 32 L-46 -18Z" fill="#0002" transform="translate(6 14)"/>
+     <path d="M0 -40 L46 -18 L0 4 L-46 -18Z" fill="var(--t)"/>
+     <path d="M-46 -18 L0 4 L0 54 L-46 32Z" fill="var(--l)"/>
+     <path d="M46 -18 L0 4 L0 54 L46 32Z" fill="var(--r)"/>
+     <path d="M0 -40 L46 -18" stroke="#fff8" stroke-width="3"/>
+    </g>
+   </defs>
+   <ellipse cx="260" cy="350" rx="330" ry="110" fill="url(#hill)"/>
+   <circle cx="455" cy="55" r="34" fill="#ffc93c"/><circle cx="455" cy="55" r="46" fill="#ffc93c" opacity=".25"/>
+   <g fill="#fff" opacity=".9"><ellipse cx="80" cy="60" rx="46" ry="16"/><ellipse cx="110" cy="50" rx="30" ry="18"/><ellipse cx="330" cy="40" rx="36" ry="12"/></g>
+   <g class="float"><use href="#cube" x="130" y="170" style="--t:#ffd86b;--l:#f2a81d;--r:#e08a00"/><text x="130" y="182" text-anchor="middle" font-family="Secular One" font-size="34" fill="#fff">א</text></g>
+   <g class="float d2"><use href="#cube" x="260" y="135" style="--t:#ff958b;--l:#ff6f61;--r:#d94c40"/><text x="260" y="147" text-anchor="middle" font-family="Secular One" font-size="34" fill="#fff">ב</text></g>
+   <g class="float d3"><use href="#cube" x="390" y="180" style="--t:#a994ff;--l:#8b6cf0;--r:#6a4bd1"/><text x="390" y="192" text-anchor="middle" font-family="Secular One" font-size="34" fill="#fff">ג</text></g>
+   <g transform="translate(320 250)"><circle r="16" fill="#2fa8e0"/><path d="M-6 -7 L8 0 L-6 7Z" fill="#fff"/></g>
+   <g fill="#fff" transform="translate(190 80)"><path d="M0-12 3-4 12-4 5 2 8 11 0 5-8 11-5 2-12-4-3-4Z"/></g>
+  </svg>
+ </div>
+</header>
+
+<nav class="bar" aria-label="סינון משחקים">
+ <div class="bwrap">
+  <div class="grp" role="group" aria-label="כיתה" id="fGrade"><span>כיתה:</span></div>
+  <div class="grp">
+      <select id="fLevel" aria-label="רמה"><option value="">כל הרמות</option><option>מתחילים</option><option>ביניים</option><option>מתקדמים</option></select>
+   <select id="fSkill" aria-label="נושא"><option value="">כל הנושאים</option></select>
+  </div>
+  <input type="search" id="q" placeholder="חיפוש משחק…" aria-label="חיפוש משחק">
+  <div class="tools">
+   <button class="chip" id="bigBtn" aria-pressed="false" title="הגדלת טקסט">א+</button>
+  </div>
+ </div>
+</nav>
+
+<main id="games">
+ <div id="worlds"></div>
+ <p class="empty" id="empty">לא נמצא משחק כזה. נסו לבחור נושא או כיתה אחרים.</p>
+</main>
+<footer>נבנה עבור השיעורים של עדי פרץ</footer>
+
+<script>
+{
+const U='games/';
+const WORLDS=[
+ {id:'g12',name:"כיתות א'–ב'",short:'א-ב',c:'#ff6f61',sub:'ניקוד, צלילים וקריאה ראשונה'},
+ {id:'g34',name:"כיתות ג'–ד'",short:'ג-ד',c:'#f2a81d',sub:'קריאה שוטפת, הבנה וכתיבה'},
+ {id:'g56',name:"כיתות ה'–ו'",short:'ה-ו',c:'#2fa8e0',sub:'הבנת הנקרא, כתיב ופיסוק'},
+ {id:'g7',name:"כיתה ז'",short:'ז',c:'#8b6cf0',sub:'לשון ודקדוק'},
+ {id:'emo',name:'עולם הרגשות',short:'♥',c:'#5cc85a',sub:'כלים רגשיים לגילאי 6–12'}
+];
+const SK={
+ 'ניקוד':'#ff6f61','קריאה ופענוח':'#f2a81d','הבנת הנקרא':'#2fa8e0','כתיב':'#e0569b',
+ 'פיסוק':'#00a6a6','לשון ודקדוק':'#8b6cf0','חשיבה':'#5a7be0','רגשי':'#5cc85a'
+};
+const LV={'מתחילים':'#bdf0a8','ביניים':'#ffe08a','מתקדמים':'#ffb3a8'};
+const G=[
+ // א-ב
+ ['g12','פרצוף הניקוד','8JZKT8VPWo6LvbtwU3QfMv','ניקוד','מתחילים','משחק','פרצוף שמלמד את התנועות עם תנועות ידיים, השמעה וחידון.'],
+ ['g12','חמישיות ניקוד','4rxHxTjQxES84jtSYMA6w7','ניקוד','מתחילים','משחק','משחק קלפים מול ינשופי: אוספים חמישייה של אות בכל התנועות.'],
+ ['g12','קוביית קריאה','7XBMPVXJJW6o3wgNagNR6Q','קריאה ופענוח','מתחילים','משחק','קובייה תלת־ממדית: קוראים בקול מצחיק, מפחיד, לאט או מהר.'],
+ ['g12','מוסך התנועות','QBjW2HFiCM5YBx7h3ZVjwL','ניקוד','מתחילים','משחק','חמש מכוניות התנועות: זיהוי תנועה, ספירת הברות וחיבור למילה.'],
+ ['g12','הגרנד פרי','RGBZd5y9bsZL6qL7YXVWVu','קריאה ופענוח','מתחילים','משחק','מרוץ מכוניות: צליל פותח, מילה ותמונה, וציור מילים.'],
+ ['g12','בינגו המכוניות','HUy34qxAmkscoNwMF5o543','ניקוד','ביניים','משחק','בינגו מילים לפי תנועה, עם מכריז דיגיטלי.'],
+ ['g12','צייד המילים','RR9fY1RqhJDkBJgoBcS4fk','קריאה ופענוח','מתחילים','משחק','יוצאים לצוד מילים קצרות ומנוקדות.'],
+ ['g12','משימת החלל','GaBeBaFYEVneaWsybd74nj','קריאה ופענוח','מתחילים','שיעור','שיעור 45 דקות בחללית: מילים בכל כוכב, הפסקות כוח ורישיון טייס.'],
+ ['g12','המסע בחלל','NEcVPs7JndxwqCdgX3oKVu','קריאה ופענוח','מתחילים','שיעור','המשך הרפתקת החלל עם הברות וקריאה בתנועה.'],
+ ['g12','משלחת הדינוזאורים','8bfq5YCDRk5kDh4tvPRVNB','קריאה ופענוח','מתחילים','שיעור','בוקעים ביצים, עוקבים אחרי עקבות ומאכילים דינוזאורים.'],
+ ['g12','מסע המחוננים','PZUkVsD1r31agdVZhKfN5p','חשיבה','מתקדמים','משחק',"תרגול למבחן מיפוי מחוננים לכיתה ב': הבנה וחשבון, שני סבבים."],
+ ['g12','מסלול הקריאה והחשיבה – מנוקד','YcUS7XzTmtUn7CiYGG45w3','הבנת הנקרא','ביניים','משחק','לוח משחק עם קלפי טקסט, שאלות ומשימות תנועה וכתיבה.'],
+ ['g12','בלשי האיות – מנוקד','HuGPRsWjSjCnzvxaLqHbsP','כתיב','ביניים','משחק','מחפשים שגיאות כתיב ומתקנים, עם ניקוד מלא.'],
+ // ג-ד
+ ['g34','הסוכנת האמיצה','4qFW2zenyk7K9twX5Z6pFb','קריאה ופענוח','ביניים','שיעור','משימה סודית: רמזים, פענוח מילת סוד, קומיקס ותעודה.'],
+ ['g34','אליפות הקריאה','TCQ5QGLt49QDGeHN6ewjxV','הבנת הנקרא','ביניים','שיעור','7 תחנות אימון: עונים על שאלות ובונים פסקה מסודרת.'],
+ ['g34','אליפות הקריאה – מקוצר','FirVFyCEYmSU3my5ohLmM4','הבנת הנקרא','מתחילים','שיעור','אותה אליפות עם טקסטים קצרים ומנוקדים וקריאה בשניים.'],
+ ['g34','מעבדת המדען','L9MEBgMY9RDNLrfwn11nHX','קריאה ופענוח','מתחילים','שיעור','קוראים הוראות וממלאים בלון בניסוי אמיתי.'],
+ ['g34','בלשי האיות','8tPaEZMkstuZjrcCRuAzfv','כתיב','ביניים','משחק','מחברת בלשים: מאתרים שגיאות כתיב ומתקנים.'],
+ ['g34',"בלשי האיות – כיתה ד'",'XgcbFC9gNn2ST5412DdppQ','כתיב','ביניים','משחק',"משחקי תיקון שגיאות כתיב ברמת כיתה ד'."],
+ ['g34',"בינגו שורשים – כיתה ד'",'Ee6imjYvQ3wZebHzrM7oH2','לשון ודקדוק','ביניים','משחק','בינגו עם צלילים, טיימר ושיא אישי.'],
+ // ה-ו
+ ['g56',"בינגו שורשים – כיתה ה'",'5PvGdkP92iRRXcHXFFscQ7','לשון ודקדוק','ביניים','משחק','מוגרל שורש ומסמנים מילה מאותה משפחה.'],
+ ['g56','השעון של סבא','Ao2So9JG1dw73hEwcEBLnM','הבנת הנקרא','ביניים','שיעור','בניין הקומות: 4 סוגי שאלות, סימון בצבעים ו-10 שאלות מבדק.'],
+ ['g56','עגורים בעמק החולה','Hrj8WXmwco7NDNmAbhB7ym','הבנת הנקרא','מתקדמים','שיעור','שני טקסטים ו-22 שאלות בסגנון מיצ"ב, עם מצב מורה.'],
+ ['g56','מערת הגאות','GujW8SYC2uYMNXsZEvJ2EW','הבנת הנקרא','ביניים','שיעור','סיפור הרפתקה עם תחנות עצירה, דמויות ושביל השינוי.'],
+ ['g56','מערת הגאות + אפיון דמות','1MnjQwcm9BmVBAc3h2YWVA','הבנת הנקרא','מתקדמים','שיעור','אותו סיפור עם אפיון דמות, מפת סיפור ובלש.'],
+ ['g56','המפה של סבא יוסף','Gd8E5gZvXp5jRZNXx1KPh9','הבנת הנקרא','ביניים','שיעור','סיפור עם עצירות, מפת סיפור, בלש הסקה וכרטיסיות.'],
+ ['g56',"מסלול הקריאה והחשיבה – כיתה ה'",'1pVp6KJu8SJ15skshZR9kj','הבנת הנקרא','ביניים','משחק','לוח משחק: טקסטים, חמשת הממ"ים ומשימות תנועה.'],
+ ['g56',"מסלול הקריאה והחשיבה – כיתה ו'",'9hRwyzgsuvhMwZJQWs9VEN','הבנת הנקרא','מתקדמים','משחק','16 טקסטים כולל טיעון וידיעה, ושאלות ברמה גבוהה.'],
+ ['g56','עורך הפיסוק','1Fn7yWRi4ZknnTxcGipA9A','פיסוק','ביניים','שיעור','6 תחנות: נקודה, פסיק, מירכאות, סוגריים ועוד.'],
+ ['g56',"בלשי האיות – כיתה ה'",'7P6TUzDRVJSuBo2vwLGUX9','כתיב','ביניים','משחק',"תיקון שגיאות כתיב ברמת כיתה ה'."],
+ ['g56',"בלשי האיות – כיתות ה'–ו'",'52iun47X6CCPrt4R6jx4iU','כתיב','מתקדמים','משחק','כולל "תותי טעותי": טקסטים עם שגיאות לתיקון.'],
+ // ז
+ ['g7','בינגו שורשים','PseWwLgiWpf1KyJJNLRZum','לשון ודקדוק','ביניים','משחק','4 לוחות, 24 שורשים ו-72 מילים.'],
+ ['g7','מעבדת המילים','8uhJ6zPC7jk9bcA8uzEZiT','לשון ודקדוק','ביניים','משחק','שורש, פועל, סמיכות והתאם, עם כוכבים.'],
+ ['g7','סמיכות או תואר?','Q7rQKAdc528ajYAgpdgduM','לשון ודקדוק','ביניים','משחק','ממיינים 24 ביטויים לשני סלים.'],
+ ['g7','מילה אחת, שני תפקידים','8ozczjL5ic25KErQzaeCvo','לשון ודקדוק','מתקדמים','משחק','שם עצם, שם תואר או פועל? 13 זוגות משפטים.'],
+ ['g7','מסלול השייכות','KfshdpMH6yhFQBFQLik46v','לשון ודקדוק','מתקדמים','שיעור','כינויי שייכות ומילות יחס, 6 תחנות עם טיימר.'],
+ // רגשי
+ ['emo','מסע הרגשות','VYs2Jx5soH4PgsTsDhiiDh','רגשי','מתחילים','משחק','שאלונים רגשיים כמשחק: כדור פורח שלוקח את הדאגות.'],
+ ['emo','מסע הרגשות – תלת־ממד','C4U1dsaxhPmxL1yCGzp9a2','רגשי','מתחילים','משחק','גרסה מבריקה עם דרגות, מטבעות, גביעים ודמות מלווה.'],
+ ['emo','מסע הרגשות – מדבקות','PyqptBKYm7Kw6eB8GzHrDp','רגשי','מתחילים','משחק','גרסה שטוחה בסגנון מדבקות, עם צלילים ופרסים.']
+];
+const ICON={
+ 'ניקוד':'<circle cx="12" cy="9" r="6" fill="#fff"/><circle cx="9" cy="21" r="3" fill="#fff"/><circle cx="17" cy="21" r="3" fill="#fff"/><path d="M24 6h10v26H24z" fill="#fff" opacity=".8"/>',
+ 'קריאה ופענוח':'<path d="M4 8q9-4 15 2v24q-6-6-15-2z" fill="#fff"/><path d="M34 8q-9-4-15 2v24q6-6 15-2z" fill="#fff" opacity=".8"/>',
+ 'הבנת הנקרא':'<circle cx="15" cy="15" r="10" fill="none" stroke="#fff" stroke-width="5"/><path d="M22 22l11 11" stroke="#fff" stroke-width="6" stroke-linecap="round"/>',
+ 'כתיב':'<path d="M8 30l3-10L27 4l7 7-16 16z" fill="#fff"/><path d="M8 30l10-3" stroke="#fff" stroke-width="3"/>',
+ 'פיסוק':'<circle cx="10" cy="28" r="5" fill="#fff"/><path d="M24 6v16" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="24" cy="31" r="3.5" fill="#fff"/>',
+ 'לשון ודקדוק':'<rect x="4" y="4" width="13" height="13" rx="3" fill="#fff"/><rect x="21" y="4" width="13" height="13" rx="3" fill="#fff" opacity=".8"/><rect x="12" y="21" width="13" height="13" rx="3" fill="#fff"/>',
+ 'חשיבה':'<path d="M19 4a11 11 0 0 0-6 20v5h12v-5A11 11 0 0 0 19 4z" fill="#fff"/><rect x="14" y="31" width="10" height="4" rx="2" fill="#fff"/>',
+ 'רגשי':'<path d="M19 33S4 23 4 13a8 8 0 0 1 15-4 8 8 0 0 1 15 4c0 10-15 20-15 20z" fill="#fff"/>'
+};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let grade='';
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+$('fGrade').insertAdjacentHTML('beforeend',
+ `<button class="chip" data-g="" aria-pressed="true" style="--c:#1b2a5e">הכול</button>`+
+ WORLDS.map(w=>`<button class="chip" data-g="${w.id}" aria-pressed="false" style="--c:${w.c}">${esc(w.name.replace('כיתות ','').replace('כיתה ',''))}</button>`).join(''));
+$('fSkill').insertAdjacentHTML('beforeend',Object.keys(SK).map(s=>`<option>${esc(s)}</option>`).join(''));
+const nGames=G.filter(g=>g[5]==='משחק').length;
+$('stats').innerHTML=`<span class="pill"><b>${G.length}</b> פעילויות</span><span class="pill"><b>${nGames}</b> משחקים</span><span class="pill"><b>${G.length-nGames}</b> שיעורים חווייתיים</span>`;
+
+function card(g,i){
+ const [w,t,slug,sk,lv,kind,d]=g;
+ return `<a class="card" href="${U}${slug}/" style="--c:${SK[sk]};--lc:${LV[lv]};--ry:${i%2?3:-3}deg" aria-label="${esc(t)} – ${esc(kind)}, ${esc(sk)}, ${esc(lv)}">
+  <span class="go" aria-hidden="true">◀</span>
+  <span class="ico" aria-hidden="true"><svg viewBox="0 0 38 38">${ICON[sk]}</svg></span>
+  <h3>${esc(t)}</h3><p>${esc(d)}</p>
+  <span class="tags"><span class="tag lv">${esc(lv)}</span><span class="tag">${esc(sk)}</span><span class="tag">${kind==='שיעור'?'שיעור 45 דק׳':'משחק'}</span></span></a>`;
+}
+function render(){
+ const lv=$('fLevel').value,sk=$('fSkill').value,q=$('q').value.trim();
+ let total=0;
+ $('worlds').innerHTML=WORLDS.map(w=>{
+  if(grade&&grade!==w.id)return'';
+  const list=G.filter(g=>g[0]===w.id&&(!lv||g[4]===lv)&&(!sk||g[3]===sk)&&(!q||(g[1]+g[6]+g[3]).includes(q)));
+  total+=list.length;
+  if(!list.length)return'';
+  return `<section class="world" id="${w.id}" aria-labelledby="h-${w.id}"><div class="whead"><span class="badge" style="--c:${w.c}" aria-hidden="true">${esc(w.short)}</span><div><h2 id="h-${w.id}">${esc(w.name)}</h2><p>${esc(w.sub)} · ${list.length} פעילויות</p></div></div><div class="grid">${list.map(card).join('')}</div></section>`;
+ }).join('');
+ $('empty').style.display=total?'none':'block';
+}
+$('fGrade').addEventListener('click',e=>{
+ const b=e.target.closest('[data-g]');if(!b)return;
+ grade=b.dataset.g;
+ $('fGrade').querySelectorAll('[data-g]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+ render();
+});
+['fLevel','fSkill'].forEach(id=>$(id).addEventListener('change',render));
+$('q').addEventListener('input',render);
+function setBig(on){document.body.classList.toggle('big',on);$('bigBtn').setAttribute('aria-pressed',on);store.set('hub-big',on?'1':'')}
+$('bigBtn').addEventListener('click',()=>setBig(!document.body.classList.contains('big')));
+setBig(store.get('hub-big')==='1');
+render();
+}
+</script>
+</body>
+</html>

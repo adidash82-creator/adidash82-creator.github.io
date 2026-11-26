@@ -1,0 +1,354 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>עגורים בעמק החולה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one narrow RTL reading column; four steps (floors game → two texts → exam → checklist) */
+:root{
+  --bg:#eef2f1; --paper:#fbfdfc; --ink:#1d2a2c; --muted:#5a6a6c; --line:#d3dcda;
+  --accent:#2f6d73; --brass:#b0652c; --brass-soft:#f6e6d8;
+  --ok:#2e7d4f; --ok-soft:#e1f2e7; --bad:#b4472f; --bad-soft:#f8e2dc;
+  --f1:#3f7cac; --f2:#7a5ea8; --f3:#c0732f; --f4:#2e7d4f;
+  --display:"Suez One","Assistant",Georgia,serif; --body:"Assistant",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131b1d; --paper:#1b2628; --ink:#e7ebe9; --muted:#9aaaa9; --line:#304244;
+  --accent:#68b4ba; --brass:#e0a06a; --brass-soft:#3a2a1e;
+  --ok:#6cc58f; --ok-soft:#1d3527; --bad:#e58a73; --bad-soft:#3d2520;
+  --f1:#7fb0d8; --f2:#ac94d6; --f3:#e3a06a; --f4:#6cc58f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131b1d; --paper:#1b2628; --ink:#e7ebe9; --muted:#9aaaa9; --line:#304244;
+  --accent:#68b4ba; --brass:#e0a06a; --brass-soft:#3a2a1e;
+  --ok:#6cc58f; --ok-soft:#1d3527; --bad:#e58a73; --bad-soft:#3d2520;
+  --f1:#7fb0d8; --f2:#ac94d6; --f3:#e3a06a; --f4:#6cc58f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3,h4{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:2.1rem} h2{font-size:1.45rem} h3{font-size:1.2rem} h4{font-size:1.05rem;color:var(--accent);margin-top:6px}
+.lead{color:var(--muted);margin:4px 0 0}
+header{display:flex;align-items:center;gap:16px}
+.mark{width:64px;height:64px;flex:none}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav button,.tabs button{font:inherit;font-weight:700;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+nav button[aria-current="true"],.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+section.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.tower{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.floor{font:inherit;border:0;border-radius:10px;padding:12px 8px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.25}
+.floor b{font-family:var(--display);font-size:1.6rem;font-weight:400}
+.floor small{font-size:.85rem}
+.floor:disabled{opacity:.45;cursor:default}
+.f1{background:var(--f1)}.f2{background:var(--f2)}.f3{background:var(--f3)}.f4{background:var(--f4)}
+@media (max-width:520px){.tower{grid-template-columns:repeat(2,1fr)}}
+.qcard{border:2px dashed var(--line);border-radius:12px;padding:18px;font-size:1.15rem;font-weight:600;min-height:90px}
+.feedback{border-radius:10px;padding:12px 14px}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)} .feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border:0;background:var(--accent);color:var(--paper);padding:10px 18px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.score{font-variant-numeric:tabular-nums;color:var(--muted)}
+.text p{margin:0 0 12px} .pn{color:var(--brass);font-weight:700;margin-left:6px;font-variant-numeric:tabular-nums}
+.text span.s{cursor:pointer;border-radius:4px;padding:0 2px}
+.text span.s.yellow{background:#f6e27a;color:#1d2a2c}
+.text span.s.blue{background:#a9d4f5;color:#1d2a2c}
+.text span.s.pink{background:#f6b8cf;color:#1d2a2c}
+.pens{display:flex;gap:8px;flex-wrap:wrap}
+.pen{font:inherit;border:2px solid transparent;border-radius:999px;padding:6px 14px;cursor:pointer;color:#1d2a2c;font-weight:600}
+.pen[aria-pressed="true"]{border-color:var(--ink)}
+.pen.yellow{background:#f6e27a}.pen.blue{background:#a9d4f5}.pen.pink{background:#f6b8cf}.pen.erase{background:var(--bg);color:var(--ink);border-color:var(--line)}
+.group{font-family:var(--display);font-size:1.2rem;color:var(--accent);border-bottom:2px solid var(--line);padding-bottom:4px;margin-top:8px}
+.q{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:10px}
+.group+.q{border-top:0;padding-top:4px}
+.qhead{display:flex;gap:10px;align-items:flex-start}
+.qnum{font-family:var(--display);color:var(--brass);font-size:1.3rem;line-height:1.2;white-space:nowrap}
+.star{font-size:.8rem;background:var(--brass-soft);color:var(--brass);border-radius:999px;padding:1px 8px;margin-inline-start:6px;font-weight:700;white-space:nowrap}
+.floorpick{display:flex;gap:6px;align-items:center;font-size:.95rem;color:var(--muted)}
+select{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);padding:2px 6px}
+textarea{font:inherit;width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.model{background:var(--brass-soft);border-radius:10px;padding:10px 14px;margin-top:8px}
+.model strong{color:var(--brass)}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.check input,.opts input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:4px}
+.timer{font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums;color:var(--accent)}
+.legend{width:100%;border-collapse:collapse;font-size:.95rem}
+.legend td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.legend td:first-child{white-space:nowrap;font-weight:700}
+.tablewrap{overflow-x:auto}
+nav .tbtn{border-color:var(--brass);color:var(--brass)}
+nav .tbtn[aria-current="true"]{background:var(--brass);border-color:var(--brass);color:var(--paper)}
+.now{display:flex;flex-direction:column;gap:10px;background:var(--brass-soft);border-radius:12px;padding:18px}
+.now .big{font-family:var(--display);font-size:2.4rem;font-variant-numeric:tabular-nums;color:var(--brass);line-height:1}
+.now .big.over{color:var(--bad)}
+.stages{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.stages button{font:inherit;width:100%;text-align:start;display:grid;grid-template-columns:4.5rem 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer}
+.stages button[aria-current="true"]{border-color:var(--brass);box-shadow:inset -4px 0 0 var(--brass)}
+.stages .tm{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.stages .ok{color:var(--ok);font-weight:700}
+.tkey{background:var(--brass-soft);border-radius:10px;padding:10px 14px;font-size:.95rem}
+.tkey strong{color:var(--brass)}
+.steps{margin:0;padding-inline-start:20px}
+.steps li{margin-bottom:4px}
+.filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.95rem;color:var(--muted)}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.feedback{animation:pop .25s ease}}
+@keyframes pop{from{transform:scale(.97)}to{transform:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="32" r="30" fill="var(--paper)" stroke="var(--accent)" stroke-width="3"/>
+    <path d="M10 30 Q22 20 32 28 Q42 20 54 30 Q42 26 32 34 Q22 26 10 30Z" fill="var(--ink)"/>
+    <circle cx="32" cy="29" r="2" fill="var(--bad)"/>
+    <line x1="14" y1="48" x2="50" y2="48" stroke="var(--brass)" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  <div><h1>עגורים בעמק החולה</h1><p class="lead">אימון למבדק הבנת הנקרא · כיתה ה׳ · טקסט מידעי + טקסט סיפורי · 22 שאלות</p></div>
+</header>
+
+<nav aria-label="שלבי השיעור">
+  <button data-go="game" aria-current="true">1. בניין הקומות</button>
+  <button data-go="read">2. הטקסטים</button>
+  <button data-go="exam">3. המבדק</button>
+  <button data-go="done">4. בדיקה עצמית</button>
+  <button data-go="teacher" class="tbtn">מצב מורה</button>
+</nav>
+
+<section class="panel" id="game">
+  <h2>לאיזו קומה שייכת השאלה?</h2>
+  <p class="lead" style="margin:0">אלה שאלות מהמבדק של היום. עוד לא עונים – רק מזהים את סוג השאלה.</p>
+  <div class="tablewrap"><table class="legend">
+    <tr><td style="color:var(--f1)">קומה 1</td><td>כתוב בטקסט · מי, מה, מתי, כמה</td></tr>
+    <tr><td style="color:var(--f2)">קומה 2</td><td>מילה, משפט ומבנה · פירוש, מילת קישור, תפקיד פסקה</td></tr>
+    <tr><td style="color:var(--f3)">קומה 3</td><td>בין השורות · מדוע, כיצד השתנה, אפיון, השוואה</td></tr>
+    <tr><td style="color:var(--f4)">קומה 4</td><td>אני והטקסט · מה דעתכם, מסר, נמקו</td></tr>
+  </table></div>
+  <div class="qcard" id="gq" aria-live="polite"></div>
+  <div class="tower">
+    <button class="floor f4" data-f="4"><b>4</b><small>אני והטקסט</small></button>
+    <button class="floor f3" data-f="3"><b>3</b><small>בין השורות</small></button>
+    <button class="floor f2" data-f="2"><b>2</b><small>מילה ומבנה</small></button>
+    <button class="floor f1" data-f="1"><b>1</b><small>כתוב בטקסט</small></button>
+  </div>
+  <div id="gfb" aria-live="polite"></div>
+  <div class="row"><button class="btn" id="gnext" hidden>לשאלה הבאה</button><span class="score" id="gscore"></span></div>
+</section>
+
+<section class="panel" id="read" hidden>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-t="A" aria-selected="true">טקסט א׳ · מידעי</button>
+    <button role="tab" data-t="B" aria-selected="false">טקסט ב׳ · סיפורי</button>
+  </div>
+  <p class="lead" style="margin:0" id="readhint"></p>
+  <div class="pens" role="group" aria-label="צבע סימון">
+    <button class="pen yellow" data-pen="yellow" aria-pressed="true" id="penY"></button>
+    <button class="pen blue" data-pen="blue" aria-pressed="false">כחול · מילה קשה / דימוי</button>
+    <button class="pen pink" data-pen="pink" aria-pressed="false" id="penP"></button>
+    <button class="pen erase" data-pen="" aria-pressed="false">מחק</button>
+  </div>
+  <div class="text" id="textA"></div>
+  <div class="text" id="textB" hidden></div>
+  <div class="row"><button class="btn" data-go="exam">סיימתי לקרוא, למבדק</button></div>
+</section>
+
+<section class="panel" id="exam" hidden>
+  <div class="row" style="justify-content:space-between">
+    <h2>שאלות בסגנון מבדק</h2>
+    <div class="row"><span class="timer" id="clock">16:00</span><button class="btn ghost" id="tbtn">הפעל טיימר</button></div>
+  </div>
+  <p class="lead" style="margin:0">3 צעדים לכל שאלה: <b>מסמנים</b> את מילת השאלה · <b>מחפשים</b> בטקסט הנכון · <b>מנסחים</b> משפט מלא.</p>
+  <div class="filter"><label><input type="checkbox" id="hideStar"> הסתר שאלות ★ (שיעורי בית)</label></div>
+  <div id="qs"></div>
+</section>
+
+<section class="panel" id="done" hidden>
+  <h2>צ׳קליסט לפני הגשה</h2>
+  <div class="check" id="chk"></div>
+  <h3>מה שונה בין שאלה על טקסט מידעי לשאלה על סיפור?</h3>
+  <textarea id="tip" placeholder="למשל: בטקסט מידעי מחפשים עובדות ומספרים, ובסיפור מחפשים רגשות ומעשים של הדמויות."></textarea>
+</section>
+
+<section class="panel" id="teacher" hidden>
+  <h2>מצב מורה · מהלך השיעור</h2>
+  <p class="lead" style="margin:0">לחצו על שלב כדי להתחיל אותו. הטיימר סופר לאחור, ו„פתח מסך” מעביר את הלוח לשלב של התלמידים.</p>
+  <div class="now" aria-live="polite">
+    <div class="row" style="justify-content:space-between"><h3 id="stTitle"></h3><span class="big" id="stClock">--:--</span></div>
+    <ol class="steps" id="stSteps"></ol>
+    <div class="row">
+      <button class="btn" id="stGo">פתח מסך</button>
+      <button class="btn ghost" id="stPause">עצור</button>
+      <button class="btn ghost" id="stNext">לשלב הבא</button>
+    </div>
+  </div>
+  <ul class="stages" id="stList"></ul>
+  <div class="row" style="justify-content:space-between">
+    <span class="score" id="totalClock">זמן שיעור: 00:00 מתוך 45:00</span>
+    <label class="filter"><input type="checkbox" id="showKey"> הצג מחוון בכל שאלות המבדק</label>
+  </div>
+</section>
+</div>
+
+<script>
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const panels=["game","read","exam","done","teacher"];
+function go(id){panels.forEach(p=>document.getElementById(p).hidden=p!==id);
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.go===id));window.scrollTo(0,0)}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+/* questions: g = A / B / AB */
+const Q=[
+ {g:"A",t:"באילו עונות עוברות הציפורים הנודדות מעל ישראל?",f:1,m:"הציפורים עוברות מעל ישראל בסתיו ובאביב (פסקה 1)."},
+ {g:"A",s:1,t:"כמה תירס אוכל עגור אחד ביום, לפי הטקסט?",f:1,m:"עגור אחד אוכל כ-180 גרם תירס ביום (פסקה 5)."},
+ {g:"A",t:"מדוע ציפורים גדולות מעדיפות שלא לעבור מעל הים? הסבירו לפי פסקה 2.",f:3,m:"מעל היבשה יש זרמי אוויר חמים שעולים למעלה, והציפורים דואות עליהם בלי לנפנף וחוסכות כוח. מעל הים אין זרמים כאלה, ולכן הטיסה קשה יותר. (זה לא כתוב במפורש – מסיקים.)"},
+ {g:"A",t:"בפסקה 2 כתוב: „ישראל היא מעין צוואר צר”. מה הכוונה?",f:2,m:"ישראל היא מעבר יבשתי צר, ולכן כל הציפורים שנודדות מעל היבשה נדחסות לשטח קטן, כמו בצוואר של בקבוק."},
+ {g:"A",t:"בפסקה 3 מופיעה מילת הקישור „אולם”. מה היא מבטאת?",f:2,type:"mc",opts:["סיבה – מסבירה למה קרה משהו.","ניגוד – מציגה משהו שונה ממה שנאמר קודם.","דוגמה – מביאה מקרה למה שנאמר.","תוספת – מוסיפה מידע דומה."],ans:1,hint:"מה היה לפני „אולם”, ומה אחריו?",m:"ב. ניגוד: קודם העגורים רק עברו, ו„אולם” מציג שהמצב השתנה."},
+ {g:"A",t:"מה התפקיד של פסקה 5 בטקסט?",f:2,type:"mc",opts:["לתאר איך נראה העגור.","להסביר מדוע ציפורים נודדות מעל ישראל.","להציג פתרון לבעיה שתוארה בפסקה 4.","לספר על התיירים שמגיעים לאגמון."],ans:2,hint:"קראו את כותרות המשנה של פסקאות 4 ו-5.",m:"ג. פסקה 4 מציגה בעיה (נזק לשדות) ופסקה 5 מציגה פתרון."},
+ {g:"A",t:"מדוע התחילו העגורים להישאר בעמק החולה? השלימו: אגם החולה יובש ← ___ ← ___ ← העגורים נשארים כל החורף.",f:3,m:"אגם החולה יובש ← נשתלו שדות בוטנים ← אחרי הקטיף נשארו בוטנים ונוצר מזון בשפע ← העגורים נשארים."},
+ {g:"A",s:1,t:"השלימו לפי פסקאות 4–5: הבעיה · מה ניסו קודם (ולא עבד) · הפתרון · התוצאה.",f:3,m:"בעיה: עגורים אוכלים את היבול. ניסו קודם: לגרש ברעש ובדחלילים. פתרון: פיזור תירס באגמון. תוצאה: הנזק קטן מאוד (וגם הגיעו תיירים)."},
+ {g:"A",s:1,t:"„לפעמים הפתרון הטוב ביותר נמצא דווקא כשמפסיקים לריב” (פסקה 6). מי היו שני הצדדים, ומה כל צד רצה?",f:3,m:"החקלאים רצו לשמור על היבול והפרנסה. אנשי שמירת הטבע רצו לשמור על העגורים. כשישבו יחד מצאו פתרון שטוב לשניהם."},
+ {g:"A",s:1,t:"האם לדעתכם נכון להוציא כסף רב על האכלת העגורים? נמקו בעזרת שתי סיבות מהטקסט.",f:4,m:"עמדה ברורה + 2 סיבות מהטקסט. בעד: הנזק קטן; התיירים מכניסים פרנסה. נגד: זה עולה הרבה (טונות תירס בכל יום). שתי העמדות מקובלות."},
+ {g:"B",t:"מה מצאה נועה על הרגל של העגורה, ומה היא גילתה בעזרתו?",f:1,m:"נועה מצאה טבעת פלסטיק כתומה. בעזרתה גילו שהעגורה מפינלנד, שקיבלה את הטבעת לפני שש שנים ושהיא מגיעה כל חורף."},
+ {g:"B",s:1,t:"„הערפל עוד כיסה את העמק כמו שמיכה אפורה” (פסקה 2). למה מדומה הערפל, ומה הדימוי מלמד עליו?",f:2,m:"הערפל מדומה לשמיכה אפורה: הוא עבה, כיסה את כל העמק, והבוקר עוד היה שקט ומוקדם."},
+ {g:"B",t:"„הטבע יסתדר לבד,” רטן סבא (פסקה 4). מה פירוש המילה „רטן”?",f:2,type:"mc",opts:["צעק בשמחה.","דיבר בקול נמוך ולא מרוצה.","שאל שאלה.","צחק בשקט."],ans:1,hint:"האם סבא רצה לעזור?",m:"ב. דיבר בקול נמוך ולא מרוצה."},
+ {g:"B",t:"מדוע לדעתכם אמר סבא „רק בגלל הטבעת”, בלי להסתכל על נועה?",f:3,m:"סבא לא רצה להודות שהוא משנה את דעתו על העגורים. אולי התבייש, או שאכפת לו יותר ממה שרצה להראות, ולכן הסתיר את פניו."},
+ {g:"B",s:1,t:"כיצד השתנה היחס של סבא מנחם לעגורים? הביאו דוגמה מתחילת הסיפור ודוגמה מסופו.",f:3,m:"בהתחלה כעס על העגורים („גנבים עם כנפיים”, הרים אגרוף). בסוף הוא אוהד אותם: מאחל לעגורה הצלחה ומשאיר להם פינה בשדה."},
+ {g:"B",t:"כתבו תכונה אחת של נועה, והביאו דוגמה מהסיפור.",f:3,m:"למשל: חומלת – רצתה לעזור לעגורה; עקשנית – לא ויתרה כשסבא סירב; שימת לב – הבחינה בטבעת. תכונה בלי דוגמה = תשובה חלקית."},
+ {g:"B",s:1,t:"„על פניו הופיע חיוך קטן, עקום” (פסקה 7). מה אפשר ללמוד מהמילה „עקום” על מה שסבא מרגיש?",f:3,m:"חיוך „עקום” הוא חיוך מהוסס – סבא קצת שמח ומתבדח, אבל עדיין לא מוכן להראות שהוא נקשר לעגורה."},
+ {g:"B",s:1,t:"מה המסר של הסיפור? קשרו אותו למשפט האחרון: „רק פינה קטנה.”",f:4,m:"למשל: כשמכירים מקרוב את „הצד השני”, קשה לשנוא אותו; שינוי יכול להיות קטן. „רק פינה קטנה” מראה שסבא משתנה צעד קטן, אבל באמת."},
+ {g:"AB",t:"העתיקו מטקסט ב׳ משפט שמתאים למידע בפסקה 4 של טקסט א׳, והסבירו מה הקשר.",f:3,m:"למשל מפסקה 1: „נעלמה חלקת החימצה שלו בתוך יומיים”. הקשר: בטקסט א׳ כתוב שלהקת עגורים יכולה לאכול שדה חימצה ביום או יומיים."},
+ {g:"AB",t:"שני הטקסטים עוסקים ביחסים שבין חקלאים לעגורים. כתבו דבר אחד משותף ודבר אחד שונה.",f:3,m:"משותף: בשניהם החקלאים כועסים על העגורים, ובסוף מגיעים לפתרון. שונה: טקסט א׳ מספר על קבוצות אנשים ומספרים (מיליוני שקלים, תירס); טקסט ב׳ מספר על אדם אחד ועל רגשותיו. בטקסט א׳ הפתרון הוא ההאכלה, ובטקסט ב׳ – ההיכרות עם עגורה אחת."},
+ {g:"AB",s:1,t:"מה המטרה העיקרית של כל אחד מהטקסטים?",f:2,type:"mc",opts:["שניהם מנסים לשכנע את הקורא לבקר באגמון.","טקסט א׳ מספר חוויה אישית, וטקסט ב׳ מסביר עובדות.","טקסט א׳ מוסר מידע ועובדות, וטקסט ב׳ מספר חוויה ורגשות של דמויות.","שניהם מסבירים איך מטפלים בעגור פצוע."],ans:2,hint:"באיזה טקסט יש כותרות משנה ומספרים?",m:"ג."},
+ {g:"AB",s:1,t:"דמיינו שסבא מנחם קורא את טקסט א׳. איזו פסקה לדעתכם תעניין אותו הכי הרבה, ומדוע? השתמשו במידע משני הטקסטים.",f:4,m:"פסקה מנומקת עם מידע משני הטקסטים. למשל: פסקה 5 – כי סבא חקלאי שנפגע (טקסט ב׳), והפתרון של התירס שומר על השדות (טקסט א׳)."}
+];
+
+/* floor game: pick 8 */
+const GI=[0,3,4,6,10,15,19,9];
+const why={1:"התשובה כתובה בטקסט במפורש.",2:"השאלה היא על מילה, משפט או מבנה הטקסט.",3:"צריך לחבר רמזים – התשובה לא כתובה ישירות.",4:"מבקשים את הדעה שלכם + נימוק."};
+let gi=0,gs=0,answered=false;
+const gq=document.getElementById("gq"),gfb=document.getElementById("gfb"),gnext=document.getElementById("gnext"),gscore=document.getElementById("gscore");
+const floors=()=>document.querySelectorAll(".floor");
+function showG(){answered=false;gfb.innerHTML="";gnext.hidden=true;floors().forEach(b=>b.disabled=false);
+  if(gi>=GI.length){gq.textContent=`כל הכבוד! ${gs} מתוך ${GI.length} בקומה הנכונה.`;floors().forEach(b=>b.disabled=true);
+    gnext.hidden=false;gnext.textContent="לטקסטים";gnext.onclick=()=>go("read");return}
+  const q=Q[GI[gi]];gq.textContent=`${gi+1}/${GI.length} · ${q.t}`;gscore.textContent=`נקודות: ${gs}`}
+floors().forEach(b=>b.addEventListener("click",()=>{
+  if(answered)return;answered=true;const f=+b.dataset.f,right=Q[GI[gi]].f;
+  floors().forEach(x=>x.disabled=true);
+  if(f===right){gs++;gfb.innerHTML=`<div class="feedback ok">נכון! קומה ${right}. ${why[right]}</div>`}
+  else gfb.innerHTML=`<div class="feedback bad">לא בדיוק – זו קומה ${right}. ${why[right]}</div>`;
+  gscore.textContent=`נקודות: ${gs}`;gi++;gnext.hidden=false;gnext.textContent="לשאלה הבאה";gnext.onclick=showG}));
+showG();
+
+/* texts */
+const TA={title:"כביש מהיר בשמיים: ציפורים נודדות מעל ישראל",paras:[
+ [null,"פעמיים בשנה, בסתיו ובאביב, מתרחש מעל ראשנו אחד ממחזות הטבע המרשימים בעולם: מאות מיליוני ציפורים עוברות בשמי ישראל.|חלקן עוצרות למנוחה קצרה, חלקן ממשיכות בלי לעצור, וחלקן מחליטות להישאר כאן כל החורף.|מדוע דווקא כאן?"],
+ ["גשר בין שלוש יבשות","ישראל נמצאת במקום שבו נפגשות שלוש יבשות: אירופה, אסיה ואפריקה.|ציפורים רבות מטילות בקיץ בצפון אירופה וברוסיה, ובחורף עפות דרומה, לאפריקה החמה.|ציפורים גדולות, כמו חסידות ועופות דורסים, מעדיפות שלא לעבור מעל הים.|מעל היבשה נוצרים זרמי אוויר חמים שעולים מעלה, והציפורים מנצלות אותם כדי לדאות בלי לנפנף בכנפיים ולחסוך כוח.|לכן רובן בוחרות בדרך היבשתית – וישראל היא מעין צוואר צר שכולן עוברות בו."],
+ ["העגורים ששינו תוכנית","העגור האפור הוא ציפור גבוהה, עם רגליים ארוכות וקול חצוצרה שנשמע מרחוק.|העגורים מקננים בסקנדינביה וברוסיה, ובעבר רובם רק עברו מעל ישראל בדרכם לאפריקה.|אולם בשנות ה-50 יובש אגם החולה, ובמקומו נשתלו שדות חקלאיים.|החקלאים גידלו בהם בוטנים, ואחרי הקטיף נשארו בשטח טונות של בוטנים.|העגורים גילו שיש כאן מזון בשפע, והתחילו להישאר בעמק החולה כל החורף.|מספרם הלך וגדל משנה לשנה, ובחורפים מסוימים נספרו בעמק יותר מ-40,000 עגורים."],
+ ["מלחמה על השדות","מה שהיה טוב לעגורים היה רע לחקלאים.|להקת עגורים יכולה לנחות בשדה של חימצה או חיטה צעירה ולאכול את כולו תוך יום או יומיים.|החקלאים ניסו לגרש את העגורים ברעש ובדחלילים, אך הציפורים פשוט עפו לשדה הסמוך.|הנזק הגיע למיליוני שקלים בכל חורף, ונראה היה שאין דרך לשמור גם על העגורים וגם על הפרנסה של החקלאים."],
+ ["פתרון בצבע צהוב","בסוף שנות ה-90 חקלאים ואנשי שמירת טבע ישבו יחד וחיפשו פתרון.|הרעיון שלהם היה פשוט: אם אי אפשר לגרש את העגורים, צריך לתת להם מקום טוב יותר.|באגמון החולה – אזור קטן שהוצף מחדש במים – התחילו לפזר תירס על הקרקע בכל בוקר.|עגור אחד אוכל כ-180 גרם תירס ביום, ולכן בחורף עמוס מפוזרים שם טונות תירס בכל יום.|מכיוון שהעגורים מקבלים אוכל בקלות ובמקום בטוח, רובם מפסיקים לחפש מזון בשדות.|מאז קטן הנזק לחקלאות מאוד."],
+ ["ציפורים מושכות תיירים","לפתרון היה גם רווח שלא תכננו מראש.|העגורים שמתקבצים במקום אחד יוצרים מחזה מרהיב, ומאות אלפי מבקרים מגיעים מדי שנה לצפות בהם.|כך הפכה הבעיה למקור פרנסה לתושבי האזור.|צופי ציפורים מסבירים שסיפור העגורים מלמד שלפעמים הפתרון הטוב ביותר נמצא דווקא כשמפסיקים לריב ומתחילים להקשיב לצד השני."]
+]};
+const TB={title:"הטבעת הכתומה",paras:[
+ [null,"סבא מנחם לא אהב עגורים.|„גנבים עם כנפיים,” קרא להם, וכל פעם שלהקה אפורה עברה מעל המשק, הוא היה מרים את האגרוף אל השמיים.|נועה זכרה את הסיפור שלו על החורף שבו נעלמה חלקת החימצה שלו בתוך יומיים.|„עבדתי שם חודשים,” אמר, „והם באו לארוחת בוקר.”"],
+ [null,"באחד הבקרים של חופשת חנוכה יצאה נועה לבד אל התעלה שליד השדה.|הערפל עוד כיסה את העמק כמו שמיכה אפורה.|ואז ראתה אותה: עגורה גבוהה עומדת על רגל אחת, והכנף השמאלית שלה נגררת על האדמה.|נועה עצרה.|העגורה לא ברחה.|היא רק הסתכלה עליה בעין אדומה ועייפה."],
+ [null,"על הרגל של העגורה הבחינה נועה במשהו שלא ציפתה לראות: טבעת פלסטיק כתומה, ועליה אותיות ומספרים.|היא רצה הביתה כל כך מהר, עד שהמגפיים התמלאו בבוץ."],
+ [null,"„סבא, יש עגורה פצועה ליד התעלה! צריך לעזור לה!”|סבא לא הרים את העיניים מהעיתון.|„הטבע יסתדר לבד,” רטן.|„אבל יש לה טבעת על הרגל. מישהו מחכה לה.”"],
+ [null,"סבא שתק רגע.|אחר כך קיפל את העיתון, קם לאט ולקח מהמחסן שמיכה ישנה.|„רק בגלל הטבעת,” אמר, בלי להסתכל עליה."],
+ [null,"שניהם יחד עטפו את העגורה בשמיכה, וסבא התקשר לפקח של שמורת הטבע.|הפקח הגיע תוך שעה, בדק את הכנף ואמר שהיא נפגעה מחוט חשמל.|אחר כך קרא את הכתוב על הטבעת וחייך.|„היא מפינלנד,” אמר.|„חוקרים שם שמו לה טבעת כשהייתה אפרוחית, לפני שש שנים.|מאז היא עפה לכאן כל חורף – אלפי קילומטרים לכל כיוון.”"],
+ [null,"סבא מנחם הביט בעגורה כאילו ראה אותה לראשונה.|„שש שנים,” מלמל.|„אז אולי היא אכלה פעם מהחימצה שלי.”|נועה חששה שהוא יתרגז, אבל על פניו הופיע חיוך קטן, עקום."],
+ [null,"במשך שבועות העגורה החלימה במרכז ההצלה.|נועה ביקרה אותה פעמיים, ובפעם השנייה – להפתעתה – סבא ביקש לבוא איתה."],
+ [null,"בסוף חודש מרץ עמדו שניהם על גבעה נמוכה וראו להקות עגורים עולות צפונה.|אי אפשר היה לדעת אם העגורה שלהם ביניהן.|„שיהיה לה בהצלחה בפינלנד,” אמר סבא בקול שנועה כמעט לא שמעה.|ואז הוסיף: „בסתיו הבא אני משאיר להן פינה קטנה בשדה. רק פינה קטנה.”"]
+]};
+const marks=store.get("cr-marks",{});let pen="yellow";
+function build(T,el,key){
+  el.innerHTML=`<h3>${T.title}</h3>`;
+  T.paras.forEach((p,i)=>{if(p[0]){const h=document.createElement("h4");h.textContent=p[0];el.appendChild(h)}
+    const P=document.createElement("p");P.innerHTML=`<span class="pn">(${i+1})</span>`;
+    p[1].split("|").forEach((s,j)=>{const sp=document.createElement("span");sp.className="s";const k=key+i+"-"+j;
+      if(marks[k])sp.classList.add(marks[k]);sp.textContent=s+" ";
+      sp.addEventListener("click",()=>{sp.classList.remove("yellow","blue","pink");if(pen&&marks[k]!==pen){sp.classList.add(pen);marks[k]=pen}else delete marks[k];store.set("cr-marks",marks)});
+      P.appendChild(sp)});el.appendChild(P)})}
+build(TA,document.getElementById("textA"),"A");build(TB,document.getElementById("textB"),"B");
+const penY=document.getElementById("penY"),penP=document.getElementById("penP"),hint=document.getElementById("readhint");
+function tab(t){document.getElementById("textA").hidden=t!=="A";document.getElementById("textB").hidden=t!=="B";
+  document.querySelectorAll("[role=tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===t));
+  if(t==="A"){penY.textContent="צהוב · מילת קישור (לכן, אולם, מכיוון ש)";penP.textContent="ורוד · מספר או עובדה חשובה";
+    hint.textContent="קראו פסקה אחר פסקה. לפני כל פסקה – קראו את כותרת המשנה ונחשו על מה היא."}
+  else{penY.textContent="צהוב · רגשות של הדמויות";penP.textContent="ורוד · מידע שמופיע גם בטקסט א׳";
+    hint.textContent="קריאה ראשונה: רק להבין מה קרה. קריאה שנייה: בחרו צבע ולחצו על משפט כדי לסמן."}}
+document.querySelectorAll("[role=tab]").forEach(b=>b.addEventListener("click",()=>tab(b.dataset.t)));tab("A");
+document.querySelectorAll(".pen").forEach(b=>b.addEventListener("click",()=>{pen=b.dataset.pen;document.querySelectorAll(".pen").forEach(x=>x.setAttribute("aria-pressed",x===b))}));
+
+/* exam */
+const ans=store.get("cr-ans",{}),qs=document.getElementById("qs");
+const GN={A:"טקסט א׳ · כביש מהיר בשמיים",B:"טקסט ב׳ · הטבעת הכתומה",AB:"שני הטקסטים יחד"};let lastG="";
+Q.forEach((q,i)=>{
+  if(q.g!==lastG){const h=document.createElement("div");h.className="group";h.textContent=GN[q.g];qs.appendChild(h);lastG=q.g}
+  const d=document.createElement("div");d.className="q";if(q.s)d.dataset.star="1";
+  const body=q.type==="mc"?`<div class="opts">${q.opts.map((o,j)=>`<label><input type="radio" name="mc${i}" id="mc${i}-${j}" value="${j}">${"אבגד"[j]}. ${o}</label>`).join("")}</div>`
+    :`<textarea id="t${i}" placeholder="התחילו במילים של השאלה…"></textarea>`;
+  d.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><div style="min-width:0">${q.t}${q.s?'<span class="star">★ שיעורי בית</span>':""}${i===19?'<span class="star">הדגמת מורה</span>':""}</div></div>
+   <div class="floorpick"><label for="f${i}">באיזו קומה?</label><select id="f${i}"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option></select><span id="fr${i}"></span></div>
+   ${body}<div class="row"><button class="btn ghost" id="b${i}">בדקו</button></div><div id="r${i}" aria-live="polite"></div>
+   <div class="tkey" hidden><strong>מחוון · קומה ${q.f}:</strong> ${q.m}</div>`;
+  qs.appendChild(d);
+  const ta=d.querySelector("textarea");if(ta){ta.value=ans[i]||"";ta.addEventListener("input",()=>{ans[i]=ta.value;store.set("cr-ans",ans)})}
+  d.querySelector("#b"+i).addEventListener("click",()=>{
+    const fp=d.querySelector("#f"+i).value,fr=d.querySelector("#fr"+i);
+    fr.textContent=fp?(+fp===q.f?" ✓ קומה נכונה":` ✗ זו קומה ${q.f}`):` קומה ${q.f}`;fr.style.color=+fp===q.f?"var(--ok)":"var(--bad)";
+    let res="";
+    if(q.type==="mc"){const c=d.querySelector(`input[name=mc${i}]:checked`);
+      res=c&&+c.value===q.ans?'<div class="feedback ok">נכון!</div>':`<div class="feedback bad">עוד לא. רמז: ${q.hint}</div>`}
+    d.querySelector("#r"+i).innerHTML=res+`<div class="model"><strong>תשובה לדוגמה:</strong> ${q.m}</div>`})});
+document.getElementById("hideStar").addEventListener("change",e=>{document.querySelectorAll('.q[data-star="1"]').forEach(q=>q.hidden=e.target.checked)});
+
+/* timer */
+let left=960,tid=null;const clock=document.getElementById("clock"),tbtn=document.getElementById("tbtn");
+function draw(){clock.textContent=`${String(Math.floor(left/60)).padStart(2,"0")}:${String(left%60).padStart(2,"0")}`}
+tbtn.addEventListener("click",()=>{if(tid){clearInterval(tid);tid=null;tbtn.textContent="המשך";return}
+  tbtn.textContent="עצור";tid=setInterval(()=>{if(left>0){left--;draw()}else{clearInterval(tid);tid=null;tbtn.textContent="נגמר הזמן"}},1000)});
+
+/* checklist */
+const C=["קראתי את השאלה עד הסוף וסימנתי את מילת השאלה.","בדקתי על איזה טקסט השאלה – א׳, ב׳ או שניהם.","עניתי על כל החלקים („הסבירו וגם הביאו דוגמה”).","התשובה מתחילה במילים של השאלה – משפט שלם.","בקומות 3–4 הוספתי „כי…” או „בטקסט כתוב…”.","בשאלה על שני טקסטים – הבאתי דוגמה מכל אחד מהם."];
+const ck=store.get("cr-chk",{}),chk=document.getElementById("chk");
+C.forEach((c,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="checkbox" id="c${i}">${c}`;const cb=l.querySelector("input");cb.checked=!!ck[i];
+  cb.addEventListener("change",()=>{ck[i]=cb.checked;store.set("cr-chk",ck)});chk.appendChild(l)});
+const tip=document.getElementById("tip");tip.value=store.get("cr-tip","");tip.addEventListener("input",()=>store.set("cr-tip",tip.value));
+
+/* teacher mode */
+const ST=[
+ {t:"פתיחה: מה ההבדל?",m:4,go:"read",tab:"A",s:["הראו את הכותרת והפסקה הראשונה של כל טקסט (החליפו לשונית).","שאלו: איך יודעים שזה מידעי ושזה סיפור?","כוונו לתשובות: כותרות משנה, מספרים, עובדות ↔ דמויות, רגשות, דיאלוג."]},
+ {t:"משחק תנועה: לאיזו קומה?",m:4,go:"game",s:["הדביקו 4 דפי קומות בארבע פינות בחדר.","קראו כל שאלה בקול; התלמידים רצים לפינה ומצביעים על מילת השאלה.","לחצו על הקומה שנבחרה כדי לראות משוב."]},
+ {t:"טקסט א׳ – מפת טקסט",m:8,go:"read",tab:"A",s:["קוראים פסקה אחר פסקה.","ליד כל פסקה כותבים 2–3 מילים: על מה הפסקה?","מסמנים בצהוב מילות קישור (לכן, אולם, מכיוון ש), בוורוד מספרים ועובדות."]},
+ {t:"טקסט ב׳ – שלושה צבעים",m:8,go:"read",tab:"B",s:["קריאה ראשונה שקטה – רק להבין מה קרה.","קריאה שנייה: צהוב = רגשות, כחול = מילה קשה/דימוי, ורוד = מידע שמופיע גם בטקסט א׳.","הוורוד מכין לשאלות 19–22."]},
+ {t:"תרגול בסגנון מבדק",m:16,go:"exam",s:["סמנו „הסתר שאלות ★” – בשיעור עונים על 12 שאלות.","לפני שמתחילים: הדגימו בקול את שאלה 20 (השוואה): מה משותף ← מה שונה ← דוגמה מכל טקסט.","הפעילו את הטיימר שבמסך המבדק. התערבו רק בשאלה: „באיזו קומה אתם?”"]},
+ {t:"בדיקה עצמית",m:4,go:"done",s:["התלמידים בוחרים שתי תשובות ובודקים אותן מול הצ׳קליסט.","מתקנים, ורק אז לוחצים „בדקו” כדי לראות תשובה לדוגמה."]},
+ {t:"סיכום",m:1,go:"done",s:["שאלה בעל פה: מה היה שונה בין שאלה על טקסט מידעי לשאלה על סיפור?","שיעורי בית: 10 שאלות ★."]}
+];
+let cur=0,sLeft=ST[0].m*60,sTid=null,elapsed=0;const doneSt=new Set();
+const stList=document.getElementById("stList"),stClock=document.getElementById("stClock"),stPause=document.getElementById("stPause");
+let start=0;const starts=ST.map(x=>{const a=start;start+=x.m;return a});
+ST.forEach((x,i)=>{const li=document.createElement("li");li.innerHTML=`<button><span class="tm">${starts[i]}–${starts[i]+x.m} דק׳</span><span>${x.t}</span><span class="ok" id="ok${i}"></span></button>`;
+  li.querySelector("button").addEventListener("click",()=>pick(i,true));stList.appendChild(li)});
+const fmt=s=>{const a=Math.abs(s);return (s<0?"−":"")+String(Math.floor(a/60)).padStart(2,"0")+":"+String(a%60).padStart(2,"0")};
+function paint(){stClock.textContent=fmt(sLeft);stClock.classList.toggle("over",sLeft<0);
+  document.getElementById("totalClock").textContent=`זמן שיעור: ${fmt(elapsed)} מתוך 45:00`}
+function pick(i,run){if(cur!==i)doneSt.add(cur);cur=i;sLeft=ST[i].m*60;
+  document.getElementById("stTitle").textContent=`${i+1}. ${ST[i].t}`;
+  document.getElementById("stSteps").innerHTML=ST[i].s.map(x=>`<li>${x}</li>`).join("");
+  stList.querySelectorAll("button").forEach((b,j)=>b.setAttribute("aria-current",j===i));
+  ST.forEach((_,j)=>document.getElementById("ok"+j).textContent=doneSt.has(j)&&j!==i?"✓":"");
+  if(run)startT();else paint()}
+function startT(){clearInterval(sTid);sTid=setInterval(()=>{sLeft--;elapsed++;paint()},1000);stPause.textContent="עצור";paint()}
+stPause.addEventListener("click",()=>{if(sTid){clearInterval(sTid);sTid=null;stPause.textContent="המשך"}else startT()});
+document.getElementById("stNext").addEventListener("click",()=>{if(cur<ST.length-1)pick(cur+1,true);else{doneSt.add(cur);clearInterval(sTid);sTid=null;stPause.textContent="המשך";pick(cur,false)}});
+document.getElementById("stGo").addEventListener("click",()=>{const x=ST[cur];go(x.go);if(x.tab)tab(x.tab)});
+document.getElementById("showKey").addEventListener("change",e=>document.querySelectorAll(".tkey").forEach(k=>k.hidden=!e.target.checked));
+pick(0,false);
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

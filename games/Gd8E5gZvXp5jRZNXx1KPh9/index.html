@@ -1,0 +1,310 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>המפה של סבא יוסף</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: מסע לאורך שביל – פס שלבים עליון דביק, מתחתיו תחנה אחת בכל פעם על "נייר מפה" */
+:root{
+  --paper:#eef0e4; --card:#f8f9f2; --ink:#1f2d27; --muted:#5b6a60; --line:#c9cfba;
+  --accent:#c2362b; --trail:#2f6b52; --blue:#2b5f8f; --green:#2f7a4f; --purple:#6b4a9a; --orange:#b8641c; --red:#b0303a;
+  --display:"Secular One","Assistant",system-ui,sans-serif; --body:"Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#161c19; --card:#1f2723; --ink:#e7ebe0; --muted:#a3b0a5; --line:#34413a;
+  --accent:#ef6b5e; --trail:#6fbf98; --blue:#7fb0de; --green:#7cc79a; --purple:#b597e0; --orange:#e7a462; --red:#f0808a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#161c19; --card:#1f2723; --ink:#e7ebe0; --muted:#a3b0a5; --line:#34413a;
+  --accent:#ef6b5e; --trail:#6fbf98; --blue:#7fb0de; --green:#7cc79a; --purple:#b597e0; --orange:#e7a462; --red:#f0808a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6;direction:rtl;text-align:right}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;padding-block:10px}
+h1{font-family:var(--display);font-weight:400;font-size:1.5rem;margin:0;line-height:1.2}
+.sub{color:var(--muted);font-size:.9rem}
+.clock{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.clock b{font-size:1.25rem}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px}
+button:hover{border-color:var(--trail)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.word:focus-visible{outline:3px solid var(--trail);outline-offset:2px}
+button.primary{background:var(--trail);color:var(--paper);border-color:var(--trail);font-weight:700}
+.trail{display:flex;gap:4px;overflow-x:auto;padding-block:0 10px}
+.trail button{flex:1 0 auto;border-radius:20px;font-size:.85rem;padding:4px 12px;white-space:nowrap}
+.trail button[aria-current="step"]{background:var(--trail);color:var(--paper);border-color:var(--trail)}
+.trail button.done{border-style:dashed;color:var(--muted)}
+main{padding-top:20px}
+.stage-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:12px}
+h2{font-family:var(--display);font-weight:400;font-size:1.9rem;margin:0;text-wrap:balance}
+.mins{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.goal{color:var(--muted);margin:0 0 16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.tip{border-right:4px solid var(--accent);padding:6px 12px;background:var(--paper);border-radius:4px;font-size:.95rem}
+.tip b{color:var(--accent)}
+label{font-weight:600;display:block;margin-bottom:4px}
+input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);text-align:right}
+textarea{min-height:64px;resize:vertical}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px}
+/* box */
+.box{display:grid;place-items:center;min-height:220px;border:2px dashed var(--line);border-radius:12px;text-align:center;gap:10px;padding:16px}
+.items{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.item{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:120px}
+.item svg{display:block;margin:0 auto 6px}
+/* story */
+.para{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.para .n{font-family:var(--display);color:var(--trail);min-width:2ch}
+.para p{margin:0;min-width:0}
+.word{cursor:pointer;border-radius:3px}
+.word.marked{background:color-mix(in srgb,var(--accent) 22%,transparent);text-decoration:underline wavy var(--accent)}
+.word.clue{background:color-mix(in srgb,var(--purple) 25%,transparent)}
+.stop{margin:10px 0;padding:12px;border:2px solid var(--accent);border-radius:10px;background:var(--paper)}
+.stop h3{margin:0 0 6px;font-size:1.05rem;color:var(--accent)}
+.marked-list{font-size:.95rem;color:var(--muted)}
+/* map path */
+.path{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;counter-reset:st}
+.node{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px;position:relative}
+.node .lbl{font-family:var(--display);font-size:1.1rem;color:var(--trail);display:flex;gap:8px;align-items:center}
+.node .lbl::before{counter-increment:st;content:counter(st);display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--trail);color:var(--paper);font-size:.85rem}
+.node .hint{font-size:.85rem;color:var(--muted);margin:2px 0 6px}
+.node.filled{border-color:var(--trail)}
+.reveal{font-size:.9rem;color:var(--muted);margin-top:6px}
+.reveal[hidden]{display:none}
+.link{background:none;border:none;color:var(--trail);text-decoration:underline;padding:0;font-size:.9rem}
+/* detective */
+.formula{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:end}
+.formula .op{font-family:var(--display);font-size:1.6rem;color:var(--accent);padding-bottom:4px}
+@media (max-width:620px){.formula{grid-template-columns:1fr}.formula .op{text-align:center;padding:0}}
+.qnav{display:flex;gap:6px;flex-wrap:wrap}
+.qnav button{min-width:40px}
+.qnav button[aria-current="true"]{background:var(--purple);color:var(--paper);border-color:var(--purple)}
+/* cards */
+.decks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.deck{border-width:2px;padding:14px 10px;font-weight:700;border-radius:12px}
+.deck small{display:block;font-weight:400;color:var(--muted)}
+.flip{min-height:170px;border-radius:14px;border:3px solid var(--c,var(--line));background:var(--card);padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.flip .cat{font-weight:700;color:var(--c)}
+.flip .q{font-size:1.25rem;font-weight:600}
+.flip .a{color:var(--muted)}
+.steps{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--trail)}
+.dot.on{background:var(--trail)}
+.dot.x{border-color:var(--accent);background:var(--accent);border-radius:3px;transform:rotate(45deg);width:18px;height:18px}
+/* reflection */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button[aria-pressed="true"],.rate button[aria-pressed="true"]{background:var(--trail);color:var(--paper);border-color:var(--trail)}
+.rate{display:flex;gap:8px}
+.rate button{width:48px;height:48px;font-size:1.2rem;font-weight:700;border-radius:50%}
+.teacher{font-size:.9rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.flip,.box{transition:border-color .2s}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div><h1>המפה של סבא יוסף</h1><div class="sub">שיעור · 45 דקות · סיפור הרפתקה</div></div>
+      <div class="clock" aria-live="off">
+        <span>זמן שיעור</span><b id="clk">00:00</b><span class="sub">/ 45:00</span>
+        <button id="clkBtn" class="primary" type="button">התחל</button>
+        <button id="clkReset" type="button" aria-label="אפס שעון">אפס</button>
+      </div>
+    </div>
+    <nav class="trail" id="trail" aria-label="שלבי השיעור"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<script>
+(function(){
+const store={get(k,d){try{const v=localStorage.getItem('eyal-'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('eyal-'+k,JSON.stringify(v))}catch(e){}}};
+
+const story=[
+ 'איתי לא רצה לנסוע למושב של סבא יוסף. "אין שם קליטה, אין שם חברים, יש רק פרות ושקט," אמר לאמא. אבל אמא כבר העמיסה את התיק לרכב.',
+ 'ביום השני, כשחיפש מטען בעליית הגג, מצא איתי קופסת פח חלודה. בתוכה היו פנס ישן, מצפן ודף מקופל. על הדף צויר שביל שיצא מהבית, עבר ליד עץ שקמה גדול וירד לוואדי. בסוף השביל סומן X אדום, ומתחתיו נכתב בכתב יד מעוגל: "למי שיודע לחכות."',
+ '"סבא, מה זה?" שאל איתי והניח את הדף על השולחן. סבא הביט במפה זמן רב. אחר כך חייך חיוך קטן ואמר רק: "אם תמצא, תספר לי."',
+ 'איתי לקח את המצפן ויצא לדרך. את עץ השקמה מצא בקלות, אבל מהעץ נפתחו שני שבילים. הוא סובב את המפה עד שהחץ של המצפן הצביע צפונה, ובחר בשביל השמאלי, שירד במדרון.',
+ 'בוואדי היה קריר ושקט. השמש כבר הייתה נמוכה, והצללים של הסלעים התארכו. פתאום שמע איתי רשרוש מאחורי השיחים. ליבו דפק חזק. הוא עמד בלי לזוז והחזיק את הפנס כמו חרב. מתוך השיחים יצא דורבן קטן, הביט בו רגע והסתלק.',
+ 'איתי צחק לעצמו, אבל ידיו עדיין רעדו. הוא התיישב על סלע, נשם עמוק ובדק שוב את המפה. ליד ה-X היה ציור קטן שלא שם לב אליו קודם: שלוש אבנים מונחות זו על זו.',
+ 'הוא עבר על הוואדי לאט, צעד אחר צעד. ליד עץ חרוב עקום ראה אותן: שלוש אבנים שטוחות, מכוסות טחב. מתחתן הייתה קבורה צנצנת זכוכית, ובתוכה מכתב מצהיב.',
+ '"לבן שלי, משה," נכתב במכתב. "אם הגעת עד כאן, למדת שלא כל דבר טוב בא מהר. גם אני פחדתי בוואדי הזה כשהייתי בגילך. הפחד לא נעלם, אבל אפשר ללכת איתו. אבא."',
+ 'משה הוא השם של אבא של איתי. איתי קרא את המכתב פעם נוספת, והחזיר אותו לצנצנת בזהירות.',
+ 'כשחזר הביתה כבר היה חושך. סבא ישב במרפסת עם שתי כוסות תה. מאחת מהן עדיין עלה אד. "מצאת?" שאל. איתי הנהן והתיישב לידו. בפעם הראשונה מאז שהגיע, השקט לא הפריע לו.'
+];
+const stops={3:'עצירה 1: מה לדעתך סבא יודע ולא אומר?',6:'עצירה 2: מה עזר לאיתי להבחין בציור הקטן?',9:'עצירה 3: למה איתי החזיר את המכתב ולא לקח אותו?'};
+const stopTools=['בדיקת ניחוש: האם הניחוש שלי עדיין מתאים?','מה אני רואה בראש? תאר את המקום במילים שלך.','מילה לא מוכרת? לחץ עליה כדי לסמן.'];
+
+const mapNodes=[
+ ['דמויות','מי משתתף בסיפור?','איתי, סבא יוסף, (אמא, אבא משה – במכתב)'],
+ ['מקום','איפה ומתי?','מושב של סבא, עליית הגג, הוואדי; בחופש, לקראת ערב'],
+ ['הבעיה','מה איתי צריך לפתור או להתגבר עליו?','למצוא את ה-X במפה; וגם: משעמם לו ומפחיד בוואדי'],
+ ['ניסיונות','מה הוא עושה כדי להצליח?','משתמש במצפן, בוחר שביל, נרגע ובודק שוב את המפה'],
+ ['שיא','הרגע הכי מותח','הרשרוש בשיחים – הדורבן'],
+ ['פתרון','איך זה נגמר?','מוצא את הצנצנת והמכתב, וחוזר לסבא'],
+ ['מה השתנה בדמות','איתי בהתחלה מול בסוף','בהתחלה השקט הפריע לו, בסוף נהנה ממנו; למד ללכת עם הפחד']
+];
+
+const detective=[
+ ['למה סבא חייך ולא הסביר?','פסקה 3','הוא צייר את המפה בעצמו ורצה שאיתי יגלה לבד.'],
+ ['מי כתב את המכתב ולמי? איך ידעת?','פסקאות 8–9','סבא יוסף כתב לבנו משה, אבא של איתי.'],
+ ['מה מלמדות שתי כוסות התה?','פסקה 10','סבא חיכה לאיתי והאמין שיחזור ויצליח.'],
+ ['מה הפירוש של "למי שיודע לחכות"?','פסקאות 2, 6, 8','מי שלא מוותר ומחפש לאט ובסבלנות.'],
+ ['מה השתנה באיתי בסוף? מצא רמז.','פסקאות 1, 10','השקט לא הפריע לו – עכשיו הוא מעריך את המקום ואת סבא.']
+];
+
+const decks=[
+ {k:'פרט',c:'--blue',q:[['מה מצא איתי בקופסת הפח?','פנס, מצפן ומפה (פסקה 2)'],['מי יצא מהשיחים?','דורבן קטן (פסקה 5)'],['ליד איזה עץ היו האבנים?','עץ חרוב עקום (פסקה 7)']]},
+ {k:'רצף',c:'--green',q:[['מה עשה איתי כשהגיע לשני השבילים?','כיוון את המפה לפי המצפן ובחר בשביל השמאלי'],['סדר: מכתב / דורבן / קופסה / תה עם סבא','קופסה ← דורבן ← מכתב ← תה']]},
+ {k:'רעיון מרכזי',c:'--orange',q:[['מה המסר של הסיפור במשפט אחד?','אפשר לפחד ולהמשיך בכל זאת; דברים טובים דורשים סבלנות'],['תן לסיפור כותרת חדשה. למה בחרת בה?','תשובה פתוחה עם נימוק']]},
+ {k:'חיבור אישי',c:'--red',q:[['מתי המשכת משהו למרות שפחדת?','תשובה אישית'],['איתי התיישב ונשם עמוק. מה עוזר לך להירגע?','תשובה אישית']]}
+];
+
+const tools=['ניחוש מהכותרת','מטרת קריאה','עצירה ובדיקה','תמונה בראש','סימון מילה','מפת סיפור','בלש: רמז + ידע = מסקנה'];
+
+const stages=[
+ {id:'open',name:'הקופסה',min:'0–5',len:5,title:'פתיחה: הקופסה המסתורית',goal:'סקרנות והשערות לפני הקריאה.',render:renderBox},
+ {id:'before',name:'לפני קריאה',min:'5–10',len:5,title:'כלי לפני קריאה',goal:'הפעלת ידע קודם והצבת מטרה.',render:renderBefore},
+ {id:'read',name:'קריאה',min:'10–20',len:10,title:'קריאה עם עצירות',goal:'ניטור הבנה תוך כדי קריאה.',render:renderRead},
+ {id:'map',name:'מפת סיפור',min:'20–28',len:8,title:'מפת הסיפור בתנועה',goal:'זיהוי רכיבי מבנה הסיפור.',render:renderMap},
+ {id:'detective',name:'בלש',min:'28–36',len:8,title:'בלש בין השורות',goal:'הסקת מסקנות מרמזים בטקסט.',render:renderDetective},
+ {id:'cards',name:'כרטיסיות',min:'36–41',len:5,title:'כרטיסיות שאלות',goal:'פרט, רצף, רעיון מרכזי וחיבור אישי.',render:renderCards},
+ {id:'end',name:'סיכום',min:'41–45',len:4,title:'סיכום: אני והכלים שלי',goal:'רפלקציה מטה-קוגניטיבית.',render:renderEnd}
+];
+let cur=Math.min(store.get('stage',0),stages.length-1);
+if(location.hash){const i=stages.findIndex(s=>s.id===location.hash.slice(1));if(i>=0)cur=i}
+
+const $=(t,a={},...kids)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}kids.flat().forEach(c=>c!=null&&e.append(c));return e};
+function field(key,lbl,multi,ph){const id='f-'+key;const el=$(multi?'textarea':'input',{id,type:'text',placeholder:ph||''});el.value=store.get(key,'');el.addEventListener('input',()=>store.set(key,el.value));return $('div',{},$('label',{for:id,text:lbl}),el)}
+
+/* trail */
+const trail=document.getElementById('trail');
+function drawTrail(){trail.innerHTML='';stages.forEach((s,i)=>{const b=$('button',{type:'button',text:(i+1)+'. '+s.name,onclick:()=>go(i)});if(i===cur)b.setAttribute('aria-current','step');else if(i<cur)b.classList.add('done');trail.append(b)})}
+function go(i){cur=i;store.set('stage',i);drawTrail();draw();window.scrollTo({top:0});const a=trail.querySelector('[aria-current]');a&&a.scrollIntoView({block:'nearest',inline:'center'})}
+
+const main=document.getElementById('main');
+function draw(){const s=stages[cur];main.innerHTML='';
+ main.append($('div',{class:'stage-head'},$('h2',{text:s.title}),$('span',{class:'mins',text:'דקות '+s.min})),$('p',{class:'goal',text:'מטרה: '+s.goal}));
+ main.append(s.render());
+ main.append($('div',{class:'nav'},
+  cur>0?$('button',{type:'button',text:'→ שלב קודם',onclick:()=>go(cur-1)}):$('span'),
+  cur<stages.length-1?$('button',{type:'button',class:'primary',text:'לשלב הבא ←',onclick:()=>go(cur+1)}):$('span')));
+}
+
+/* stage 1 */
+const icons={
+ lamp:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2"><rect x="16" y="18" width="12" height="20" rx="2" fill="none"/><path d="M12 8h20l-4 10H16z" fill="none"/><path d="M22 2v3M10 4l2 3M34 4l-2 3"/></svg>',
+ comp:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2"><circle cx="22" cy="22" r="17" fill="none"/><path d="M22 9l4 13-4 13-4-13z" fill="none"/><text x="19" y="8" font-size="7" fill="currentColor" stroke="none">N</text></svg>',
+ map:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8l12-4 12 4 12-4v32l-12 4-12-4-12 4z" fill="none"/><path d="M10 30c6-2 6-12 14-12" stroke-dasharray="3 3"/><path d="M28 14l6 6M34 14l-6 6" stroke="var(--accent)" stroke-width="3"/></svg>'};
+function renderBox(){
+ const open=store.get('boxOpen',false);
+ const box=$('div',{class:'box'});
+ function fill(o){box.innerHTML='';if(!o){box.append($('div',{class:'sub',text:'קופסת פח ישנה. מה יש בפנים?'}),$('button',{type:'button',class:'primary',text:'פתח את הקופסה',onclick:()=>{store.set('boxOpen',true);fill(true)}}))}
+  else{const it=$('div',{class:'items'});[['lamp','פנס ישן'],['comp','מצפן'],['map','דף מקופל עם X אדום']].forEach(([k,t])=>{const d=$('div',{class:'item'});d.innerHTML=icons[k];d.append($('div',{text:t}));it.append(d)});box.append(it,$('button',{type:'button',class:'link',text:'סגור שוב',onclick:()=>{store.set('boxOpen',false);fill(false)}}))}}
+ fill(open);
+ return $('div',{class:'stack'},
+  $('div',{class:'tip'},$('b',{text:'למורה: '}),'מניחים קופסה אמיתית עם פנס, מצפן ודף מקופל. התלמיד פותח ומשער.'),
+  box,
+  $('div',{class:'panel stack'},field('who','למי שייכים החפצים?'),field('plan','מה הוא תכנן לעשות איתם?',true)));
+}
+/* stage 2 */
+function renderBefore(){
+ return $('div',{class:'stack'},
+  $('div',{class:'panel stack'},
+   $('div',{},$('div',{class:'sub',text:'הכותרת'}),$('div',{style:'font-family:var(--display);font-size:1.6rem',text:'המפה של סבא יוסף'})),
+   field('reminds','הכותרת מזכירה לי:'),
+   field('guess','אני מנחש שהסיפור יהיה על:',true),
+   field('know','מה בדרך כלל קורה בסיפור הרפתקה?',true),
+   field('goalRead','המטרה שלי בקריאה: לגלות...')),
+  $('div',{class:'tip'},$('b',{text:'כלי: '}),'ניחוש מהכותרת + מטרת קריאה. נחזור לבדוק את הניחוש בעצירה 1.'));
+}
+/* stage 3 */
+function renderRead(){
+ const marks=new Set(store.get('marks',[]));
+ const shown=store.get('shown',3);
+ const wrap=$('div',{class:'stack'});
+ wrap.append($('div',{class:'tip'},$('b',{text:'קריאה משותפת: '}),'פסקה אני, פסקה אתה. לחיצה על מילה מסמנת אותה כמילה לא מוכרת.'));
+ const panel=$('div',{class:'panel'});
+ const list=$('div',{class:'marked-list'});
+ function upd(){list.textContent=marks.size?'מילים שסימנת: '+[...marks].join(' · '):'עוד לא סימנת מילים.'}
+ story.forEach((t,i)=>{if(i>=shown)return;const n=i+1;const p=$('p');
+  t.split(/(\s+)/).forEach(w=>{if(/^\s+$/.test(w)){p.append(w);return}const clean=w.replace(/[".,:?!]/g,'');const s=$('span',{class:'word'+(marks.has(clean)?' marked':''),tabindex:'0',role:'button',text:w});
+   const tog=()=>{marks.has(clean)?marks.delete(clean):marks.add(clean);s.classList.toggle('marked');store.set('marks',[...marks]);upd()};
+   s.addEventListener('click',tog);s.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}});p.append(s)});
+  panel.append($('div',{class:'para'},$('span',{class:'n',text:n}),p));
+  if(stops[n]){const k='stop'+n;panel.append($('div',{class:'stop'},$('h3',{text:stops[n]}),
+   $('div',{class:'teacher',text:stopTools[(n/3)-1]}),field(k,'התשובה של התלמיד:',true),
+   n===shown&&n<story.length?$('button',{type:'button',class:'primary',style:'margin-top:8px',text:'המשך לקרוא',onclick:()=>{store.set('shown',n===9?10:n+3);go(cur)}}):null))}
+ });
+ if(shown>=story.length)panel.append($('p',{class:'sub',style:'margin-top:10px',text:'סוף הסיפור.'}));
+ wrap.append(panel,list,$('button',{type:'button',class:'link',text:'התחל קריאה מחדש',onclick:()=>{store.set('shown',3);go(cur)}}));
+ upd();return wrap;
+}
+/* stage 4 */
+function renderMap(){
+ const g=$('div',{class:'path'});
+ mapNodes.forEach(([l,h,a],i)=>{const k='map'+i;const node=$('div',{class:'node'});const f=$('textarea',{id:'f-'+k,'aria-label':l});f.value=store.get(k,'');
+  const r=$('div',{class:'reveal',text:'תשובה אפשרית: '+a});r.hidden=true;
+  const sync=()=>node.classList.toggle('filled',!!f.value.trim());f.addEventListener('input',()=>{store.set(k,f.value);sync()});sync();
+  node.append($('div',{class:'lbl',text:l}),$('div',{class:'hint',text:h}),f,$('button',{type:'button',class:'link',text:'הצג תשובה למורה',onclick:()=>{r.hidden=!r.hidden}}),r);g.append(node)});
+ return $('div',{class:'stack'},
+  $('div',{class:'tip'},$('b',{text:'בתנועה: '}),'מדפיסים 7 כרטיסים ומניחים על הרצפה כשביל. התלמיד צועד מכרטיס לכרטיס, אומר מה מתאים מהסיפור, ואז ממלאים כאן.'),g);
+}
+/* stage 5 */
+function renderDetective(){
+ let qi=store.get('dq',0);const box=$('div',{class:'panel stack'});const qn=$('div',{class:'qnav'});
+ function d(){box.innerHTML='';qn.innerHTML='';detective.forEach((_,i)=>{const b=$('button',{type:'button',text:i+1,onclick:()=>{qi=i;store.set('dq',i);d()}});if(i===qi)b.setAttribute('aria-current','true');qn.append(b)});
+  const [q,where,ans]=detective[qi];const r=$('div',{class:'reveal',text:'תשובה למורה: '+ans});r.hidden=true;
+  box.append($('div',{style:'font-size:1.3rem;font-weight:700',text:q}),$('div',{class:'teacher',text:'איפה לחפש: '+where}),
+   $('div',{class:'formula'},field('d'+qi+'c','רמז בטקסט'),$('span',{class:'op',text:'+'}),field('d'+qi+'k','מה שאני יודע'),$('span',{class:'op',text:'='}),field('d'+qi+'m','מסקנה')),
+   $('button',{type:'button',class:'link',text:'הצג תשובה למורה',onclick:()=>{r.hidden=!r.hidden}}),r)}
+ d();
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'נוסחת הבלש: '}),'רמז + מה שאני יודע = מסקנה. התלמיד מסמן את הרמז בדף המודפס במרקר.'),qn,box);
+}
+/* stage 6 */
+function renderCards(){
+ let steps=store.get('steps',0);const used=store.get('used',{});
+ const card=$('div',{class:'flip'},$('div',{class:'sub',text:'בחר חבילה ושלוף כרטיס.'}));
+ const dots=$('div',{class:'steps','aria-label':'שביל המפה'});
+ function dd(){dots.innerHTML='';for(let i=0;i<7;i++)dots.append($('span',{class:'dot'+(i<steps?' on':'')}));dots.append($('span',{class:'dot x',title:'האוצר'}));dots.append($('span',{class:'sub',text:steps>=7?' הגעת לאוצר!':' '+steps+' צעדים מתוך 7'}))}
+ function draw(di){const dk=decks[di];const u=used[di]||[];let pool=dk.q.map((_,i)=>i).filter(i=>!u.includes(i));if(!pool.length){used[di]=[];pool=dk.q.map((_,i)=>i)}
+  const qi=pool[Math.floor(Math.random()*pool.length)];(used[di]=used[di]||[]).push(qi);store.set('used',used);
+  const [q,a]=dk.q[qi];card.style.setProperty('--c','var('+dk.c+')');card.innerHTML='';
+  const ans=$('div',{class:'a',text:'תשובה למורה: '+a});ans.hidden=true;
+  card.append($('div',{class:'cat',text:dk.k}),$('div',{class:'q',text:q}),ans,
+   $('div',{class:'steps'},$('button',{type:'button',text:'הפוך כרטיס',onclick:()=>{ans.hidden=!ans.hidden}}),
+    $('button',{type:'button',class:'primary',text:'ענה נכון – צעד קדימה',onclick:e=>{if(steps<7){steps++;store.set('steps',steps);dd()}e.target.disabled=true}})))}
+ const dk=$('div',{class:'decks'});decks.forEach((d,i)=>dk.append($('button',{type:'button',class:'deck',style:'border-color:var('+d.c+');color:var('+d.c+')',onclick:()=>draw(i)},d.k,$('small',{text:d.q.length+' כרטיסים'}))));
+ dd();
+ return $('div',{class:'stack'},dk,card,$('div',{class:'panel stack'},$('label',{text:'שביל המפה'}),dots,$('button',{type:'button',class:'link',text:'אפס שביל',onclick:()=>{steps=0;store.set('steps',0);dd()}})),
+  $('div',{class:'teacher',text:'שאלות ההסקה נמצאות בשלב "בלש". אם הזמן קצר – כרטיס אחד מכל צבע.'}));
+}
+/* stage 7 */
+function renderEnd(){
+ const pick=new Set(store.get('tools',[]));const ch=$('div',{class:'chips'});
+ tools.forEach(t=>{const b=$('button',{type:'button','aria-pressed':pick.has(t)?'true':'false',text:t,onclick:()=>{pick.has(t)?pick.delete(t):pick.add(t);b.setAttribute('aria-pressed',pick.has(t));store.set('tools',[...pick])}});ch.append(b)});
+ let rate=store.get('rate',0);const rt=$('div',{class:'rate',role:'group','aria-label':'דירוג הבנה'});
+ function dr(){rt.innerHTML='';for(let i=1;i<=5;i++)rt.append($('button',{type:'button','aria-pressed':i===rate?'true':'false',text:i,onclick:()=>{rate=i;store.set('rate',i);dr()}}))}dr();
+ return $('div',{class:'panel stack'},
+  $('div',{},$('label',{text:'אילו כלים השתמשתי היום? (אפשר כמה)'}),ch),
+  field('bestTool','הכלי שהכי עזר לי, ולמה:',true),
+  $('div',{},$('label',{text:'כמה הבנתי את הסיפור? 1 = קצת, 5 = הכול'}),rt),
+  field('nextTime','בפעם הבאה אנסה:'),
+  $('div',{class:'tip'},$('b',{text:'למורה: '}),'לסיים במשפט מהמכתב: "הפחד לא נעלם, אבל אפשר ללכת איתו." – לשאול את התלמיד מה זה אומר לו.'),
+  $('button',{type:'button',class:'link',text:'נקה את כל התשובות לשיעור חדש',onclick:clearAll}));
+}
+let armed=false;
+function clearAll(e){if(!armed){armed=true;e.target.textContent='לחץ שוב כדי לאשר מחיקה';setTimeout(()=>{armed=false;e.target.textContent='נקה את כל התשובות לשיעור חדש'},4000);return}
+ try{Object.keys(localStorage).filter(k=>k.startsWith('eyal-')).forEach(k=>localStorage.removeItem(k))}catch(_){}armed=false;sec=0;run=false;tick();go(0)}
+
+/* clock */
+let sec=store.get('sec',0),run=false,t=null;const clk=document.getElementById('clk'),cb=document.getElementById('clkBtn');
+function tick(){const m=String(Math.floor(sec/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');clk.textContent=m+':'+s;clk.style.color=sec>=2700?'var(--accent)':'';cb.textContent=run?'השהה':(sec?'המשך':'התחל')}
+cb.onclick=()=>{run=!run;clearInterval(t);if(run)t=setInterval(()=>{sec++;if(sec%5===0)store.set('sec',sec);tick()},1000);tick()};
+document.getElementById('clkReset').onclick=()=>{run=false;clearInterval(t);sec=0;store.set('sec',0);tick()};
+tick();drawTrail();draw();
+})();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

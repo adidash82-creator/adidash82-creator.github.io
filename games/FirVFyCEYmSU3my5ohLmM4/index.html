@@ -1,0 +1,265 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>אליפות הקריאה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=Varela+Round&display=swap">
+<style>
+/* Layout: a scoreboard bar on top, one training station per screen, station tabs as a track below the board */
+:root{
+  --bg:#F3F6FB; --surface:#FFFFFF; --ink:#16233F; --muted:#5B6782;
+  --court:#F07A2B; --turf:#2E9E5B; --sky:#2F7FD8; --gold:#E8B21C;
+  --hl-key:#FFE45C; --hl-ans:#9BE7B4; --line:#D9E1EE; --board:#16233F; --board-ink:#FFFFFF;
+  --display:"Rubik","Varela Round",system-ui,sans-serif;
+  --body:"Varela Round","Rubik",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1626; --surface:#18233A; --ink:#EEF2FA; --muted:#A8B3CC;
+  --court:#FF8E45; --turf:#45C27A; --sky:#5EA2F0; --gold:#F2C744;
+  --hl-key:#8A7410; --hl-ans:#1F6B41; --line:#2B3954; --board:#0A101D; --board-ink:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1626; --surface:#18233A; --ink:#EEF2FA; --muted:#A8B3CC;
+  --court:#FF8E45; --turf:#45C27A; --sky:#5EA2F0; --gold:#F2C744;
+  --hl-key:#8A7410; --hl-ans:#1F6B41; --line:#2B3954; --board:#0A101D; --board-ink:#FFFFFF; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6;direction:rtl}
+.wrap{max-width:860px;margin:0 auto;padding-block:12px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+button{font-family:var(--display);font-size:17px;cursor:pointer;border:0;border-radius:14px;padding:10px 16px;background:var(--sky);color:#fff;font-weight:700}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+button.go{background:var(--turf)}
+button.orange{background:var(--court)}
+/* scoreboard */
+.board{background:var(--board);color:var(--board-ink);border-radius:18px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.board h1{font-size:22px;font-weight:800}
+.board small{display:block;opacity:.75;font-family:var(--body);font-size:14px}
+.digits{display:flex;gap:10px;align-items:center}
+.digit{font-family:var(--display);font-weight:800;font-size:28px;background:#24314F;color:var(--gold);border-radius:10px;padding:2px 12px;min-width:56px;text-align:center;font-variant-numeric:tabular-nums}
+.digit.clock{color:#7FE3A6}
+.digits span{font-size:13px;opacity:.8}
+/* station track */
+.track{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 4px}
+.track button{flex:0 0 auto;background:var(--surface);color:var(--ink);border:2px solid var(--line);font-size:15px;padding:8px 12px}
+.track button[aria-current="true"]{background:var(--court);color:#fff;border-color:var(--court)}
+.track button.done{border-color:var(--turf)}
+.station{background:var(--surface);border-radius:20px;padding:20px;margin-top:10px;border:2px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.station-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.station-head h2{font-size:26px}
+.tag{font-family:var(--display);font-size:14px;color:var(--muted);letter-spacing:.02em}
+.lead{color:var(--muted);margin:0;max-width:62ch}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+/* warmup */
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qcard{background:var(--bg);color:var(--ink);border:3px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+.qcard b{display:block;font-size:26px;font-family:var(--display)}
+.qcard span{font-size:14px;color:var(--muted);font-family:var(--body);font-weight:400}
+.qcard.right{border-color:var(--turf);background:color-mix(in srgb,var(--turf) 18%,var(--surface))}
+.qcard.wrong{border-color:var(--court);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.callout{font-family:var(--display);font-size:24px;font-weight:700;text-align:center;background:var(--bg);border-radius:16px;padding:14px;border:2px dashed var(--court)}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.step{background:var(--bg);border-radius:16px;padding:14px;border-top:6px solid var(--sky)}
+.step:nth-child(2){border-top-color:var(--gold)}.step:nth-child(3){border-top-color:var(--turf)}.step:nth-child(4){border-top-color:var(--court)}
+.step h3{font-size:19px}
+.step p{margin:4px 0 0;font-size:16px}
+.step .move{color:var(--muted);font-size:14px}
+/* text */
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tools button{font-size:15px;padding:8px 12px}
+.tools button.on{outline:3px solid var(--ink);outline-offset:1px}
+.pen-key{background:#E0B800;color:#1a1a1a}.pen-ans{background:var(--turf)}.pen-off{background:var(--muted)}
+.text{background:var(--bg);border-radius:16px;padding:16px 18px;font-size:20px;line-height:2}
+.text h3{font-size:20px;color:var(--sky);margin-top:8px}
+.text p{margin:0 0 6px}
+.w{border-radius:6px;padding:0 1px;cursor:pointer}
+.w.k{background:var(--hl-key)}.w.a{background:var(--hl-ans)}
+.hint{box-shadow:inset 0 -4px 0 var(--court)}
+.qs{display:flex;flex-direction:column;gap:14px}
+.q{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.q-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.q-top b{font-family:var(--display);font-size:18px}
+.chip{font-size:13px;font-family:var(--display);padding:2px 10px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.chip.think{color:var(--court)}
+.starter{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:18px}
+.starter input{flex:1 1 180px;min-width:0;font-family:var(--body);font-size:18px;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.q .row button{font-size:14px;padding:6px 12px}
+.q.scored{border-color:var(--turf)}
+.teacher{font-size:14px;color:var(--muted)}
+/* break */
+.big-clock{font-family:var(--display);font-size:64px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;color:var(--turf)}
+.picks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.picks button{background:var(--bg);color:var(--ink);border:2px solid var(--line);padding:14px 8px;font-size:16px}
+.picks button.on{border-color:var(--turf);background:color-mix(in srgb,var(--turf) 18%,var(--surface))}
+/* scramble */
+.strips{display:flex;flex-direction:column;gap:8px}
+.strip{background:var(--bg);color:var(--ink);border:2px dashed var(--line);text-align:right;font-family:var(--body);font-weight:400;font-size:18px;padding:10px 14px}
+.strip.placed{border-style:solid;border-color:var(--sky)}
+.strip.ok{border-color:var(--turf)}
+.strip.bad{border-color:var(--court)}
+.num{display:inline-block;width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;text-align:center;line-height:26px;font-family:var(--display);font-size:14px;margin-left:8px}
+.connectors{display:flex;flex-wrap:wrap;gap:8px}
+.connectors span{background:var(--gold);color:#1a1a1a;font-family:var(--display);font-weight:700;padding:4px 12px;border-radius:999px;font-size:15px}
+/* burger */
+.burger{display:flex;flex-direction:column;gap:6px}
+.layer{border-radius:18px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;color:#1a1a1a}
+.layer label{font-family:var(--display);font-weight:700;font-size:15px}
+.layer .starter input{background:rgba(255,255,255,.85);color:#1a1a1a;border-color:rgba(0,0,0,.15)}
+.bun{background:#E9B46A}.bun.top{border-radius:40px 40px 14px 14px}.bun.bottom{border-radius:14px 14px 40px 40px}
+.patty{background:#B9774A;color:#fff}.patty .starter{color:#fff}
+.lettuce{background:#8ED16F}.tomato{background:#F2876B}
+/* checklist + medal */
+.checks{display:flex;flex-direction:column;gap:8px}
+.checks label{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:12px;padding:10px 12px;cursor:pointer}
+.checks input{width:24px;height:24px;accent-color:var(--turf)}
+.medal{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:10px}
+.disc{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3B0,var(--gold) 55%,#B88A0A);display:grid;place-items:center;box-shadow:0 0 0 8px color-mix(in srgb,var(--gold) 30%,transparent);font-family:var(--display);font-weight:800;color:#5A3E00;font-size:20px;line-height:1.2;max-width:100%}
+.medal input{font-family:var(--body);font-size:18px;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);width:min(320px,100%)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (max-width:560px){.qgrid,.picks{grid-template-columns:repeat(2,minmax(0,1fr))}.steps{grid-template-columns:1fr}.board h1{font-size:19px}.station-head h2{font-size:22px}.text{font-size:18px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="board">
+    <div><h1>אליפות הקריאה</h1><small>7 תחנות אימון · 45 דקות</small></div>
+    <div class="digits">
+      <div><div class="digit" id="score">0</div><span>שערים</span></div>
+      <div><div class="digit clock" id="clock">5:00</div><span>זמן תחנה</span></div>
+    </div>
+  </header>
+  <nav class="track" id="track" aria-label="תחנות"></nav>
+  <main id="stage"></main>
+</div>
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const S={score:0,cur:0,done:new Set(),pen:'k',timer:null,left:300};
+const stations=[
+ {t:'חימום',min:5},{t:'4 תרגילי האלוף',min:5},{t:'טקסט סיפורי',min:10},
+ {t:'הפסקת מים',min:2},{t:'טקסט מידעי',min:10},{t:'אימון כתיבה',min:10},{t:'טקס מדליות',min:3}];
+const $=s=>document.querySelector(s);
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function goal(n=1){S.score+=n;$('#score').textContent=S.score;burst()}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function startClock(min){clearInterval(S.timer);S.left=min*60;$('#clock').textContent=fmt(S.left);
+  S.timer=setInterval(()=>{if(S.left>0){S.left--;$('#clock').textContent=fmt(S.left)}},1000)}
+function track(){ $('#track').innerHTML=stations.map((s,i)=>`<button data-i="${i}" aria-current="${i===S.cur}" class="${S.done.has(i)?'done':''}">${i+1}. ${s.t}</button>`).join('');
+  $('#track').querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.i)) }
+function nav(i){return `<div class="nav">${i>0?`<button class="ghost" id="prev">→ תחנה קודמת</button>`:'<span></span>'}${i<stations.length-1?`<button class="go" id="next">סיימתי! לתחנה הבאה ←</button>`:''}</div>`}
+function head(i,lead){return `<div class="station-head"><h2>${stations[i].t}</h2><span class="tag">תחנה ${i+1} · ${stations[i].min} דק'</span></div>${lead?`<p class="lead">${lead}</p>`:''}`}
+function go(i){S.cur=i;track();startClock(stations[i].min);$('#stage').innerHTML=`<section class="station">${views[i]()}${nav(i)}</section>`;
+  const p=$('#prev'),n=$('#next');if(p)p.onclick=()=>go(i-1);if(n)n.onclick=()=>{S.done.add(i);go(i+1)};binds[i]&&binds[i]();window.scrollTo({top:0,behavior:'smooth'})}
+
+/* 1 warmup */
+const QW=[['מִי?','דְּמוּת'],['מָה?','דָּבָר / מַעֲשֶׂה'],['אֵיפֹה?','מָקוֹם'],['מָתַי?','זְמַן'],['לָמָּה?','סִבָּה'],['אֵיךְ?','דֶּרֶךְ / רֶגֶשׁ']];
+const WU=[['בַּפַּארְק','אֵיפֹה?'],['עוֹמֶר','מִי?'],['בְּשַׁבָּת בַּבֹּקֶר','מָתַי?'],['כִּי הוּא הָיָה עָיֵף','לָמָּה?'],['כַּדּוּר כָּתֹם','מָה?'],['מַהֵר מְאֹד','אֵיךְ?'],['הַמְּאַמֵּן','מִי?'],['כִּי יָרַד גֶּשֶׁם','לָמָּה?'],['בַּחֲדַר הַכּוֹשֶׁר','אֵיפֹה?'],['אַחֲרֵי הַהַפְסָקָה','מָתַי?']];
+let wu=0;
+const views=[],binds=[];
+views[0]=()=>head(0,'קודם התלמיד קורא כל כרטיס בקול פעם אחת. אחר כך המורה מקריאה תשובה, ואופיר קופץ (או לוחץ) על מילת השאלה המתאימה.')+
+ `<div class="callout" id="wuAns">${WU[0][0]}</div><div class="qgrid" id="qgrid">${QW.map(q=>`<button class="qcard" data-q="${q[0]}"><b>${q[0]}</b><span>${q[1]}</span></button>`).join('')}</div>
+ <p class="teacher">החלפת תפקידים בסוף: התלמיד אומר תשובה, המורה קופצת. המסר: מילת השאלה אומרת לנו מה לחפש.</p>`;
+binds[0]=()=>{wu=0;$('#qgrid').querySelectorAll('.qcard').forEach(b=>b.onclick=()=>{
+  if(wu>=WU.length)return;
+  if(b.dataset.q===WU[wu][1]){b.classList.add('right');goal();setTimeout(()=>{b.classList.remove('right');wu++;$('#wuAns').textContent=wu<WU.length?WU[wu][0]:'כָּל הַכָּבוֹד! עַכְשָׁו תּוֹרְךָ לָתֵת תְּשׁוּבָה לַמּוֹרָה'},600)}
+  else{b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong')}})};
+
+/* 2 steps */
+views[1]=()=>head(1,'ארבעה תרגילים קבועים לכל שאלה. לכל תרגיל תנועת יד, כדי שיישאר בגוף.')+
+ `<div class="steps">
+  <div class="step"><h3>1. קוֹרֵא וּמַקִּיף</h3><p>קוֹרֵא אֶת הַשְּׁאֵלָה פַּעֲמַיִם וּמַקִּיף אֶת מִלַּת הַשְּׁאֵלָה.</p><p class="move">תְּנוּעָה: עִגּוּל בָּאֲוִיר</p></div>
+  <div class="step"><h3>2. מְסַמֵּן מַפְתֵּחַ</h3><p>מְסַמֵּן בְּצָהֹב מִלָּה חֲשׁוּבָה מֵהַשְּׁאֵלָה.</p><p class="move">תְּנוּעָה: מַפְתֵּחַ שֶׁנִּפְתָּח</p></div>
+  <div class="step"><h3>3. רִיצָה לַטֶּקְסְט</h3><p>מוֹצֵא אֶת הַמִּלָּה בַּטֶּקְסְט וּמְסַמֵּן בְּיָרֹק אֶת הַתְּשׁוּבָה.</p><p class="move">תְּנוּעָה: רִיצָה בַּמָּקוֹם</p></div>
+  <div class="step"><h3>4. מְסִירָה</h3><p>עוֹנֶה בְּמִשְׁפָּט מָלֵא שֶׁמַּתְחִיל בַּמִּלִּים מֵהַשְּׁאֵלָה.</p><p class="move">תְּנוּעָה: מְסִירַת כַּדּוּר</p></div></div>
+  <div class="callout" style="font-size:19px">"אֵיפֹה שִׂחֵק עוֹמֶר?" ← "עוֹמֶר שִׂחֵק בַּמִּגְרָשׁ שֶׁל בֵּית הַסֵּפֶר."<br><span style="font-size:15px;color:var(--muted);font-weight:400">וְלֹא רַק "בַּמִּגְרָשׁ"</span></div>
+  <p class="teacher">שאלת "מצאתי": התשובה כתובה בטקסט. שאלת "חשבתי": מסיקים, ועונים "לדעתי... כי...". שאלה עם שני חלקים: ממספרים ① ②.</p>`;
+
+/* text builder */
+function words(t,base){return t.split(' ').map((w,j)=>`<span class="w" data-s="${base}">${esc(w)}</span>`).join(' ')}
+function textBlock(paras){return `<div class="tools" id="tools"><button class="pen-key on" data-p="k">צהוב: מילת מפתח</button><button class="pen-ans" data-p="a">ירוק: תשובה</button><button class="pen-off" data-p="x">מחק</button></div>
+ <div class="text">${paras.map((p,i)=>p.h?`<h3>${words(p.h,i)}</h3>`:`<p>${words(p.t,i)}</p>`).join('')}</div>`}
+function qBlock(qs){return `<div class="qs">${qs.map((q,i)=>`<div class="q" data-i="${i}"><div class="q-top"><b>${i+1}. ${esc(q.q)}</b><span class="chip ${q.k==='חָשַׁבְתִּי'?'think':''}">שְׁאֵלַת "${q.k}"</span></div>
+ ${q.st.map(s=>`<div class="starter"><span>${esc(s[0])}</span><input aria-label="השלמת תשובה"><span>${esc(s[1]||'.')}</span></div>`).join('')}
+ <div class="row"><button class="ghost hintb" data-h="${q.h}">רמז: איפה לחפש?</button><button class="go goalb">גול! ענתה במשפט מלא</button></div></div>`).join('')}</div>`}
+function bindText(qs){
+  $('#tools').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.pen=b.dataset.p;$('#tools').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+  document.querySelectorAll('.w').forEach(w=>w.onclick=()=>{w.classList.remove('k','a');if(S.pen!=='x')w.classList.add(S.pen)});
+  document.querySelectorAll('.hintb').forEach(b=>b.onclick=()=>{document.querySelectorAll('.w').forEach(w=>w.classList.toggle('hint',w.dataset.s===b.dataset.h))});
+  document.querySelectorAll('.goalb').forEach(b=>b.onclick=()=>{const q=b.closest('.q');if(q.classList.contains('scored'))return;q.classList.add('scored');b.textContent='נכנס! ⚽'.replace(' ⚽','');goal()})}
+
+/* 3 narrative */
+const NAR=[{t:'עוֹמֶר אוֹהֵב כַּדּוּרְסַל. בְּכָל הַפְסָקָה הוּא רָץ לַמִּגְרָשׁ שֶׁל בֵּית הַסֵּפֶר.'},
+{t:"בְּיוֹם שְׁלִישִׁי הָיָה מִשְׂחָק גָּדוֹל נֶגֶד כִּתָּה ה'. הַיְּלָדִים שָׁם הָיוּ גְּבוֹהִים, וְעוֹמֶר הִרְגִּישׁ פַּרְפָּרִים בַּבֶּטֶן."},
+{t:'בַּדַּקָּה הָאַחֲרוֹנָה הַכַּדּוּר הִגִּיעַ לְעוֹמֶר. הוּא רָאָה שֶׁהֶחָבֵר שֶׁלּוֹ, אִיתַי, עוֹמֵד לְבַד לְיַד הַסַּל.'},
+{t:'עוֹמֶר מָסַר לְאִיתַי, וְאִיתַי קָלַע! אַחֲרֵי הַמִּשְׂחָק אִיתַי אָמַר: "בִּלְעָדֶיךָ לֹא הָיִינוּ מְנַצְּחִים." עוֹמֶר הֵבִין שֶׁמְּסִירָה טוֹבָה שָׁוָה כְּמוֹ קְלִיעָה.'}];
+const NQ=[{q:'אֵיפֹה עוֹמֶר מְשַׂחֵק בְּכָל הַפְסָקָה?',k:'מָצָאתִי',h:0,st:[['עוֹמֶר מְשַׂחֵק בְּכָל הַפְסָקָה בְּ']]},
+{q:'מָתַי הָיָה הַמִּשְׂחָק הַגָּדוֹל?',k:'מָצָאתִי',h:1,st:[['הַמִּשְׂחָק הַגָּדוֹל הָיָה בְּ']]},
+{q:'אֵיךְ הִרְגִּישׁ עוֹמֶר לִפְנֵי הַמִּשְׂחָק, וְלָמָּה?',k:'מָצָאתִי',h:1,st:[['לִפְנֵי הַמִּשְׂחָק עוֹמֶר הִרְגִּישׁ','כִּי'],['','.']]},
+{q:'לָמָּה לְדַעְתְּךָ עוֹמֶר מָסַר לְאִיתַי וְלֹא זָרַק לְבַד?',k:'חָשַׁבְתִּי',h:2,st:[['לְדַעְתִּי עוֹמֶר מָסַר לְאִיתַי כִּי']]}];
+views[2]=()=>head(2,'קריאת "מסירות": המורה קוראת משפט, התלמיד קורא את הבא. אחר כך התלמיד קורא הכול לבד. שאלה 1 עונים יחד, את השאר התלמיד לבד.')+`<h3>הַמְּסִירָה שֶׁל עוֹמֶר</h3>`+textBlock(NAR)+qBlock(NQ)+
+ `<p class="teacher">תשובות: 1. במגרש של בית הספר. 2. ביום שלישי. 3. פרפרים בבטן, כי הילדים מכיתה ה' היו גבוהים. 4. פתוחה: איתי עמד לבד ליד הסל. בונוס בעל פה: מה עומר הבין בסוף?</p>`;
+binds[2]=()=>bindText(NQ);
+
+/* 4 break */
+views[3]=()=>head(3,'התלמיד בוחר תנועה, ואחריה שם יד על החזה ומרגיש את הלב. ניסוי קטן לטקסט הבא. ואז שותים מים.')+
+ `<div class="picks" id="picks"><button>10 קְפִיצוֹת חֶבֶל דִּמְיוֹנִי</button><button>5 מְסִירוֹת עִם הַמּוֹרָה</button><button>רִיצָה בַּמָּקוֹם עַד הַצִּפְצוּף</button></div><div class="big-clock" id="bclock">2:00</div>`;
+binds[3]=()=>{$('#picks').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('#picks').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+  const tick=()=>{const c=$('#bclock');if(c)c.textContent=fmt(S.left)};const iv=setInterval(()=>{if(!$('#bclock'))return clearInterval(iv);tick()},500)};
+
+/* 5 informational */
+const INF=[{t:'כְּשֶׁאֲנַחְנוּ רָצִים, הַגּוּף עוֹבֵד קָשֶׁה.'},
+{h:'הַלֵּב דּוֹפֵק מַהֵר'},{t:'הַלֵּב שׁוֹלֵחַ דָּם לְכָל הַגּוּף. כְּשֶׁרָצִים, הַלֵּב דּוֹפֵק מַהֵר יוֹתֵר. שִׂים יָד עַל הֶחָזֶה וְתַרְגִּישׁ!'},
+{h:'נוֹשְׁמִים חָזָק'},{t:'בְּרִיצָה אֲנַחְנוּ נוֹשְׁמִים מַהֵר. כָּךְ נִכְנָס לַגּוּף יוֹתֵר חַמְצָן.'},
+{h:'מַזִּיעִים'},{t:'כְּשֶׁרָצִים, הַגּוּף מִתְחַמֵּם. הַזֵּעָה עוֹזֶרֶת לַגּוּף לְהִתְקָרֵר. לָכֵן חָשׁוּב לִשְׁתּוֹת מַיִם.'}];
+const IQ=[{q:'מָה הַלֵּב שׁוֹלֵחַ לְכָל הַגּוּף?',k:'מָצָאתִי',h:2,st:[['הַלֵּב שׁוֹלֵחַ לְכָל הַגּוּף']]},
+{q:'כְּתֹב שְׁנֵי דְּבָרִים שֶׁקּוֹרִים לַגּוּף כְּשֶׁאֲנַחְנוּ רָצִים.',k:'מָצָאתִי',h:0,st:[['① דָּבָר אֶחָד: כְּשֶׁאֲנַחְנוּ רָצִים'],['② דָּבָר שֵׁנִי: כְּשֶׁאֲנַחְנוּ רָצִים']]},
+{q:'לָמָּה הַזֵּעָה חֲשׁוּבָה לַגּוּף?',k:'מָצָאתִי',h:6,st:[['הַזֵּעָה חֲשׁוּבָה לַגּוּף כִּי']]},
+{q:'בְּאֵיזוֹ פִּסְקָה תְּחַפֵּשׂ אִם תִּרְצֶה לָדַעַת לָמָּה צָרִיךְ לִשְׁתּוֹת מַיִם?',k:'מָצָאתִי',h:5,st:[['אֲחַפֵּשׂ בַּפִּסְקָה שֶׁנִּקְרֵאת']]}];
+views[4]=()=>head(4,'סריקת מגרש לפני הקריאה: התלמיד קורא רק את הכותרות הקטנות, מסמן אותן בצהוב ומנחש מה נלמד. בטקסט מידעי, תת-הכותרת מראה לאן לרוץ.')+`<h3>מָה קוֹרֶה לַגּוּף כְּשֶׁאֲנַחְנוּ רָצִים?</h3>`+textBlock(INF)+qBlock(IQ)+
+ `<p class="teacher">שאלה 2 מבקשת שני דברים: כותבים ① ② מעל השאלה. תשובות: 1. דם. 2. שניים מתוך: הלב דופק מהר / נושמים מהר / מזיעים. 3. עוזרת לגוף להתקרר. 4. "מזיעים". בונוס "חשבתי": למה אחרי ריצה אנחנו צמאים?</p>`;
+binds[4]=()=>bindText(IQ);
+
+/* 6 writing */
+const ORDER=['בְּיוֹם שִׁשִּׁי הָיָה יוֹם סְפּוֹרְט בְּבֵית הַסֵּפֶר.','קֹדֶם כֹּל עָשִׂינוּ חִמּוּם עַל הַדֶּשֶׁא.','אַחַר כָּךְ רַצְנוּ מֵרוֹץ שְׁלִיחִים.','הַקְּבוּצָה שֶׁלִּי נִצְּחָה וְקִבַּלְנוּ מֵדַלְיוֹת.','בַּסּוֹף כֻּלָּנוּ שָׁתִינוּ מַיִם וְנַחְנוּ בַּצֵּל.'];
+const SHUF=[2,4,0,3,1];let picked=[];
+views[5]=()=>head(5,'חלק א\': לוחצים על המשפטים לפי הסדר שבו הדברים קרו. חלק ב\': בונים המבורגר כתיבה.')+
+ `<h3>חלק א' · יוֹם הַסְּפּוֹרְט</h3><p class="lead">סַדֵּר אֶת הַסִּפּוּר לְפִי הַסֵּדֶר שֶׁבּוֹ הַדְּבָרִים קָרוּ.</p><div class="strips" id="pool">${SHUF.map(i=>`<button class="strip" data-i="${i}">${ORDER[i]}</button>`).join('')}</div>
+ <div class="row"><button class="orange" id="chk">בדיקה</button><button class="ghost" id="rst">מתחילים מחדש</button></div>
+ <div class="connectors"><span>קֹדֶם כֹּל</span><span>אַחַר כָּךְ</span><span>בְּנוֹסָף</span><span>וְחוּץ מִזֶּה</span><span>לָכֵן</span><span>בַּסּוֹף</span></div>
+ <p class="teacher">רמז אם נתקעת: מילות הקישור מראות את הסדר. כתיבה מסודרת = דברים בסדר שבו הם קרו.</p>
+ <h3>חלק ב' · הַמְּבוּרְגֶּר הַכְּתִיבָה</h3><p class="lead">הַנּוֹשֵׂא: הַמִּשְׂחָק אוֹ הַסְּפּוֹרְט שֶׁאֲנִי הֲכִי אוֹהֵב. קֹדֶם מְתַכְנְנִים בְּמִלָּה אַחַת לְכָל שִׁכְבָה, וְאָז כּוֹתְבִים מִשְׁפָּט.</p>
+ <div class="burger">
+  <div class="layer bun top"><label for="b1">לַחְמָנִיָּה עֶלְיוֹנָה · פְּתִיחָה</label><div class="starter"><span>הַמִּשְׂחָק שֶׁאֲנִי הֲכִי אוֹהֵב הוּא</span><input id="b1"><span>.</span></div></div>
+  <div class="layer patty"><label for="b2">קְצִיצָה · פְּרָט 1</label><div class="starter"><span>קֹדֶם כֹּל,</span><input id="b2"><span>.</span></div></div>
+  <div class="layer lettuce"><label for="b3">חַסָּה · פְּרָט 2</label><div class="starter"><span>בְּנוֹסָף,</span><input id="b3"><span>.</span></div></div>
+  <div class="layer tomato"><label for="b4">עַגְבָנִיָּה · פְּרָט 3</label><div class="starter"><span>וְחוּץ מִזֶּה,</span><input id="b4"><span>.</span></div></div>
+  <div class="layer bun bottom"><label for="b5">לַחְמָנִיָּה תַּחְתּוֹנָה · סִיּוּם</label><div class="starter"><span>לָכֵן</span><input id="b5"><span>.</span></div></div>
+ </div><p class="teacher">פחות משלושה פרטים זה בסדר. מה שחשוב: פתיחה וסיום. את ההמבורגר מעתיקים אחר כך לדף, שורה לכל משפט.</p>`;
+binds[5]=()=>{picked=[];const pool=$('#pool');
+  const draw=()=>{pool.querySelectorAll('.strip').forEach(b=>{const k=picked.indexOf(+b.dataset.i);b.classList.toggle('placed',k>-1);b.classList.remove('ok','bad');
+    b.innerHTML=(k>-1?`<span class="num">${k+1}</span>`:'')+ORDER[+b.dataset.i]});
+    [...pool.children].sort((a,b)=>{const x=picked.indexOf(+a.dataset.i),y=picked.indexOf(+b.dataset.i);return (x<0?99:x)-(y<0?99:y)}).forEach(c=>pool.appendChild(c))};
+  pool.querySelectorAll('.strip').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(!picked.includes(i))picked.push(i);draw()});
+  $('#rst').onclick=()=>{picked=[];draw()};
+  $('#chk').onclick=()=>{let all=picked.length===5;pool.querySelectorAll('.strip').forEach(b=>{const k=picked.indexOf(+b.dataset.i);if(k<0)return;const ok=k===+b.dataset.i;b.classList.add(ok?'ok':'bad');if(!ok)all=false});if(all)goal(2)}};
+
+/* 7 medal */
+views[6]=()=>head(6,'בדיקת השופט: עוברים על ההמבורגר ומסמנים. תיקון אחד קטן מספיק.')+
+ `<div class="checks">${['כָּתַבְתִּי עַל הַשּׁוּרָה.','הִשְׁאַרְתִּי "אֶצְבַּע רֶוַח" בֵּין מִלָּה לְמִלָּה.','כָּל מִשְׁפָּט נִגְמַר בִּנְקֻדָּה.','יֵשׁ לִי פְּתִיחָה, אֶמְצַע וְסִיּוּם.','הִשְׁתַּמַּשְׁתִּי לְפָחוֹת בְּמִלַּת קִשּׁוּר אַחַת.'].map((c,i)=>`<label for="c${i}"><input type="checkbox" id="c${i}">${c}</label>`).join('')}</div>
+ <div class="medal"><div class="disc">אַלּוּף<br>הַקְּרִיאָה<br>וְהַכְּתִיבָה</div><h3>אוֹפִיר סִיֵּם 7 תַּחֲנוֹת אִמּוּן!</h3>
+ <div id="final" style="font-family:var(--display);font-size:20px"></div>
+ <label for="proud">הַיּוֹם אֲנִי הֲכִי גֵּאָה בְּ:</label><input id="proud"></div>`;
+binds[6]=()=>{$('#final').textContent='תּוֹצָאָה סוֹפִית: '+S.score+' שְׁעָרִים';burst(80)};
+
+/* confetti */
+const cv=$('#confetti'),cx=cv.getContext('2d');let parts=[];
+function burst(n=24){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#F07A2B','#2E9E5B','#2F7FD8','#E8B21C'];for(let i=0;i<n;i++)parts.push({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*12,vy:Math.random()*-10-2,c:cols[i%4],l:60});
+  if(parts.length<=n)requestAnimationFrame(step)}
+function step(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.4;p.l--;cx.fillStyle=p.c;cx.fillRect(p.x,p.y,8,8)});parts=parts.filter(p=>p.l>0);if(parts.length)requestAnimationFrame(step);else cx.clearRect(0,0,cv.width,cv.height)}
+
+go(0);
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

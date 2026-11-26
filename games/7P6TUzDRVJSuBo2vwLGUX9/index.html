@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>בלשי האיות – כיתה ה'</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Noto+Sans+Hebrew:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: playful but grown-up enough for 5th grade, encouraging, no timers
+   IDEA: a detective's notebook — hunt spelling mistakes in vocalized Hebrew
+   PICTURE: the game board itself on ruled paper, with a magnifier mascot
+   COLOUR and TYPE: mint ground, deep blue ink, coral accent; Secular One titles, Noto Sans Hebrew for nikud
+   LAYOUT: one centred column; header, then board; stacks on phones */
+:root{color-scheme:light dark;--bg:light-dark(#8fe3cf,#10263a);--ink:light-dark(#16294f,#f4f1e6);--paper:light-dark(#fffdf5,#1b3450);--line:light-dark(#d6e4f5,#2b4866);--blue:light-dark(#1f3a93,#8fb0ff);--coral:#ff5a5f;--green:light-dark(#1f8a4c,#5fd98f);--soft:light-dark(#e3f8f2,#22405e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 'Noto Sans Hebrew',system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+.wrap{max-width:780px;margin:0 auto;padding:clamp(16px,4vw,40px) max(4vw,14px)}
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+header svg{width:64px;height:64px;flex:none}
+h1{font:400 clamp(32px,6vw,48px)/1.05 'Secular One',sans-serif;margin:0}
+.sub{margin:2px 0 0;font-size:15px;opacity:.85}
+.paper{background:var(--paper);border-radius:22px;padding:clamp(18px,4vw,34px);box-shadow:0 10px 0 rgba(0,0,0,.12)}
+h2{font:700 28px/1.3 'Noto Sans Hebrew',sans-serif;margin:0 0 12px}
+label{font-weight:500}
+input[type=text]{font:inherit;font-size:20px;padding:10px 14px;border-radius:12px;border:3px solid var(--blue);background:var(--paper);color:var(--ink);width:100%;max-width:320px}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px;margin:20px 0}
+.gbtn{font:inherit;text-align:start;padding:16px;border-radius:18px;border:3px solid var(--blue);background:var(--soft);color:var(--ink);cursor:pointer;min-height:110px;transition:transform .15s}
+.gbtn:hover,.gbtn:focus-visible{transform:translateY(-3px);outline:none;border-color:var(--coral)}
+.gbtn b{display:block;font-size:21px;margin-bottom:4px}
+.gbtn span{font-size:15px}
+.gbtn i{font-style:normal;font-size:28px;float:inline-end}
+fieldset{border:2px dashed var(--line);border-radius:14px;padding:10px 14px;margin:0}
+legend{font-weight:700;padding:0 6px}
+.chk{display:flex;flex-wrap:wrap;gap:6px 18px}
+.chk label{display:flex;gap:6px;align-items:center;font-weight:400;min-height:36px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--coral)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar{flex:1 1 160px;height:14px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar div{height:100%;background:var(--coral);border-radius:9px;transition:width .3s}
+.stars{font-weight:700;white-space:nowrap}
+.q{font-size:20px;margin:6px 0 14px;font-weight:500}
+.big{font:700 clamp(34px,8vw,54px)/1.5 'Noto Sans Hebrew',sans-serif;text-align:center;margin:10px 0}
+.ctx{font:500 clamp(22px,5vw,30px)/1.9 'Noto Sans Hebrew',sans-serif;text-align:center;margin:10px 0;background:var(--soft);border-radius:14px;padding:10px 14px}
+.blank{display:inline-block;min-width:70px;border-bottom:3px solid var(--coral)}
+.emoji{font-size:52px;text-align:center;line-height:1.1}
+.wrong{text-decoration:underline wavy var(--coral) 3px;text-underline-offset:10px}
+.opts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.opt{font:700 clamp(26px,6.5vw,38px)/1.5 'Noto Sans Hebrew',sans-serif;padding:10px 26px;border-radius:18px;border:3px solid var(--blue);background:var(--paper);color:var(--ink);cursor:pointer;min-width:120px;min-height:64px}
+.opt:focus-visible,.word:focus-visible,.key:focus-visible,.btn:focus-visible{outline:4px solid var(--coral);outline-offset:2px}
+.opt.ok,.word.ok{background:var(--green);border-color:var(--green);color:#fff}
+.opt.no,.word.no,input.no{animation:shake .35s;border-color:var(--coral)}
+.opt.no{opacity:.55}
+.sent{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.word{font:500 clamp(22px,5.5vw,30px)/1.6 'Noto Sans Hebrew',sans-serif;padding:6px 14px;border-radius:12px;border:2px dashed var(--blue);background:var(--paper);color:var(--ink);cursor:pointer;min-height:48px}
+.answer{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:10px 0}
+.answer input{font:700 30px/1.3 'Noto Sans Hebrew',sans-serif;text-align:center;max-width:300px}
+.kb{display:grid;gap:6px;margin:12px auto 0;max-width:560px}
+.row{display:flex;gap:5px;justify-content:center}
+.key{font:500 20px 'Noto Sans Hebrew',sans-serif;flex:1 1 0;max-width:48px;height:48px;border-radius:10px;border:2px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer;padding:0}
+.key.w{max-width:110px;flex:2 1 0;font-size:16px}
+.btn{font:700 18px 'Noto Sans Hebrew',sans-serif;padding:10px 22px;border-radius:14px;border:0;background:var(--blue);color:var(--paper);cursor:pointer;min-height:48px}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.fb{min-height:56px;text-align:center;font-size:19px;font-weight:500;margin-top:8px}
+.fb.good{color:var(--green)}.fb.try{color:var(--coral)}
+.hint{display:inline-block;background:var(--soft);border-radius:10px;padding:4px 12px;margin-top:6px;font-size:18px;color:var(--ink)}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.end{text-align:center}
+.end .big{color:var(--coral)}
+.list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.list span{background:var(--soft);padding:4px 14px;border-radius:10px;font:700 22px/1.6 'Noto Sans Hebrew',sans-serif}
+.note{font-size:14px;opacity:.75;margin-top:16px}
+@keyframes shake{25%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.pop{animation:pop .35s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:600px){.key{height:42px;font-size:17px}.row{gap:3px}.paper{border-radius:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="26" cy="26" r="20" fill="#fffdf5" stroke="#1f3a93" stroke-width="6"/><circle cx="20" cy="20" r="6" fill="#d6e4f5"/><rect x="40" y="38" width="10" height="24" rx="4" transform="rotate(-45 45 50)" fill="#ff5a5f"/><circle cx="20" cy="27" r="2.5" fill="#1f3a93"/><circle cx="32" cy="27" r="2.5" fill="#1f3a93"/><path d="M20 34q6 5 12 0" stroke="#1f3a93" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+<div><h1>בלשי האיות</h1><p class="sub">כיתה ה' · מנוקד · מוצאים שגיאות כתיב ומתקנים</p></div>
+</header>
+<main class="paper" id="app" aria-live="polite"></main>
+</div>
+<script>
+{
+const ROUND=8;
+const TYPES={s:'אותיות דומות בצליל (א/ע, ט/ת, כ/ח, כ/ק, ס/ש)',h:'מילים שנשמעות אותו דבר (עם/אם, לא/לו, כל/קל, על/אל)',f:'אותיות סופיות (ך ם ן ף ץ)',p:'מילים מחוברות (ה, ו, ב, כ, ל, מ, ש)'};
+/* c = correct, w = wrong, t = type, e = emoji, x = sentence (___ = place of word), h = hint */
+const W=[
+{c:'תַּלְמִיד',w:'טַלְמִיד',t:'s',e:'🧑‍🎓'},{c:'מִכְתָּב',w:'מִחְתָּב',t:'s',e:'✉️'},{c:'הַחְלָטָה',w:'הַכְלָטָה',t:'s',e:'✅'},
+{c:'אֲוִיר',w:'עֲוִיר',t:'s',e:'🌬️'},{c:'טֶבַע',w:'תֶּבַע',t:'s',e:'🌿'},{c:'תַּחְבּוּרָה',w:'טַחְבּוּרָה',t:'s',e:'🚆'},
+{c:'הִתְקַדְּמוּת',w:'הִתְכַּדְּמוּת',t:'s',e:'📈'},{c:'אֶתְגָּר',w:'אֶטְגָּר',t:'s',e:'🧗'},{c:'מַעֲרֶכֶת',w:'מַאֲרֶכֶת',t:'s',e:'🪐'},
+{c:'אַחֲרָיוּת',w:'אַכֲרָיוּת',t:'s',e:'🤝'},{c:'שִׂמְחָה',w:'סִמְחָה',t:'s',e:'😄'},{c:'סְבִיבָה',w:'שְׂבִיבָה',t:'s',e:'🌍'},
+{c:'בְּעָיָה',w:'בְּאָיָה',t:'s',e:'🧩'},{c:'תְּשׁוּבָה',w:'טְשׁוּבָה',t:'s',e:'💬'},{c:'מַחְשֵׁב',w:'מַכְשֵׁב',t:'s',e:'💻'},{c:'טִיּוּל',w:'תִּיּוּל',t:'s',e:'🥾'},
+{c:'אַרְמוֹן',w:'אַרְמוֹנ',t:'f',e:'🏰'},{c:'מַדְעָן',w:'מַדְעָנ',t:'f',e:'🔬'},{c:'שָׁלוֹם',w:'שָׁלוֹמ',t:'f',e:'🕊️'},
+{c:'חֲלוֹם',w:'חֲלוֹמ',t:'f',e:'💭'},{c:'מְחַנֵּךְ',w:'מְחַנֵּכ',t:'f',e:'👨‍🏫'},{c:'הֶמְשֵׁךְ',w:'הֶמְשֵׁכ',t:'f',e:'➡️'},
+{c:'נוֹף',w:'נוֹפ',t:'f',e:'🏞️'},{c:'מִיץ',w:'מִיצ',t:'f',e:'🧃'},{c:'אֶרֶץ',w:'אֶרֶצ',t:'f',e:'🗺️'},{c:'דֶּרֶךְ',w:'דֶּרֶכ',t:'f',e:'🛣️'},
+{c:'עִם',w:'אִם',t:'h',x:'הָלַכְתִּי לַפַּארְק ___ אָחִי.',h:'"עִם" = יַחַד'},
+{c:'אִם',w:'עִם',t:'h',x:'___ יֵרֵד גֶּשֶׁם, נִשָּׁאֵר בַּבַּיִת.',h:'"אִם" = בְּמִקְרֶה שֶׁ...'},
+{c:'לוֹ',w:'לֹא',t:'h',x:'נָתַתִּי ___ אֶת הַסֵּפֶר שֶׁלִּי.',h:'לְמִי נָתַתִּי? ← לוֹ'},
+{c:'לֹא',w:'לוֹ',t:'h',x:'הוּא ___ הִגִּיעַ לַמְּסִבָּה.',h:'"לֹא" = הַהֵפֶךְ מִ"כֵּן"'},
+{c:'כָּל',w:'קַל',t:'h',x:'___ הַתַּלְמִידִים יָצְאוּ לַטִּיּוּל.',h:'"כָּל" = כֻּלָּם'},
+{c:'קַל',w:'כָּל',t:'h',x:'הַמִּבְחָן הָיָה ___ מְאוֹד.',h:'"קַל" = הַהֵפֶךְ מִ"קָּשֶׁה"'},
+{c:'עַל',w:'אַל',t:'h',x:'הַסֵּפֶר מֻנָּח ___ הַשֻּׁלְחָן.',h:'"עַל" = מֵעַל'},
+{c:'אֶל',w:'עֶל',t:'h',x:'הַתַּלְמִיד פָּנָה ___ הַמּוֹרָה.',h:'"אֶל" = לְכִוּוּן'},
+{c:'כְּשֶׁהִגַּעְתִּי',w:'כְּשֶׁ הִגַּעְתִּי',t:'p',h:'"כְּשֶׁ" מְחֻבֶּרֶת לַמִּלָּה'},{c:'וְהַמּוֹרָה',w:'וְ הַמּוֹרָה',t:'p',h:'וי"ו הַחִבּוּר מְחֻבֶּרֶת לַמִּלָּה'},
+{c:'מֵהַבַּיִת',w:'מֵ הַבַּיִת',t:'p',h:'מ"ם מְחֻבֶּרֶת לַמִּלָּה'},{c:'שֶׁאֲנַחְנוּ',w:'שֶׁ אֲנַחְנוּ',t:'p',h:'שי"ן מְחֻבֶּרֶת לַמִּלָּה'},
+{c:'הַתַּלְמִידִים',w:'הַ תַּלְמִידִים',t:'p',h:'ה"א הַיְּדִיעָה מְחֻבֶּרֶת לַמִּלָּה'},{c:'לַמִּשְׂחָק',w:'לַ מִשְׂחָק',t:'p',h:'למ"ד מְחֻבֶּרֶת לַמִּלָּה'},
+{c:'בַּסִּפְרִיָּה',w:'בַּ סִפְרִיָּה',t:'p',h:'בי"ת מְחֻבֶּרֶת לַמִּלָּה'},{c:'וּכְשֶׁיָּצָאנוּ',w:'וּ כְשֶׁ יָּצָאנוּ',t:'p',h:'"וּכְשֶׁ" מְחֻבֶּרֶת לַמִּלָּה'}
+];
+const S=[
+{s:'הַתַּלְמִידִים כָּתְבוּ מִחְתָּב לַמְּנַהֶלֶת',i:2,c:'מִכְתָּב',t:'s'},
+{s:'אֲנַחְנוּ צְרִיכִים לִשְׁמֹר עַל הַתֶּבַע',i:4,c:'הַטֶּבַע',t:'s'},
+{s:'הַמַּכְשֵׁב הֶחָדָשׁ עוֹבֵד מַהֵר',i:0,c:'הַמַּחְשֵׁב',t:'s'},
+{s:'קִבַּלְנוּ הַכְלָטָה חֲשׁוּבָה בַּכִּתָּה',i:1,c:'הַחְלָטָה',t:'s'},
+{s:'יָצָאנוּ לְתִיּוּל שְׁנָתִי בַּצָּפוֹן',i:1,c:'לְטִיּוּל',t:'s'},
+{s:'יֵשׁ לָנוּ בְּאָיָה בַּשְּׁאֵלָה הַזֹּאת',i:2,c:'בְּעָיָה',t:'s'},
+{s:'אֵין טַחְבּוּרָה צִבּוּרִית בְּשַׁבָּת',i:1,c:'תַּחְבּוּרָה',t:'s'},
+{s:'הַמַּאֲרֶכֶת הַסּוֹלָרִית כּוֹלֶלֶת שְׁמוֹנֶה כּוֹכְבֵי לֶכֶת',i:0,c:'הַמַּעֲרֶכֶת',t:'s'},
+{s:'אַכֲרָיוּת הִיא תְּכוּנָה חֲשׁוּבָה',i:0,c:'אַחֲרָיוּת',t:'s'},
+{s:'הַמַּדְעָנ גִּלָּה תַּגְלִית חֲדָשָׁה',i:0,c:'הַמַּדְעָן',t:'f'},
+{s:'הָלַכְנוּ בַּדֶּרֶכ הָאֲרֻכָּה',i:1,c:'בַּדֶּרֶךְ',t:'f'},
+{s:'בְּסוֹפ הַסִּפּוּר הַגִּבּוֹר נִצַּח',i:0,c:'בְּסוֹף',t:'f'},
+{s:'הַשָּׁלוֹמ חָשׁוּב לְכֻלָּנוּ',i:0,c:'הַשָּׁלוֹם',t:'f'},
+{s:'שָׁתִיתִי מִיצ תַּפּוּזִים קַר',i:1,c:'מִיץ',t:'f'},
+{s:'הַמְּחַנֵּכ הִסְבִּיר אֶת הַשִּׁעוּר',i:0,c:'הַמְּחַנֵּךְ',t:'f'},
+{s:'אֲנִי הוֹלֵךְ לַסִּפְרִיָּה אִם חָבֵר שֶׁלִּי',i:3,c:'עִם',t:'h',h:'"עִם" = יַחַד'},
+{s:'עִם יִהְיֶה מָחָר שֶׁמֶשׁ, נֵצֵא לַחוֹף',i:0,c:'אִם',t:'h',h:'"אִם" = בְּמִקְרֶה שֶׁ...'},
+{s:'הוּא לוֹ שָׁמַע אֶת הַצִּלְצוּל',i:1,c:'לֹא',t:'h',h:'"לֹא" = הַהֵפֶךְ מִ"כֵּן"'},
+{s:'קַל הַכָּבוֹד! הִצְלַחְתֶּם בַּמְּשִׂימָה',i:0,c:'כָּל',t:'h',h:'"כָּל" = כֻּלָּם'},
+{s:'הַתַּשְׁבֵּץ הָיָה כָּל מְאוֹד',i:2,c:'קַל',t:'h',h:'"קַל" = הַהֵפֶךְ מִ"קָּשֶׁה"'}
+];
+const GAMES=[
+{id:'pick',icon:'🔍',name:'אֵיזוֹ נְכוֹנָה?',desc:'בּוֹחֲרִים אֶת הַמִּלָּה הַנְּכוֹנָה'},
+{id:'hunt',icon:'🕵️',name:'בַּלָּשׁ בַּמִּשְׁפָּט',desc:'מוֹצְאִים אֶת הַשְּׁגִיאָה וּמְתַקְּנִים'},
+{id:'write',icon:'✏️',name:'מְתַקְּנִים וְכוֹתְבִים',desc:'כּוֹתְבִים אֶת הַמִּלָּה נָכוֹן'},
+{id:'letter',icon:'🔤',name:'הָאוֹת הַחֲסֵרָה',desc:'בּוֹחֲרִים אֵיזוֹ אוֹת חֲסֵרָה'}
+];
+const KB=[['ק','ר','א','ט','ו','ן','ם','פ'],['ש','ד','ג','כ','ע','י','ח','ל','ך','ף'],['ז','ס','ב','ה','נ','מ','צ','ת','ץ']];
+const app=document.getElementById('app');
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const plain=s=>s.replace(/[֑-ׇ]/g,'').replace(/\s+/g,' ').trim();
+const graph=s=>s.match(/[א-ת][֑-ׇ]*|\s/g)||[];
+/* index of the grapheme whose base letter differs */
+const diffG=(a,b)=>{const A=graph(a),B=graph(b);if(A.length!==B.length)return -1;let k=-1;for(let i=0;i<A.length;i++)if(A[i][0]!==B[i][0]){if(k>=0)return -1;k=i}return k};
+const FIN={'ך':1,'ם':1,'ן':1,'ף':1,'ץ':1};
+const autoHint=it=>{if(it.h)return it.h;const k=diffG(it.c,it.w||'');if(k<0)return '';const L=graph(it.c)[k][0];return FIN[L]?`בְּסוֹף מִלָּה כּוֹתְבִים ${L}`:`בַּמִּלָּה הַזֹּאת כּוֹתְבִים ${L}`};
+S.forEach(x=>{x.w=x.s.split(' ')[x.i]});
+let st={name:store.get('sp5_name',''),types:store.get('sp5_types',['s','h','f','p'])};
+const PRAISE=['כָּל הַכָּבוֹד!','מְצֻיָּן!','בַּלָּשׁ אֲמִתִּי!','יָפֶה מְאוֹד!','עַיִן חַדָּה!','נֶהְדָּר!'];
+const TRY=['כִּמְעַט! נְנַסֶּה שׁוּב 💪','לֹא נוֹרָא, עוֹד נִסָּיוֹן!','בַּלָּשִׁים לֹא מְוַתְּרִים!'];
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+
+function home(){
+  app.innerHTML=`<h2>שָׁלוֹם, בַּלָּשׁ/ית!</h2>
+  <label for="nm">אֵיךְ קוֹרְאִים לְךָ / לָךְ?</label><br><input type="text" id="nm" value="${esc(st.name)}" autocomplete="off" placeholder="הַשֵּׁם שֶׁלִּי">
+  <div class="games">${GAMES.map(g=>`<button class="gbtn" data-g="${g.id}"><i aria-hidden="true">${g.icon}</i><b>${g.name}</b><span>${g.desc}</span></button>`).join('')}</div>
+  <fieldset><legend>לאילו שגיאות להתאמן? (למבוגר/ת)</legend><div class="chk">${Object.entries(TYPES).map(([k,v])=>`<label><input type="checkbox" value="${k}" ${st.types.includes(k)?'checked':''}>${v}</label>`).join('')}</div></fieldset>
+  <p class="note">כל סבב: ${ROUND} שאלות, בלי שעון. המילים מנוקדות; בכתיבה מקלידים בלי ניקוד. טעות? מנסים שוב ומקבלים רמז.</p>`;
+  app.querySelector('#nm').oninput=e=>{st.name=e.target.value.trim();store.set('sp5_name',st.name)};
+  app.querySelectorAll('.chk input').forEach(c=>c.onchange=()=>{st.types=[...app.querySelectorAll('.chk input:checked')].map(x=>x.value);store.set('sp5_types',st.types)});
+  app.querySelectorAll('.gbtn').forEach(b=>b.onclick=()=>start(b.dataset.g));
+}
+
+let R;
+function start(g){
+  const types=st.types.length?st.types:['s','h','f','p'];
+  const ok=x=>types.includes(x.t);
+  let base=g==='hunt'?S:g==='letter'?W.filter(x=>diffG(x.c,x.w)>=0):W;
+  let pool=base.filter(ok);if(!pool.length)pool=base;
+  let items=shuf(pool);while(items.length<ROUND)items=items.concat(shuf(pool));
+  R={g,items:items.slice(0,ROUND),n:0,stars:0,miss:[],tries:0};
+  q();
+}
+function topBar(){const g=GAMES.find(x=>x.id===R.g);return `<div class="top"><strong>${g.icon} ${g.name}</strong><div class="bar" aria-hidden="true"><div style="width:${R.n/ROUND*100}%"></div></div><span class="stars">⭐ ${R.stars}</span></div>`}
+const ctxHtml=(it,inner)=>`<div class="ctx">${esc(it.x).replace('___',inner)}</div>`;
+const pic=it=>it.x?'':(it.e?`<div class="emoji">${it.e}</div>`:'');
+function q(){
+  if(R.n>=ROUND)return end();
+  R.tries=0;const it=R.items[R.n];
+  let body='';
+  if(R.g==='pick'){
+    body=`<p class="q">${it.x?'בַּחֲרוּ אֶת הַמִּלָּה הַמַּתְאִימָה לַמִּשְׁפָּט:':'אֵיזוֹ מִלָּה כְּתוּבָה נָכוֹן?'}</p>${pic(it)}${it.x?ctxHtml(it,'<span class="blank" id="bl">&nbsp;</span>'):''}<div class="opts">${shuf([it.c,it.w]).map(w=>`<button class="opt" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div>`;
+  }else if(R.g==='letter'){
+    const k=diffG(it.c,it.w);const shown=graph(it.c).map((g,j)=>j===k?'_':g).join('');
+    body=`<p class="q">אֵיזוֹ אוֹת חֲסֵרָה?</p>${pic(it)}${it.x?ctxHtml(it,`<b id="lw">${esc(shown)}</b>`):`<div class="big" id="lw">${esc(shown)}</div>`}<div class="opts">${shuf([graph(it.c)[k][0],graph(it.w)[k][0]]).map(l=>`<button class="opt" data-v="${esc(l)}">${esc(l)}</button>`).join('')}</div>`;
+  }else if(R.g==='write'){
+    body=`<p class="q">הַמִּלָּה הַמְּסֻמֶּנֶת כְּתוּבָה עִם שְׁגִיאָה. כִּתְבוּ אוֹתָהּ נָכוֹן:</p>${pic(it)}${it.x?ctxHtml(it,`<span class="wrong">${esc(it.w)}</span>`):`<div class="big"><span class="wrong">${esc(it.w)}</span></div>`}${writer()}`;
+  }else{
+    body=`<p class="q">בְּאַחַת הַמִּלִּים יֵשׁ שְׁגִיאַת כְּתִיב. לַחֲצוּ עָלֶיהָ:</p><div class="sent">${it.s.split(' ').map((w,k)=>`<button class="word" data-k="${k}">${esc(w)}</button>`).join('')}</div><div id="fix"></div>`;
+  }
+  app.innerHTML=topBar()+`<div class="pop">${body}</div><div class="fb" id="fb"></div><div class="actions"><button class="btn alt" id="home">חֲזָרָה לַתַּפְרִיט</button></div>`;
+  app.querySelector('#home').onclick=home;
+  if(R.g==='pick'||R.g==='letter')app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const good=R.g==='pick'?b.dataset.v===it.c:b.dataset.v===graph(it.c)[diffG(it.c,it.w)][0];
+    if(good){b.classList.add('ok');app.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      const bl=app.querySelector('#bl');if(bl)bl.textContent=it.c;const lw=app.querySelector('#lw');if(lw)lw.textContent=it.c;right()}
+    else{b.classList.add('no');b.disabled=true;wrongAns(autoHint(it))}
+  });
+  if(R.g==='write')bindWriter(it,autoHint(it));
+  if(R.g==='hunt')app.querySelectorAll('.word').forEach(b=>b.onclick=()=>{
+    const fb=app.querySelector('#fb');
+    if(+b.dataset.k===it.i){
+      app.querySelectorAll('.word').forEach(x=>x.disabled=true);b.classList.add('ok');
+      fb.className='fb good';fb.textContent='מְצָאתֶם! עַכְשָׁו כִּתְבוּ אֶת הַמִּלָּה נָכוֹן:';
+      app.querySelector('#fix').innerHTML=writer();bindWriter(it,autoHint(it),()=>{b.textContent=it.c});
+    }else{b.classList.add('no');setTimeout(()=>b.classList.remove('no'),400);fb.className='fb try';fb.textContent='הַמִּלָּה הַזֹּאת כְּתוּבָה נָכוֹן. חַפְּשׂוּ עוֹד 🔍'}
+  });
+}
+function writer(){
+  return `<div class="answer"><input type="text" id="ans" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="הַתְּשׁוּבָה שֶׁלִּי"><button class="btn" id="chk">בְּדִיקָה ✓</button></div>
+  <div class="kb">${KB.map(r=>`<div class="row">${r.map(l=>`<button class="key" data-l="${l}">${l}</button>`).join('')}</div>`).join('')}
+  <div class="row"><button class="key w" data-l="space">רֶוַח</button><button class="key w" data-l="del">⌫ מְחִיקָה</button></div></div>`;
+}
+function bindWriter(it,hint,onOk){
+  const inp=app.querySelector('#ans');
+  app.querySelectorAll('.key').forEach(k=>k.onclick=()=>{const l=k.dataset.l;if(l==='del')inp.value=inp.value.slice(0,-1);else if(l==='space')inp.value+=' ';else inp.value+=l;});
+  const check=()=>{
+    const v=plain(inp.value);if(!v)return;
+    if(v===plain(it.c)){inp.disabled=true;app.querySelector('#chk').disabled=true;app.querySelectorAll('.key').forEach(k=>k.disabled=true);inp.value=it.c;inp.style.borderColor='var(--green)';onOk&&onOk();
+      const bl=app.querySelector('.ctx .wrong, .big .wrong');if(bl){bl.textContent=it.c;bl.classList.remove('wrong')}right()}
+    else{inp.classList.add('no');setTimeout(()=>inp.classList.remove('no'),400);wrongAns(hint,R.tries>=1?it.c:null)}
+  };
+  app.querySelector('#chk').onclick=check;
+  inp.onkeydown=e=>{if(e.key==='Enter')check()};
+}
+function right(){
+  const it=R.items[R.n];
+  if(R.tries===0)R.stars++;else if(!R.miss.includes(it.c))R.miss.push(it.c);
+  const fb=app.querySelector('#fb');fb.className='fb good';
+  fb.textContent=(R.tries===0?'⭐ ':'')+pickOne(PRAISE)+(st.name?' '+st.name:'');
+  app.querySelector('.actions').insertAdjacentHTML('afterbegin',`<button class="btn" id="next">${R.n+1<ROUND?'הַבָּא ←':'לַסִּכּוּם ←'}</button>`);
+  const nx=app.querySelector('#next');nx.onclick=()=>{R.n++;q()};nx.focus();
+}
+function wrongAns(hint,reveal){
+  R.tries++;
+  const fb=app.querySelector('#fb');fb.className='fb try';
+  fb.innerHTML=`${esc(pickOne(TRY))}<br><span class="hint">רֶמֶז: ${esc(hint)}${reveal?` · הַתְּשׁוּבָה: <b>${esc(reveal)}</b>`:''}</span>`;
+}
+function end(){
+  const msg=R.stars===ROUND?'מֻשְׁלָם! בַּלָּשׁ/ית מִקְצוֹעִי/ת!':R.stars>=ROUND/2?'עֲבוֹדָה מְצֻיֶּנֶת!':'הִתְאַמַּנְתֶּם יָפֶה – כָּל נִסָּיוֹן מְחַזֵּק!';
+  app.innerHTML=`<div class="end pop"><h2>${esc(msg)}</h2><div class="big">⭐ ${R.stars} / ${ROUND}</div>
+  ${st.name?`<p class="q">כָּל הַכָּבוֹד, ${esc(st.name)}!</p>`:''}
+  ${R.miss.length?`<p>מִלִּים שֶׁכְּדַאי לְתַרְגֵּל שׁוּב:</p><div class="list">${R.miss.map(w=>`<span>${esc(w)}</span>`).join('')}</div>`:'<p>כָּל הַמִּלִּים נְכוֹנוֹת מֵהַנִּסָּיוֹן הָרִאשׁוֹן 🎉</p>'}
+  <div class="actions"><button class="btn" id="again">עוֹד סִבּוּב</button><button class="btn alt" id="home">מִשְׂחָק אַחֵר</button></div></div>`;
+  app.querySelector('#again').onclick=()=>start(R.g);app.querySelector('#home').onclick=home;
+}
+home();
+}
+</script>
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body>
+</html>

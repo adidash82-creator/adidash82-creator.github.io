@@ -1,0 +1,239 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>עורך הפיסוק</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Secular+One&display=swap">
+<style>
+/* Layout: one column "newsroom desk" — six numbered stations in lesson order, red proofreading pen as accent */
+:root{
+  --bg:#f3f5f9; --paper:#ffffff; --ink:#1c2a44; --muted:#5b6780; --line:#d9dfea;
+  --pen:#d23a3a; --pen-soft:#fde8e8; --ok:#1f8a5b; --ok-soft:#e2f5ec; --blue:#2c5cc5; --blue-soft:#e6edfb;
+  --display:"Secular One","Heebo",system-ui,sans-serif; --body:"Heebo",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121826; --paper:#1b2336; --ink:#e7ecf6; --muted:#9aa6bf; --line:#2d3852;
+  --pen:#ff6b6b; --pen-soft:#3a2026; --ok:#4cc38a; --ok-soft:#163327; --blue:#7ea2ff; --blue-soft:#1f2b4a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121826; --paper:#1b2336; --ink:#e7ecf6; --muted:#9aa6bf; --line:#2d3852;
+  --pen:#ff6b6b; --pen-soft:#3a2026; --ok:#4cc38a; --ok-soft:#163327; --blue:#7ea2ff; --blue-soft:#1f2b4a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:grid;gap:6px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,40px);margin:0;line-height:1.15;text-wrap:balance}
+h1 span{color:var(--pen)}
+.sub{color:var(--muted);margin:0}
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--paper);border-radius:12px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-weight:700}
+.score b{font-family:var(--display);font-weight:400;font-size:22px;font-variant-numeric:tabular-nums}
+.bar{flex:1;min-width:120px;height:8px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen);transition:width .4s}
+section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px;min-width:0}
+.sh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.num{font-family:var(--display);color:var(--pen);font-size:28px;line-height:1}
+h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.min{margin-inline-start:auto;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.task{margin:0;color:var(--muted)}
+.item{border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:8px}
+.item:first-of-type{border-top:0;padding-top:0}
+.q{font-size:19px;font-weight:500}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.opt{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 14px;text-align:start}
+.opt:hover{border-color:var(--blue)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--pen-soft);border-color:var(--pen)}
+.sign{min-width:52px;font-size:24px;font-weight:800;text-align:center;padding:4px 12px}
+.fb{font-size:15px;min-height:1.4em;margin:0}
+.fb.good{color:var(--ok)} .fb.bad{color:var(--pen)}
+.blank{display:inline-block;min-width:1.6em;border-bottom:3px solid var(--pen);text-align:center;font-weight:800;color:var(--pen)}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{background:var(--blue-soft);border:0;border-radius:12px;padding:14px;display:grid;gap:4px;text-align:start;min-height:150px;align-content:start}
+.card .big{font-size:40px;font-weight:800;line-height:1;color:var(--blue)}
+.card .nm{font-weight:700}
+.card .back{display:none;font-size:15px}
+.card.open .back{display:block}
+.card .hint{font-size:13px;color:var(--muted)}
+.card.open .hint{display:none}
+/* proofreading text */
+.story{font-size:20px;line-height:2.3;background:var(--bg);border-radius:10px;padding:14px;margin:0}
+.slot{display:inline-block;min-width:30px;height:30px;line-height:24px;vertical-align:middle;border:2px dashed var(--pen);border-radius:7px;background:var(--paper);font-weight:800;font-size:20px;padding:0 4px;margin:0 2px}
+.slot.active{border-style:solid;box-shadow:0 0 0 3px var(--pen-soft)}
+.slot.right{border:2px solid var(--ok);background:var(--ok-soft);color:var(--ok)}
+.slot.wrong{border:2px solid var(--pen);background:var(--pen-soft);color:var(--pen)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.main{background:var(--pen);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700}
+.ghost{background:transparent;border:2px solid var(--line);border-radius:10px;padding:8px 14px}
+/* writing */
+textarea{width:100%;min-height:150px;font:inherit;font-size:19px;padding:12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus{outline:none;border-color:var(--blue)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);border-radius:99px;padding:4px 12px;font-size:15px;color:var(--muted)}
+.chip.on{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.end{text-align:center;font-family:var(--display);font-size:22px;color:var(--ok);margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header>
+    <h1>עורך <span>הפיסוק</span></h1>
+    <p class="sub">היום אתה עורך בעיתון. העט האדום בידיים שלך: מוצאים, מתקנים ומשתמשים בסימני הפיסוק. שיעור של 45 דקות, 6 תחנות.</p>
+  </header>
+
+  <div class="score">
+    <span>נקודות: <b id="pts">0</b> / <b id="max">0</b></span>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+
+  <section>
+    <div class="sh"><span class="num">1</span><h2>פסיק שמציל חיים</h2><span class="min">5 דק׳</span></div>
+    <p class="task">אותן מילים, פיסוק שונה, משמעות אחרת. קרא ובחר.</p>
+    <div id="s1"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="num">2</span><h2>ארגז הכלים של העורך</h2><span class="min">5 דק׳</span></div>
+    <p class="task">לחץ על כל כרטיס, קרא את הכלל והדוגמה, ונסה להמציא דוגמה משלך בעל פה.</p>
+    <div class="cards" id="s2"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="num">3</span><h2>איזה סימן חסר?</h2><span class="min">10 דק׳</span></div>
+    <p class="task">בחר את הסימן שמתאים למקום הריק.</p>
+    <div id="s3"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="num">4</span><h2>הכתבה שאיבדה את הסימנים</h2><span class="min">10 דק׳</span></div>
+    <p class="task">לחץ על משבצת אדומה, ואז על הסימן המתאים (גם סוגריים).  כשמסיימים, לוחצים "בדיקת עורך".</p>
+    <p class="story" id="story"></p>
+    <div class="tools" id="pad"></div>
+    <div class="tools"><button class="main" id="check4">בדיקת עורך</button><button class="ghost" id="reset4">ניקוי</button></div>
+    <p class="fb" id="fb4"></p>
+  </section>
+
+  <section>
+    <div class="sh"><span class="num">5</span><h2>מי אמר מה? (דיבור ישיר)</h2><span class="min">5 דק׳</span></div>
+    <p class="task">הכלל: אחרי "אמר/שאל/צעק" באות נקודתיים, והמילים שנאמרו בתוך מירכאות. הסימן של המשפט נשאר בתוך המירכאות. בחר את המשפט הכתוב נכון.</p>
+    <div id="s5"></div>
+  </section>
+
+  <section>
+    <div class="sh"><span class="num">6</span><h2>עכשיו אתה הכותב</h2><span class="min">10 דק׳</span></div>
+    <p class="task">כתוב הודעה לחבר שמזמינה אותו למשחק כדורגל, ליום הולדת או לכל אירוע שתבחר. השתמש בכל הסימנים: כל סימן שתשתמש בו יידלק בירוק.</p>
+    <textarea id="w" aria-label="הטקסט שלך" placeholder="לדוגמה: היי עידו, מה שלומך?..."></textarea>
+    <div class="chips" id="chips"></div>
+    <p class="end" id="end" hidden>כל הכבוד! קיבלת תעודת עורך ראשי 🏅</p>
+  </section>
+</div>
+
+<script>
+let pts=0, max=0;
+function addMax(n){max+=n;document.getElementById('max').textContent=max}
+function gain(n){pts+=n;document.getElementById('pts').textContent=pts;document.getElementById('barfill').style.width=(max?pts/max*100:0)+'%'}
+
+/* generic multiple choice */
+function mc(container, items, render){
+  const box=document.getElementById(container);
+  items.forEach(it=>{
+    addMax(1);
+    const d=document.createElement('div');d.className='item';
+    d.innerHTML=`<div class="q">${render?render(it):it.q}</div><div class="choices"></div><p class="fb"></p>`;
+    const ch=d.querySelector('.choices'), fb=d.querySelector('.fb');let done=false,tried=false;
+    it.o.forEach((o,i)=>{
+      const b=document.createElement('button');b.className='opt'+(it.sign?' sign':'');b.textContent=o;
+      b.onclick=()=>{
+        if(done)return;
+        if(i===it.a){b.classList.add('right');done=true;fb.className='fb good';fb.textContent='✓ '+(it.why||'נכון!');if(!tried)gain(1)}
+        else{b.classList.add('wrong');tried=true;fb.className='fb bad';fb.textContent=it.hint||'כמעט. נסה שוב.'}
+      };ch.appendChild(b)});
+    box.appendChild(d)});
+}
+
+/* 1 */
+mc('s1',[
+ {q:'"בואו נאכל, סבתא!"<br>מה קורה במשפט הזה?',o:['מזמינים את סבתא לאכול','מתכננים לאכול את סבתא'],a:0,why:'הפסיק מראה שפונים אל סבתא. בלי פסיק... סבתא בבעיה!'},
+ {q:'"הוא לא בא?"<br>מה מרגיש מי שאומר את המשפט?',o:['הוא מודיע עובדה','הוא מופתע ושואל'],a:1,why:'סימן השאלה הופך הודעה לשאלה.'},
+ {q:'"המורה, אמר דני, מאחרת."<br>מי מאחר?',o:['דני','המורה'],a:1,why:'דני הוא מי שאומר. המילים "אמר דני" נמצאות בין שני פסיקים.',hint:'שים לב: "אמר דני" נמצא בין פסיקים. מי מדבר, ועל מי?'}
+]);
+
+/* 2 */
+const cards=[
+ ['.','נקודה','בסוף משפט שמספר או מודיע.','היום ירד גשם חזק.'],
+ [',','פסיק','בין פריטים ברשימה, ואחרי פנייה לאדם.','קניתי עגבניות, מלפפונים ובצל.'],
+ ['?','סימן שאלה','בסוף משפט ששואל.','מתי מתחיל המשחק?'],
+ ['!','סימן קריאה','בסוף משפט עם רגש חזק: הפתעה, שמחה, פקודה, אזהרה.','איזה גול מדהים!'],
+ [':','נקודתיים','לפני רשימה, ולפני מה שמישהו אומר.','בתיק יש: מחברת, קלמר ומים.'],
+ ['" "','מירכאות','סביב המילים המדויקות שמישהו אמר.','אמא אמרה: "תתלבש מהר."'],
+ ['( )','סוגריים','סביב מידע נוסף שאפשר לוותר עליו. המשפט נשאר שלם גם בלעדיו.','הכלב שלנו (בן שלוש) נובח המון.']
+];
+const s2=document.getElementById('s2');
+cards.forEach(c=>{const b=document.createElement('button');b.className='card';
+ b.innerHTML=`<span class="big">${c[0]}</span><span class="nm">${c[1]}</span><span class="hint">לחץ כדי לפתוח</span><span class="back">${c[2]}<br><b>${c[3]}</b></span>`;
+ b.onclick=()=>b.classList.toggle('open');s2.appendChild(b)});
+
+/* 3 */
+const S=['.',',','?','!',':'];
+const S3=[...S,'( )'];
+const s3=[
+ ['איזה סרט ראית אתמול','',2],
+ ['וואו, איזה גול מדהים','',3],
+ ['קניתי בשוק תפוחים',' בננות ואגסים.',1],
+ ['ברשימת הקניות שלושה דברים',' חלב, לחם וגבינה.',4],
+ ['השמש שקעה והשמיים התכהו','',0],
+ ['רון, דנה',' ומיכל הגיעו ראשונים.',1],
+ ['זהירות, הכביש רטוב','',3],
+ ['המאמן אמר לנו',' "מחר אימון בשש."',4]
+].map(x=>({q:`${x[0]}<span class="blank">?</span>${x[1]}`,o:S3,a:x[2],sign:true}));
+s3.push(
+ {q:'הכלב שלנו <span class="blank">?</span>בן שלוש<span class="blank">?</span> נובח המון.',o:S3,a:5,sign:true,why:'"בן שלוש" הוא מידע נוסף, לכן הוא בסוגריים.'},
+ {q:'ביקרנו בירושלים <span class="blank">?</span>בירת ישראל<span class="blank">?</span> בחופש.',o:S3,a:5,sign:true,why:'הסבר נוסף שאפשר להוריד, לכן סוגריים.'}
+);
+mc('s3',s3);
+
+/* 4 */
+const parts=['ביום שישי יצאנו לטיול בפארק',['.'],' בתיק לקחנו שלושה דברים',[':'],' מים',[','],' כובע וכריך',['.'],' באמצע הדרך אחי הקטן ',['('],'בן שש',[')'],' צעק',[':'],' "תראו',[',','!'],' נחש',['!'],'" כולנו נבהלנו',['.','!'],' אבא התקרב ושאל',[':'],' "איפה הוא',['?'],'" אחי הצביע על ענף ארוך וחום',['.'],' כולנו פרצנו בצחוק',['!','.']];
+const story=document.getElementById('story');let slots=[],active=null;
+parts.forEach(p=>{
+ if(typeof p==='string'){story.appendChild(document.createTextNode(p))}
+ else{const b=document.createElement('button');b.className='slot';b.dataset.ans=JSON.stringify(p);b.setAttribute('aria-label','משבצת לסימן');
+  b.onclick=()=>{slots.forEach(s=>s.classList.remove('active'));b.classList.add('active');active=b};
+  story.appendChild(b);slots.push(b)}
+});
+addMax(slots.length);
+const pad=document.getElementById('pad');
+[...S,'(',')'].forEach(s=>{const b=document.createElement('button');b.className='opt sign';b.textContent=s;
+ b.onclick=()=>{if(!active)return;active.textContent=s;active.classList.remove('right','wrong');
+  const i=slots.indexOf(active);const nx=slots.slice(i+1).find(x=>!x.textContent)||null;
+  active.classList.remove('active');active=nx;if(nx)nx.classList.add('active')};pad.appendChild(b)});
+slots[0].classList.add('active');active=slots[0];
+let got4=0;
+document.getElementById('check4').onclick=()=>{
+ let ok=0;slots.forEach(s=>{const a=JSON.parse(s.dataset.ans);s.classList.remove('right','wrong','active');
+  if(!s.textContent)return;if(a.includes(s.textContent)){s.classList.add('right');ok++}else s.classList.add('wrong')});
+ if(ok>got4){gain(ok-got4);got4=ok}
+ const fb=document.getElementById('fb4');
+ if(ok===slots.length){fb.className='fb good';fb.textContent='✓ כתבה מושלמת! העיתון יוצא לדפוס.'}
+ else{fb.className='fb bad';fb.textContent=`${ok} מתוך ${slots.length} נכונים. תקן את האדומים ובדוק שוב.`}
+};
+document.getElementById('reset4').onclick=()=>{slots.forEach(s=>{s.textContent='';s.className='slot'});slots[0].classList.add('active');active=slots[0];document.getElementById('fb4').textContent=''};
+
+/* 5 */
+mc('s5',[
+ {q:'דנה אמרה שהיא רעבה.',o:['דנה אמרה "אני רעבה:"','דנה אמרה: "אני רעבה."','דנה אמרה: אני רעבה".'],a:1,why:'נקודתיים אחרי "אמרה", והמילים שלה בתוך מירכאות.'},
+ {q:'המורה שאלה מי סיים.',o:['המורה שאלה? "מי סיים"','המורה שאלה: "מי סיים."','המורה שאלה: "מי סיים?"'],a:2,why:'השאלה היא של המורה, לכן סימן השאלה בתוך המירכאות.'},
+ {q:'יואב ביקש מאמא שתעזור לו.',o:['יואב ביקש: "אמא, תעזרי לי בבקשה."','יואב ביקש "אמא תעזרי לי בבקשה?"','יואב, ביקש: אמא תעזרי לי בבקשה.'],a:0,why:'נקודתיים, מירכאות, ופסיק אחרי הפנייה "אמא".'},
+ {q:'אחי צעק שהוא ניצח.',o:['אחי צעק: "ניצחתי!"','אחי צעק: "ניצחתי".','אחי צעק! "ניצחתי"'],a:0,why:'צעקה של שמחה, לכן סימן קריאה בתוך המירכאות.'}
+]);
+
+/* 6 */
+const req=[['?','סימן שאלה',t=>t.includes('?')],['!','סימן קריאה',t=>t.includes('!')],[',','פסיק',t=>t.includes(',')],[':','נקודתיים',t=>t.includes(':')],['"','מירכאות',t=>(t.match(/["״”“]/g)||[]).length>=2],['.','נקודה',t=>t.includes('.')],['( )','סוגריים',t=>t.includes('(')&&t.includes(')')]];
+const chips=document.getElementById('chips');addMax(req.length);let on6=new Set();
+const chipEls=req.map(r=>{const c=document.createElement('span');c.className='chip';c.textContent=`${r[0]}  ${r[1]}`;chips.appendChild(c);return c});
+document.getElementById('w').addEventListener('input',e=>{const t=e.target.value;
+ req.forEach((r,i)=>{if(r[2](t)){chipEls[i].classList.add('on');if(!on6.has(i)){on6.add(i);gain(1)}}else chipEls[i].classList.remove('on')});
+ document.getElementById('end').hidden=on6.size<req.length});
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

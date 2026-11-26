@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>בלשי האיות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: playful, warm, encouraging — no timers, no pressure
+   IDEA: a detective's notebook — kids hunt spelling mistakes and fix them
+   PICTURE: the game board itself, on ruled notebook paper, with a magnifier mascot
+   COLOUR and TYPE: sunny yellow ground, deep blue ink, coral accent; Secular One + Rubik
+   LAYOUT: one centred column; header, then the board; stacks naturally on phones */
+:root{color-scheme:light dark;--bg:light-dark(#ffd84a,#14213d);--ink:light-dark(#1b2a5e,#f4f1e6);--paper:light-dark(#fffdf5,#1d2b4f);--line:light-dark(#d6e4f5,#2c3d66);--blue:light-dark(#1f3a93,#8fb0ff);--coral:#ff5a5f;--green:light-dark(#1f8a4c,#5fd98f);--soft:light-dark(#fff3bf,#26365e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Rubik,system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:clamp(16px,4vw,40px) max(4vw,14px)}
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+header svg{width:64px;height:64px;flex:none}
+h1{font:400 clamp(32px,6vw,48px)/1.05 'Secular One',Rubik,sans-serif;margin:0}
+.sub{margin:2px 0 0;font-size:15px;opacity:.85}
+.paper{background:var(--paper);border-radius:22px;padding:clamp(18px,4vw,34px);box-shadow:0 10px 0 rgba(0,0,0,.12);background-image:repeating-linear-gradient(var(--paper) 0 37px,var(--line) 37px 39px);position:relative}
+h2{font:400 30px/1.1 'Secular One',sans-serif;margin:0 0 12px}
+label{font-weight:500}
+input[type=text]{font:inherit;font-size:20px;padding:10px 14px;border-radius:12px;border:3px solid var(--blue);background:var(--paper);color:var(--ink);width:100%;max-width:320px}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px;margin:20px 0}
+.gbtn{font:inherit;text-align:start;padding:16px;border-radius:18px;border:3px solid var(--blue);background:var(--soft);color:var(--ink);cursor:pointer;min-height:110px;transition:transform .15s}
+.gbtn:hover,.gbtn:focus-visible{transform:translateY(-3px);outline:none;border-color:var(--coral)}
+.gbtn b{display:block;font:400 22px/1.2 'Secular One',sans-serif;margin-bottom:4px}
+.gbtn span{font-size:15px}
+.gbtn i{font-style:normal;font-size:28px;float:inline-end}
+fieldset{border:2px dashed var(--line);border-radius:14px;padding:10px 14px;margin:0}
+legend{font-weight:700;padding:0 6px}
+.chk{display:flex;flex-wrap:wrap;gap:6px 18px}
+.chk label{display:flex;gap:6px;align-items:center;font-weight:400;min-height:36px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--coral)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar{flex:1 1 160px;height:14px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar div{height:100%;background:var(--coral);border-radius:9px;transition:width .3s}
+.stars{font-weight:700;white-space:nowrap}
+.q{font-size:20px;margin:6px 0 14px;font-weight:500}
+.big{font:400 clamp(36px,9vw,58px)/1.2 'Secular One',sans-serif;text-align:center;margin:10px 0}
+.emoji{font-size:64px;text-align:center;line-height:1.1}
+.wrong{text-decoration:underline wavy var(--coral) 3px;text-underline-offset:8px}
+.opts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.opt{font:400 clamp(28px,7vw,40px)/1.2 'Secular One',sans-serif;padding:14px 26px;border-radius:18px;border:3px solid var(--blue);background:var(--paper);color:var(--ink);cursor:pointer;min-width:120px;min-height:64px}
+.opt:focus-visible,.word:focus-visible,.key:focus-visible,.btn:focus-visible{outline:4px solid var(--coral);outline-offset:2px}
+.opt.ok,.word.ok{background:var(--green);border-color:var(--green);color:#fff}
+.opt.no,.word.no{animation:shake .35s;border-color:var(--coral);opacity:.55}
+.sent{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.word{font:500 clamp(22px,5.5vw,30px)/1.2 Rubik,sans-serif;padding:8px 14px;border-radius:12px;border:2px dashed var(--blue);background:var(--paper);color:var(--ink);cursor:pointer;min-height:48px}
+.answer{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:10px 0}
+.answer input{font:400 32px/1.2 'Secular One',sans-serif;text-align:center;max-width:280px}
+.kb{display:grid;gap:6px;margin:12px auto 0;max-width:560px}
+.row{display:flex;gap:5px;justify-content:center}
+.key{font:500 20px Rubik,sans-serif;flex:1 1 0;max-width:48px;height:48px;border-radius:10px;border:2px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer;padding:0}
+.key.w{max-width:110px;flex:2 1 0;font-size:16px}
+.btn{font:700 18px Rubik,sans-serif;padding:12px 22px;border-radius:14px;border:0;background:var(--blue);color:var(--paper);cursor:pointer;min-height:48px}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.fb{min-height:56px;text-align:center;font-size:19px;font-weight:500;margin-top:8px}
+.fb.good{color:var(--green)}.fb.try{color:var(--coral)}
+.hint{display:inline-block;background:var(--soft);border-radius:10px;padding:4px 12px;margin-top:6px;font-size:17px;color:var(--ink)}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.end{text-align:center}
+.end .big{color:var(--coral)}
+.list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.list span{background:var(--soft);padding:6px 12px;border-radius:10px;font:400 22px 'Secular One',sans-serif}
+.note{font-size:14px;opacity:.75;margin-top:16px}
+@keyframes shake{25%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.pop{animation:pop .35s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:600px){.key{height:42px;font-size:17px}.row{gap:3px}.paper{border-radius:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="26" cy="26" r="20" fill="#fffdf5" stroke="#1f3a93" stroke-width="6"/><circle cx="20" cy="20" r="6" fill="#d6e4f5"/><rect x="40" y="38" width="10" height="24" rx="4" transform="rotate(-45 45 50)" fill="#ff5a5f"/><circle cx="20" cy="27" r="2.5" fill="#1f3a93"/><circle cx="32" cy="27" r="2.5" fill="#1f3a93"/><path d="M20 34q6 5 12 0" stroke="#1f3a93" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+<div><h1>בלשי האיות</h1><p class="sub">מוצאים שגיאות כתיב – ומתקנים אותן!</p></div>
+</header>
+<main class="paper" id="app" aria-live="polite"></main>
+</div>
+<script>
+{
+const ROUND=8;
+const TYPES={s:'אותיות דומות בצליל (א/ע, ט/ת, כ/ח, כ/ק, ס/ש)',m:'אמות קריאה (ו, י)',f:'אותיות סופיות (ך ם ן ף ץ)',p:'מילים מחוברות (ה, ו, ב, כ, ל, מ, ש)'};
+const W=[
+['עוגה','אוגה','s','🎂','עוגה מתחילה ב-ע'],['תפוח','טפוח','s','🍎','תפוח מתחיל ב-ת'],['חתול','כתול','s','🐱','חתול מתחיל ב-ח'],
+['כלב','קלב','s','🐶','כלב מתחיל ב-כ'],['שמש','סמש','s','☀️','שמש מתחילה ב-ש'],['סוס','שוס','s','🐴','סוס מתחיל ב-ס'],
+['עכבר','אכבר','s','🐭','עכבר מתחיל ב-ע'],['טלפון','תלפון','s','📞','טלפון מתחיל ב-ט'],['אבטיח','אבתיח','s','🍉','באמצע המילה יש ט'],
+['קוף','כוף','s','🐒','קוף מתחיל ב-ק'],['כדור','קדור','s','⚽','כדור מתחיל ב-כ'],['מחברת','מכברת','s','📒','באמצע המילה יש ח'],
+['שולחן','שולכן','s','🍽️','לפני הסוף יש ח'],['קיץ','כיץ','s','🏖️','קיץ מתחיל ב-ק'],['מטבח','מתבח','s','🍳','באמצע המילה יש ט'],['עננים','אננים','s','☁️','עננים מתחיל ב-ע'],
+['ציפור','צפור','m','🐦','שומעים "אִי" – כותבים י'],['גלידה','גלדה','m','🍦','שומעים "אִי" – כותבים י'],['חלון','חלן','m','🪟','שומעים "אוֹ" – כותבים ו'],
+['ילדים','ילדם','m','🧒','ברבים כותבים ים'],['אוטובוס','אטובס','m','🚌','במילה יש שתי ו'],['דובי','דבי','m','🧸','שומעים "אוּ" – כותבים ו'],
+['חלום','חלם','m','💭','שומעים "אוֹ" – כותבים ו'],['שוקולד','שקולד','m','🍫','שומעים "אוֹ" – כותבים ו'],['תינוק','תינק','m','👶','שומעים "אוֹ" – כותבים ו'],['פיל','פל','m','🐘','שומעים "אִי" – כותבים י'],
+['עץ','עצ','f','🌳','בסוף מילה כותבים ץ'],['מלך','מלכ','f','👑','בסוף מילה כותבים ך'],['מים','מימ','f','💧','בסוף מילה כותבים ם'],
+['אף','אפ','f','👃','בסוף מילה כותבים ף'],['גן','גנ','f','🌷','בסוף מילה כותבים ן'],['כנף','כנפ','f','🪽','בסוף מילה כותבים ף'],
+['שעון','שעונ','f','⏰','בסוף מילה כותבים ן'],['לחם','לחמ','f','🍞','בסוף מילה כותבים ם'],['בלון','בלונ','f','🎈','בסוף מילה כותבים ן'],
+['הילד','ה ילד','p','🧒','ה׳ הידיעה מחוברת למילה'],['ואמא','ו אמא','p','👩','ו׳ החיבור מחוברת למילה'],['בבית','ב בית','p','🏠','ב׳ מחוברת למילה'],
+['לגן','ל גן','p','🌷','ל׳ מחוברת למילה'],['מהים','מ הים','p','🌊','מ׳ מחוברת למילה'],['כשהלכתי','כש הלכתי','p','🚶','כש מחוברת למילה'],
+['שאני','ש אני','p','🙋','ש׳ מחוברת למילה'],['הכלב','ה כלב','p','🐶','ה׳ הידיעה מחוברת למילה']
+].map(([c,w,t,e,h])=>({c,w,t,e,h}));
+const S=[
+['הילד אחל תפוח אדום',1,'אכל','s','אכל כותבים עם כ'],['אני אוהב לשחק בקדור',3,'בכדור','s','כדור מתחיל ב-כ'],
+['הכתול ישן על הספה',0,'החתול','s','חתול מתחיל ב-ח'],['אמא קנתה לי גלדה',3,'גלידה','m','שומעים "אִי" – כותבים י'],
+['הלכנו לתייל ביער',1,'לטייל','s','טיול כותבים עם ט'],['הצפור עפה אל העץ',0,'הציפור','m','שומעים "אִי" – כותבים י'],
+['יש לי מכברת חדשה',2,'מחברת','s','באמצע המילה יש ח'],['השמש זורכת בבוקר',1,'זורחת','s','זורחת כותבים עם ח'],
+['שתיתי כוס מימ קרים',2,'מים','f','בסוף מילה כותבים ם'],['הקלב נבח על החתול',0,'הכלב','s','כלב מתחיל ב-כ'],
+['המורה קתבה על הלוח',1,'כתבה','s','כתבה מתחילה ב-כ'],['אשיתי את שיעורי הבית',0,'עשיתי','s','עשיתי מתחיל ב-ע'],
+['ראיתי ארנב בגנ',2,'בגן','f','בסוף מילה כותבים ן'],['אבא נסע באטובס',2,'באוטובוס','m','באוטובוס יש שתי ו'],
+['סבתא אפתה אוגה טעימה',2,'עוגה','s','עוגה מתחילה ב-ע'],['יש לנו חלן גדול',2,'חלון','m','שומעים "אוֹ" – כותבים ו'],
+['המלכ ישב על הכיסא',0,'המלך','f','בסוף מילה כותבים ך'],['הדג שוכה בים',1,'שוחה','s','שוחה כותבים עם ח'],
+['ביום שישי אכלנו לחמ',3,'לחם','f','בסוף מילה כותבים ם'],['התינק בוכה בעריסה',0,'התינוק','m','שומעים "אוֹ" – כותבים ו']
+].map(([s,i,c,t,h])=>({s,i,c,t,h}));
+const GAMES=[
+{id:'pick',icon:'🔍',name:'איזו נכונה?',desc:'בוחרים את המילה שכתובה נכון'},
+{id:'hunt',icon:'🕵️',name:'בלש במשפט',desc:'מוצאים את המילה השגויה ומתקנים אותה'},
+{id:'write',icon:'✏️',name:'מתקנים וכותבים',desc:'כותבים את המילה נכון בעזרת המקלדת'},
+{id:'letter',icon:'🔤',name:'האות החסרה',desc:'בוחרים איזו אות חסרה במילה'}
+];
+const KB=[['ק','ר','א','ט','ו','ן','ם','פ'],['ש','ד','ג','כ','ע','י','ח','ל','ך','ף'],['ז','ס','ב','ה','נ','מ','צ','ת','ץ']];
+const app=document.getElementById('app');
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let st={name:store.get('sp_name',''),types:store.get('sp_types',['s','m','f','p'])};
+const PRAISE=['כל הכבוד!','מעולה!','בלש אמיתי!','יפה מאוד!','איזה עין חדה!','נהדר!'];
+const TRY=['כמעט! ננסה שוב 💪','לא נורא, עוד ניסיון!','בלשים לא מוותרים – שוב!'];
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+const diffIdx=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return i;return -1};
+
+function home(){
+  app.innerHTML=`<h2>שלום, בלש/ית!</h2>
+  <label for="nm">איך קוראים לך?</label><br><input type="text" id="nm" value="${esc(st.name)}" autocomplete="off" placeholder="השם שלי">
+  <div class="games">${GAMES.map(g=>`<button class="gbtn" data-g="${g.id}"><i aria-hidden="true">${g.icon}</i><b>${g.name}</b><span>${g.desc}</span></button>`).join('')}</div>
+  <fieldset><legend>לאילו שגיאות להתאמן? (למבוגר/ת)</legend><div class="chk">${Object.entries(TYPES).map(([k,v])=>`<label><input type="checkbox" value="${k}" ${st.types.includes(k)?'checked':''}>${v}</label>`).join('')}</div></fieldset>
+  <p class="note">כל סבב: ${ROUND} שאלות, בלי שעון ובלי לחץ. טעות? מנסים שוב ומקבלים רמז.</p>`;
+  app.querySelector('#nm').oninput=e=>{st.name=e.target.value.trim();store.set('sp_name',st.name)};
+  app.querySelectorAll('.chk input').forEach(c=>c.onchange=()=>{st.types=[...app.querySelectorAll('.chk input:checked')].map(x=>x.value);store.set('sp_types',st.types)});
+  app.querySelectorAll('.gbtn').forEach(b=>b.onclick=()=>start(b.dataset.g));
+}
+
+let R;
+function start(g){
+  const types=st.types.length?st.types:['s','m','f','p'];
+  let pool;
+  if(g==='hunt')pool=S.filter(x=>types.includes(x.t));
+  else if(g==='letter')pool=W.filter(x=>(x.t==='s'||x.t==='f')&&types.includes(x.t)&&x.c.length===x.w.length);
+  else pool=W.filter(x=>types.includes(x.t));
+  if(!pool.length){pool=g==='hunt'?S:g==='letter'?W.filter(x=>x.t==='s'||x.t==='f'):W}
+  let items=shuf(pool);while(items.length<ROUND)items=items.concat(shuf(pool));
+  R={g,items:items.slice(0,ROUND),n:0,stars:0,miss:[],tries:0};
+  q();
+}
+function topBar(){const g=GAMES.find(x=>x.id===R.g);return `<div class="top"><strong>${g.icon} ${g.name}</strong><div class="bar" aria-hidden="true"><div style="width:${R.n/ROUND*100}%"></div></div><span class="stars">⭐ ${R.stars}</span></div>`}
+function fbHtml(){return `<div class="fb" id="fb"></div><div class="actions"><button class="btn alt" id="home">חזרה לתפריט</button></div>`}
+function q(){
+  if(R.n>=ROUND)return end();
+  R.tries=0;const it=R.items[R.n];
+  let body='';
+  if(R.g==='pick'){
+    body=`<p class="q">איזו מילה כתובה נכון?</p><div class="emoji">${it.e}</div><div class="opts">${shuf([it.c,it.w]).map(w=>`<button class="opt" data-v="${esc(w)}">${esc(w)}</button>`).join('')}</div>`;
+  }else if(R.g==='letter'){
+    const i=diffIdx(it.c,it.w);const shown=[...it.c].map((ch,k)=>k===i?'_':ch).join('');
+    body=`<p class="q">איזו אות חסרה?</p><div class="emoji">${it.e}</div><div class="big">${esc(shown)}</div><div class="opts">${shuf([it.c[i],it.w[i]]).map(l=>`<button class="opt" data-v="${esc(l)}" data-full="${esc(it.c)}">${esc(l)}</button>`).join('')}</div>`;
+  }else if(R.g==='write'){
+    body=`<p class="q">המילה כתובה עם שגיאה. כתבו אותה נכון:</p><div class="emoji">${it.e}</div><div class="big"><span class="wrong">${esc(it.w)}</span></div>${writer()}`;
+  }else{
+    body=`<p class="q">באחת המילים יש שגיאת כתיב. לחצו עליה:</p><div class="sent">${it.s.split(' ').map((w,k)=>`<button class="word" data-k="${k}">${esc(w)}</button>`).join('')}</div><div id="fix"></div>`;
+  }
+  app.innerHTML=topBar()+`<div class="pop">${body}</div>`+fbHtml();
+  app.querySelector('#home').onclick=home;
+  if(R.g==='pick'||R.g==='letter')app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const ok=R.g==='pick'?b.dataset.v===it.c:b.dataset.v===it.c[diffIdx(it.c,it.w)];
+    if(ok){b.classList.add('ok');app.querySelectorAll('.opt').forEach(x=>x.disabled=true);if(R.g==='letter')app.querySelector('.big').textContent=it.c;right()}
+    else{b.classList.add('no');b.disabled=true;wrongAns(it.h)}
+  });
+  if(R.g==='write')bindWriter(it.c,it.h);
+  if(R.g==='hunt')app.querySelectorAll('.word').forEach(b=>b.onclick=()=>{
+    if(+b.dataset.k===it.i){
+      app.querySelectorAll('.word').forEach(x=>x.disabled=true);b.classList.add('ok');
+      const fb=app.querySelector('#fb');fb.className='fb good';fb.textContent='מצאתם! עכשיו כתבו את המילה נכון:';
+      const fx=app.querySelector('#fix');fx.innerHTML=writer();bindWriter(it.c,it.h,()=>{b.textContent=it.c});
+    }else{b.classList.add('no');setTimeout(()=>b.classList.remove('no'),400);const fb=app.querySelector('#fb');fb.className='fb try';fb.textContent='המילה הזאת כתובה נכון. חפשו עוד 🔍'}
+  });
+}
+function writer(){
+  return `<div class="answer"><input type="text" id="ans" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="התשובה שלי"><button class="btn" id="chk">בדיקה ✓</button></div>
+  <div class="kb">${KB.map(r=>`<div class="row">${r.map(l=>`<button class="key" data-l="${l}">${l}</button>`).join('')}</div>`).join('')}
+  <div class="row"><button class="key w" data-l="space">רווח</button><button class="key w" data-l="del">⌫ מחיקה</button></div></div>`;
+}
+function bindWriter(correct,hint,onOk){
+  const inp=app.querySelector('#ans');
+  app.querySelectorAll('.key').forEach(k=>k.onclick=()=>{const l=k.dataset.l;if(l==='del')inp.value=inp.value.slice(0,-1);else if(l==='space')inp.value+=' ';else inp.value+=l;});
+  const check=()=>{
+    const v=inp.value.replace(/[֑-ׇ]/g,'').trim().replace(/\s+/g,' ');
+    if(!v)return;
+    if(v===correct){inp.disabled=true;app.querySelector('#chk').disabled=true;app.querySelectorAll('.key').forEach(k=>k.disabled=true);inp.style.borderColor='var(--green)';onOk&&onOk();right()}
+    else{inp.classList.add('no');setTimeout(()=>inp.classList.remove('no'),400);wrongAns(hint,R.tries>=1?correct:null)}
+  };
+  app.querySelector('#chk').onclick=check;
+  inp.onkeydown=e=>{if(e.key==='Enter')check()};
+}
+function right(){
+  const it=R.items[R.n];
+  if(R.tries===0)R.stars++;else if(!R.miss.includes(it.c))R.miss.push(it.c);
+  const fb=app.querySelector('#fb');fb.className='fb good';
+  fb.textContent=(R.tries===0?'⭐ ':'')+pickOne(PRAISE)+(st.name?' '+st.name:'');
+  const a=app.querySelector('.actions');a.insertAdjacentHTML('afterbegin',`<button class="btn" id="next">${R.n+1<ROUND?'הבא ←':'לסיכום ←'}</button>`);
+  const nx=app.querySelector('#next');nx.onclick=()=>{R.n++;q()};nx.focus();
+}
+function wrongAns(hint,reveal){
+  R.tries++;
+  const fb=app.querySelector('#fb');fb.className='fb try';
+  fb.innerHTML=`${esc(pickOne(TRY))}<br><span class="hint">רמז: ${esc(hint)}${reveal?` · התשובה: <b>${esc(reveal)}</b>`:''}</span>`;
+}
+function end(){
+  const msg=R.stars===ROUND?'מושלם! בלש/ית מקצוען/ית!':R.stars>=ROUND/2?'עבודה מצוינת!':'התאמנתם יפה – כל ניסיון מחזק!';
+  app.innerHTML=`<div class="end pop"><h2>${esc(msg)}</h2><div class="big">⭐ ${R.stars} / ${ROUND}</div>
+  ${st.name?`<p class="q">כל הכבוד, ${esc(st.name)}!</p>`:''}
+  ${R.miss.length?`<p>מילים שכדאי לתרגל שוב:</p><div class="list">${R.miss.map(w=>`<span>${esc(w)}</span>`).join('')}</div>`:'<p>כל המילים נכונות מהניסיון הראשון 🎉</p>'}
+  <div class="actions"><button class="btn" id="again">עוד סבב</button><button class="btn alt" id="home">משחק אחר</button></div></div>`;
+  app.querySelector('#again').onclick=()=>start(R.g);app.querySelector('#home').onclick=home;
+}
+home();
+}
+</script>
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body>
+</html>

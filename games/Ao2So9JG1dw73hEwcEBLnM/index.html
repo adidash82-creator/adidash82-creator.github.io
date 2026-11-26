@@ -1,0 +1,263 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>השעון של סבא לכיתה ה׳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one narrow reading column, RTL; three steps (floors game → story → exam), each a band */
+:root{
+  --bg:#f3f1ec; --paper:#fffdf8; --ink:#1f2a30; --muted:#5e6a70; --line:#d9d4c8;
+  --accent:#1f6f78; --accent-soft:#dcecee; --brass:#a87a2a; --brass-soft:#f4e8cf;
+  --ok:#2e7d4f; --ok-soft:#e1f2e7; --bad:#b4472f; --bad-soft:#f8e2dc;
+  --f1:#3f7cac; --f2:#7a5ea8; --f3:#c0732f; --f4:#2e7d4f;
+  --display:"Suez One","Assistant",Georgia,serif; --body:"Assistant",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141b1f; --paper:#1c252a; --ink:#e9e6df; --muted:#9aa6ab; --line:#33424a;
+  --accent:#5fb3bc; --accent-soft:#1e3a3e; --brass:#d7aa5a; --brass-soft:#3a3020;
+  --ok:#6cc58f; --ok-soft:#1d3527; --bad:#e58a73; --bad-soft:#3d2520;
+  --f1:#7fb0d8; --f2:#ac94d6; --f3:#e3a06a; --f4:#6cc58f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b1f; --paper:#1c252a; --ink:#e9e6df; --muted:#9aa6ab; --line:#33424a;
+  --accent:#5fb3bc; --accent-soft:#1e3a3e; --brass:#d7aa5a; --brass-soft:#3a3020;
+  --ok:#6cc58f; --ok-soft:#1d3527; --bad:#e58a73; --bad-soft:#3d2520;
+  --f1:#7fb0d8; --f2:#ac94d6; --f3:#e3a06a; --f4:#6cc58f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:2.2rem} h2{font-size:1.5rem} h3{font-size:1.15rem}
+.lead{color:var(--muted);margin:6px 0 0}
+header{display:flex;align-items:center;gap:16px}
+.dial{width:64px;height:64px;flex:none}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav button{font:inherit;font-weight:700;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+section.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.tower{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.floor{font:inherit;border:0;border-radius:10px;padding:12px 8px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.25}
+.floor b{font-family:var(--display);font-size:1.6rem;font-weight:400}
+.floor small{font-size:.85rem;opacity:.95}
+.floor:disabled{opacity:.45;cursor:default}
+.f1{background:var(--f1)}.f2{background:var(--f2)}.f3{background:var(--f3)}.f4{background:var(--f4)}
+@media (max-width:520px){.tower{grid-template-columns:repeat(2,1fr)}}
+.qcard{border:2px dashed var(--line);border-radius:12px;padding:18px;font-size:1.2rem;font-weight:600;min-height:90px}
+.feedback{border-radius:10px;padding:12px 14px}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)} .feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border:0;background:var(--accent);color:var(--paper);padding:10px 18px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.score{font-variant-numeric:tabular-nums;color:var(--muted)}
+.story p{margin:0 0 12px} .story .pn{color:var(--brass);font-weight:700;margin-left:6px;font-variant-numeric:tabular-nums}
+.story span.s{cursor:pointer;border-radius:4px;padding:0 2px}
+.story span.s.yellow{background:#f6e27a;color:#1f2a30}
+.story span.s.blue{background:#a9d4f5;color:#1f2a30}
+.story span.s.pink{background:#f6b8cf;color:#1f2a30}
+.pens{display:flex;gap:8px;flex-wrap:wrap}
+.pen{font:inherit;border:2px solid transparent;border-radius:999px;padding:6px 14px;cursor:pointer;color:#1f2a30;font-weight:600}
+.pen[aria-pressed="true"]{border-color:var(--ink)}
+.pen.yellow{background:#f6e27a}.pen.blue{background:#a9d4f5}.pen.pink{background:#f6b8cf}.pen.erase{background:var(--bg);color:var(--ink);border-color:var(--line)}
+.q{border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:10px}
+.q:first-of-type{border-top:0;padding-top:0}
+.qhead{display:flex;gap:10px;align-items:flex-start}
+.qnum{font-family:var(--display);color:var(--brass);font-size:1.3rem;line-height:1.2}
+.floorpick{display:flex;gap:6px;align-items:center;font-size:.95rem;color:var(--muted)}
+.floorpick select{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);padding:2px 6px}
+textarea{font:inherit;width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.order{display:flex;flex-direction:column;gap:6px}
+.order label{display:flex;gap:10px;align-items:center}
+.order select{font:inherit;width:56px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.model{background:var(--brass-soft);border-radius:10px;padding:10px 14px}
+.model strong{color:var(--brass)}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.check input,.opts input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:4px}
+.timer{font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums;color:var(--accent)}
+.legend{width:100%;border-collapse:collapse;font-size:.95rem}
+.legend td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.legend td:first-child{white-space:nowrap;font-weight:700}
+.tablewrap{overflow-x:auto}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.feedback{animation:pop .25s ease}}
+@keyframes pop{from{transform:scale(.97)}to{transform:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <svg class="dial" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="34" r="26" fill="var(--paper)" stroke="var(--brass)" stroke-width="4"/>
+    <rect x="28" y="2" width="8" height="6" rx="2" fill="var(--brass)"/>
+    <line x1="32" y1="34" x2="32" y2="16" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="32" y1="34" x2="44" y2="40" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="32" cy="34" r="2.5" fill="var(--bad)"/>
+  </svg>
+  <div><h1>השעון של סבא</h1><p class="lead">אימון למבדק הבנת הנקרא · כיתה ה׳</p></div>
+</header>
+
+<nav aria-label="שלבי השיעור">
+  <button data-go="game" aria-current="true">1. בניין הקומות</button>
+  <button data-go="story">2. הסיפור</button>
+  <button data-go="exam">3. המבדק</button>
+  <button data-go="done">4. בדיקה עצמית</button>
+</nav>
+
+<!-- STEP 1 -->
+<section class="panel" id="game">
+  <h2>לאיזו קומה שייכת השאלה?</h2>
+  <p class="lead" style="margin:0">כל שאלה במבדק גרה בקומה אחרת. קראו את השאלה על "הארנב והצב", ובחרו קומה.</p>
+  <div class="tablewrap"><table class="legend">
+    <tr><td style="color:var(--f1)">קומה 1</td><td>כתוב בטקסט · מי, מה, מתי, איפה</td></tr>
+    <tr><td style="color:var(--f2)">קומה 2</td><td>מה פירוש המילה · מה הכוונה במשפט</td></tr>
+    <tr><td style="color:var(--f3)">קומה 3</td><td>בין השורות · מדוע, כיצד השתנה, תכונה</td></tr>
+    <tr><td style="color:var(--f4)">קומה 4</td><td>אני והטקסט · מה דעתך, מסר, כותרת</td></tr>
+  </table></div>
+  <div class="qcard" id="gq" aria-live="polite"></div>
+  <div class="tower">
+    <button class="floor f4" data-f="4"><b>4</b><small>אני והטקסט</small></button>
+    <button class="floor f3" data-f="3"><b>3</b><small>בין השורות</small></button>
+    <button class="floor f2" data-f="2"><b>2</b><small>פירוש מילה</small></button>
+    <button class="floor f1" data-f="1"><b>1</b><small>כתוב בטקסט</small></button>
+  </div>
+  <div id="gfb" aria-live="polite"></div>
+  <div class="row"><button class="btn" id="gnext" hidden>לשאלה הבאה</button><span class="score" id="gscore"></span></div>
+</section>
+
+<!-- STEP 2 -->
+<section class="panel" id="story" hidden>
+  <h2>קריאה בשלושה צבעים</h2>
+  <p class="lead" style="margin:0">קריאה ראשונה: רק להבין מה קרה. קריאה שנייה: בחרו צבע ולחצו על משפט כדי לסמן.</p>
+  <div class="pens" role="group" aria-label="צבע סימון">
+    <button class="pen yellow" data-pen="yellow" aria-pressed="true">צהוב · רגשות של איתן</button>
+    <button class="pen blue" data-pen="blue" aria-pressed="false">כחול · מילה קשה / דימוי</button>
+    <button class="pen pink" data-pen="pink" aria-pressed="false">ורוד · משפט חשוב של סבא</button>
+    <button class="pen erase" data-pen="" aria-pressed="false">מחק</button>
+  </div>
+  <div class="story" id="storyText"></div>
+  <div class="row"><button class="btn" data-go="exam">סיימתי, למבדק</button></div>
+</section>
+
+<!-- STEP 3 -->
+<section class="panel" id="exam" hidden>
+  <div class="row" style="justify-content:space-between">
+    <h2>שאלות בסגנון מבדק</h2>
+    <div class="row"><span class="timer" id="clock">15:00</span><button class="btn ghost" id="tbtn">הפעל טיימר</button></div>
+  </div>
+  <p class="lead" style="margin:0">3 צעדים לכל שאלה: <b>מסמנים</b> את מילת השאלה · <b>מחפשים</b> בטקסט · <b>מנסחים</b> משפט מלא.</p>
+  <div id="qs"></div>
+</section>
+
+<!-- STEP 4 -->
+<section class="panel" id="done" hidden>
+  <h2>צ׳קליסט לפני הגשה</h2>
+  <div class="check" id="chk"></div>
+  <h3>הטיפ שלי למבדק</h3>
+  <textarea id="tip" placeholder="למשל: לפני שאני עונה, אני בודק באיזו קומה השאלה."></textarea>
+</section>
+</div>
+
+<script>
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* nav */
+const panels=["game","story","exam","done"];
+function go(id){panels.forEach(p=>document.getElementById(p).hidden=p!==id);
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.go===id));window.scrollTo(0,0)}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+/* game */
+const G=[
+ ["מי ניצח במרוץ?",1,"התשובה כתובה בטקסט במפורש."],
+ ["איפה נרדם הארנב?",1,"מחפשים מקום – כתוב בטקסט."],
+ ["מה פירוש המילה \"התרברב\" במשפט: \"הארנב התרברב מול כל החיות\"?",2,"שאלה על פירוש מילה מתוך המשפט."],
+ ["מה הכוונה במשפט \"לאט אבל בטוח\"?",2,"מסבירים מה המשפט אומר בהקשר."],
+ ["מדוע הארנב נרדם באמצע המרוץ?",3,"\"מדוע\" – התשובה לא כתובה ישירות, מחברים רמזים."],
+ ["איזו תכונה יש לצב? הביאו דוגמה מהסיפור.",3,"אפיון דמות = קומה 3: תכונה + דוגמה."],
+ ["מה המסר של הסיפור?",4,"מסר = מה אני לומד מהסיפור."],
+ ["האם לדעתכם היה הוגן שהצב ניצח? נמקו.",4,"\"לדעתכם\" + \"נמקו\" = קומה 4."]
+];
+let gi=0,gs=0,answered=false;
+const gq=document.getElementById("gq"),gfb=document.getElementById("gfb"),gnext=document.getElementById("gnext"),gscore=document.getElementById("gscore");
+function showG(){answered=false;gfb.innerHTML="";gnext.hidden=true;document.querySelectorAll(".floor").forEach(b=>b.disabled=false);
+  if(gi>=G.length){gq.textContent=`כל הכבוד! ${gs} מתוך ${G.length} בקומה הנכונה.`;document.querySelectorAll(".floor").forEach(b=>b.disabled=true);
+    gnext.hidden=false;gnext.textContent="לסיפור";gnext.onclick=()=>go("story");return}
+  gq.textContent=`${gi+1}/${G.length} · ${G[gi][0]}`;gscore.textContent=`נקודות: ${gs}`}
+document.querySelectorAll(".floor").forEach(b=>b.addEventListener("click",()=>{
+  if(answered)return;answered=true;const f=+b.dataset.f,[_,right,why]=G[gi];
+  document.querySelectorAll(".floor").forEach(x=>x.disabled=true);
+  if(f===right){gs++;gfb.innerHTML=`<div class="feedback ok">נכון! קומה ${right}. ${why}</div>`}
+  else gfb.innerHTML=`<div class="feedback bad">לא בדיוק – זו קומה ${right}. ${why}</div>`;
+  gscore.textContent=`נקודות: ${gs}`;gi++;gnext.hidden=false;gnext.textContent="לשאלה הבאה";gnext.onclick=showG}));
+showG();
+
+/* story */
+const P=[
+"בכל שבת, כשאיתן הגיע לבית של סבא יוסף, הוא נכנס ישר לחדר העבודה הקטן.|שם, על המדף העליון, בתוך קופסת עץ כהה, שכב השעון.|זה היה שעון כיס עשוי כסף, עם מכסה שנפתח בנקישה עדינה ומחוגים דקים כמו חוטי משי.|„את השעון הזה קיבלתי מאבא שלי ביום הבר מצווה שלי,” נהג סבא לספר, „והוא לא איחר אפילו דקה אחת מאז.”",
+"איתן ידע שאסור לגעת בשעון בלי רשות.|אבל באותה שבת סבא נרדם על הספה אחרי ארוחת הצהריים, והבית היה שקט מאוד.|איתן טיפס על הכיסא, הוריד את הקופסה בזהירות ופתח אותה.|הוא החזיק את השעון בכף ידו והרגיש את התקתוק הקטן, כמו לב של ציפור.|„רק עוד רגע,” לחש לעצמו.",
+"ואז נשמע צלצול הטלפון.|איתן נבהל, ידו רעדה, והשעון החליק ונפל על רצפת האבן.|הזכוכית נסדקה, והמחוגים נעצרו.",
+"איתן עמד קפוא.|ליבו הלם בחוזקה.|במהירות החזיר את השעון לקופסה, סגר את המכסה והניח אותה במקומה.|כשסבא התעורר ושאל, „נו, איתן, מה עשית כל הזמן הזה?”, איתן משך בכתפיו ואמר: „כלום, קראתי ספר.”",
+"כל אותו שבוע איתן לא הצליח להתרכז.|בכיתה הוא שכח להגיש שיעורי בית, ובאימון הכדורגל החמיץ מסירות קלות.|בלילות, כשעצם את עיניו, שמע שוב ושוב את קול השעון פוגע ברצפה.|הסוד ישב עליו כמו תיק כבד שאי אפשר להוריד.",
+"בשבת הבאה איתן הגיע לסבא מוקדם מהרגיל.|הפעם הוא לא נכנס לחדר העבודה.|הוא התיישב מול סבא, הסתכל על הרצפה ואמר בשקט: „סבא, אני צריך לספר לך משהו. השעון נפל בגללי. ושיקרתי לך.”",
+"סבא שתק רגע ארוך.|אחר כך קם, הביא את הקופסה ופתח אותה.|הוא הביט בזכוכית הסדוקה ונאנח.|„חבל,” אמר. „אבל אתה יודע מה? כשהייתי בגילך, שברתי את המשקפיים של אבא שלי והחבאתי אותם בארון. הוא גילה את זה רק אחרי חודש, והחודש הזה היה הארוך בחיי.”",
+"איתן הרים את עיניו. „באמת?”|„באמת,” חייך סבא.|„שעון אפשר לתקן אצל שען. אמון קשה הרבה יותר לתקן. היום תיקנת אותו בעצמך.”",
+"ביום ראשון הלכו שניהם יחד לחנות של השען בקצה הרחוב.|וכשהמחוגים התחילו לזוז שוב, איתן הרגיש שגם בתוכו משהו חזר לתקתק."
+];
+const marks=store.get("gen5-marks",{});let pen="yellow";
+const st=document.getElementById("storyText");
+P.forEach((p,i)=>{const el=document.createElement("p");el.innerHTML=`<span class="pn">(${i+1})</span>`;
+  p.split("|").forEach((s,j)=>{const sp=document.createElement("span");sp.className="s";const k=i+"-"+j;sp.dataset.k=k;
+    if(marks[k])sp.classList.add(marks[k]);sp.textContent=s+" ";
+    sp.addEventListener("click",()=>{sp.classList.remove("yellow","blue","pink");if(pen&&marks[k]!==pen){sp.classList.add(pen);marks[k]=pen}else delete marks[k];store.set("gen5-marks",marks)});
+    el.appendChild(sp)});st.appendChild(el)});
+document.querySelectorAll(".pen").forEach(b=>b.addEventListener("click",()=>{pen=b.dataset.pen;document.querySelectorAll(".pen").forEach(x=>x.setAttribute("aria-pressed",x===b))}));
+
+/* exam */
+const Q=[
+ {t:"מתי קיבל סבא יוסף את השעון, וממי?",f:1,m:"סבא קיבל את השעון מאביו, ביום הבר מצווה שלו (פסקה 1). צריך את שני החלקים: מתי + ממי."},
+ {t:"סדרו את האירועים לפי הסדר בסיפור (1–4):",f:2,type:"order",items:["איתן וסבא הלכו לשען.","איתן אמר שקרא ספר.","הטלפון צלצל.","סבא סיפר על המשקפיים של אביו."],ans:[4,2,1,3],m:"הסדר: הטלפון צלצל (1) → איתן אמר שקרא ספר (2) → סבא סיפר על המשקפיים (3) → הלכו לשען (4)."},
+ {t:"בפסקה 4 כתוב: „איתן עמד קפוא”. מה פירוש הביטוי במשפט?",f:2,type:"mc",opts:["היה לו קר מאוד.","הוא לא זז בגלל הבהלה.","הוא עמד ליד המקרר.","הוא חיכה שסבא יתעורר."],ans:1,m:"ב – הוא לא זז בגלל הבהלה. הרמז במשפט הבא: „ליבו הלם בחוזקה”."},
+ {t:"מדוע איתן לא הצליח להתרכז כל אותו שבוע? הסבירו והביאו דוגמה אחת מהסיפור.",f:3,m:"איתן לא הצליח להתרכז כי הסוד והשקר הציקו לו. דוגמה: בטקסט כתוב שהוא שכח להגיש שיעורי בית / החמיץ מסירות קלות / שמע בלילות את קול השעון."},
+ {t:"כתבו תכונה אחת של סבא יוסף, והביאו מהסיפור דוגמה לתכונה זו.",f:3,m:"סבא סלחן ומבין – הוא לא כעס, ואפילו סיפר שגם הוא טעה כשהיה ילד. (תכונה בלי דוגמה = תשובה חלקית.)"},
+ {t:"„הסוד ישב עליו כמו תיק כבד שאי אפשר להוריד” (פסקה 5). מה רוצה הכותב לומר על הרגשות של איתן?",f:3,m:"הסוד הכביד על איתן כל הזמן. הוא הרגיש לחץ ואשמה, ולא יכול היה להשתחרר מההרגשה כל עוד לא סיפר."},
+ {t:"כיצד השתנתה ההרגשה של איתן מפסקה 5 עד סוף הסיפור? מה גרם לשינוי?",f:3,m:"בהתחלה הרגיש אשמה ולחץ. בסוף הרגיש הקלה ושמחה („משהו חזר לתקתק”). השינוי קרה כי סיפר את האמת וסבא הגיב בהבנה."},
+ {t:"סבא אמר: „שעון אפשר לתקן אצל שען. אמון קשה הרבה יותר לתקן.” הסבירו את דבריו במילים שלכם.",f:3,m:"חפץ שנשבר קל לתקן, אבל כשמשקרים – קשה להאמין שוב לאדם. איתן תיקן את האמון כשבחר לספר את האמת."},
+ {t:"הציעו כותרת אחרת לסיפור, והסבירו מדוע בחרתם בה.",f:4,m:"כל כותרת שקשורה לעניין המרכזי (למשל „הסוד הכבד”, „אמון מתקנים לבד”) + הסבר שמקשר לסיפור."},
+ {t:"האם איתן עשה נכון כשסיפר לסבא את האמת? נמקו בעזרת שתי סיבות, אחת מהן מהסיפור.",f:4,m:"עמדה ברורה (כן/לא) + 2 סיבות: אחת מהסיפור (למשל: הוקל לו; סבא אמר שתיקן את האמון) ואחת מהידע האישי."}
+];
+const ans=store.get("gen5-ans",{});
+const qs=document.getElementById("qs");
+Q.forEach((q,i)=>{const d=document.createElement("div");d.className="q";
+  let body="";
+  if(q.type==="mc")body=`<div class="opts">${q.opts.map((o,j)=>`<label><input type="radio" name="mc${i}" id="mc${i}-${j}" value="${j}">${"אבגד"[j]}. ${o}</label>`).join("")}</div>`;
+  else if(q.type==="order")body=`<div class="order">${q.items.map((o,j)=>`<label><select id="o${i}-${j}"><option value="">–</option>${[1,2,3,4].map(n=>`<option>${n}</option>`).join("")}</select>${o}</label>`).join("")}</div>`;
+  else body=`<textarea id="t${i}" placeholder="התחילו במילים של השאלה…"></textarea>`;
+  d.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><div style="min-width:0">${q.t}</div></div>
+   <div class="floorpick"><label for="f${i}">באיזו קומה?</label><select id="f${i}"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option></select><span id="fr${i}"></span></div>
+   ${body}<div class="row"><button class="btn ghost" id="b${i}">בדקו</button></div><div id="r${i}" aria-live="polite"></div>`;
+  qs.appendChild(d);
+  const ta=d.querySelector("textarea");if(ta){ta.value=ans[i]||"";ta.addEventListener("input",()=>{ans[i]=ta.value;store.set("gen5-ans",ans)})}
+  d.querySelector("#b"+i).addEventListener("click",()=>{
+    const fp=d.querySelector("#f"+i).value,fr=d.querySelector("#fr"+i);
+    fr.textContent=fp?(+fp===q.f?" ✓ קומה נכונה":` ✗ זו קומה ${q.f}`):` קומה ${q.f}`;fr.style.color=+fp===q.f?"var(--ok)":"var(--bad)";
+    let res="";
+    if(q.type==="mc"){const c=d.querySelector(`input[name=mc${i}]:checked`);res=c&&+c.value===q.ans?'<div class="feedback ok">נכון!</div>':'<div class="feedback bad">עוד לא. חזרו לפסקה 4 וקראו את המשפט שאחרי.</div>'}
+    if(q.type==="order"){const v=q.items.map((_,j)=>+d.querySelector(`#o${i}-${j}`).value);res=v.every((x,j)=>x===q.ans[j])?'<div class="feedback ok">סדר נכון!</div>':'<div class="feedback bad">עוד לא. עברו על הפסקאות לפי המספרים.</div>'}
+    d.querySelector("#r"+i).innerHTML=res+`<div class="model" style="margin-top:8px"><strong>תשובה לדוגמה:</strong> ${q.m}</div>`;
+  })});
+
+/* timer */
+let left=900,tid=null;const clock=document.getElementById("clock"),tbtn=document.getElementById("tbtn");
+function draw(){clock.textContent=`${String(Math.floor(left/60)).padStart(2,"0")}:${String(left%60).padStart(2,"0")}`}
+tbtn.addEventListener("click",()=>{if(tid){clearInterval(tid);tid=null;tbtn.textContent="המשך";return}
+  tbtn.textContent="עצור";tid=setInterval(()=>{if(left>0){left--;draw()}else{clearInterval(tid);tid=null;tbtn.textContent="נגמר הזמן"}},1000)});
+
+/* checklist */
+const C=["קראתי את השאלה עד הסוף וסימנתי את מילת השאלה.","עניתי על כל החלקים (למשל: „הסבירו וגם הביאו דוגמה”).","התשובה מתחילה במילים של השאלה – משפט שלם.","בקומות 3–4 הוספתי „כי…” או „בטקסט כתוב…”.","קראתי את התשובה שוב – גם מי שלא קרא את הסיפור יבין אותה."];
+const ck=store.get("gen5-chk",{}),chk=document.getElementById("chk");
+C.forEach((c,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="checkbox" id="c${i}">${c}`;const cb=l.querySelector("input");cb.checked=!!ck[i];
+  cb.addEventListener("change",()=>{ck[i]=cb.checked;store.set("gen5-chk",ck)});chk.appendChild(l)});
+const tip=document.getElementById("tip");tip.value=store.get("gen5-tip","");tip.addEventListener("input",()=>store.set("gen5-tip",tip.value));
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

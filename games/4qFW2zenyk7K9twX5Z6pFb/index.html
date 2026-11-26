@@ -1,0 +1,529 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>הסוכנת האמיצה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Varela+Round&display=swap">
+<style>
+/* Layout: one stage card at a time along a "spy route" progress path; single bright daytime look, chosen deliberately for a 9-year-old */
+:root {
+  --sky: #E8F3FF;        /* page ground */
+  --paper: #FFFFFF;      /* card surface */
+  --ink: #1E2A4A;        /* text + outlines */
+  --ink-soft: #5A6684;
+  --coral: #FF6B5B;
+  --sun: #F2A900;
+  --teal: #1FB3A5;
+  --violet: #7B61FF;
+  --grass: #4CAF50;
+  --line: #C9D6EA;
+  --display: "Rubik", "Arial Hebrew", "Segoe UI", sans-serif;
+  --body: "Varela Round", "Rubik", "Arial Hebrew", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { background: var(--sky); color: var(--ink); font-family: var(--body); font-size: 18px; direction: rtl; }
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+header { display: flex; flex-direction: column; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-family: var(--display); font-weight: 800; font-size: clamp(22px, 5vw, 30px); margin: 0; text-wrap: balance; }
+.brand svg { flex: none; }
+
+.route { display: flex; align-items: center; gap: 0; padding: 4px 2px; overflow-x: auto; }
+.route .stop { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); font-family: var(--display); font-weight: 700; font-size: 15px; display: grid; place-items: center; cursor: pointer; color: var(--ink); padding: 0; }
+.route .stop.done { background: var(--grass); color: #fff; border-color: var(--grass); }
+.route .stop.now { background: var(--sun); border-color: var(--ink); transform: scale(1.15); }
+.route .path { flex: 1 1 14px; min-width: 10px; height: 0; border-top: 3px dashed var(--ink-soft); }
+
+.stage { background: var(--paper); border: 3px solid var(--ink); border-radius: 26px; padding: clamp(18px, 4vw, 30px); box-shadow: 0 6px 0 var(--ink); display: flex; flex-direction: column; gap: 18px; min-height: 420px; }
+.stage h2 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 6vw, 36px); margin: 0; text-wrap: balance; }
+.stage .lead { font-size: clamp(19px, 4.4vw, 23px); line-height: 1.8; margin: 0; }
+.eyebrow { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .03em; color: var(--ink-soft); }
+
+.btn { font-family: var(--display); font-weight: 700; font-size: 20px; border: 3px solid var(--ink); border-radius: 16px; padding: 12px 22px; background: var(--sun); color: var(--ink); cursor: pointer; box-shadow: 0 4px 0 var(--ink); transition: transform .08s; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn.alt { background: var(--paper); }
+.btn.go { background: var(--grass); color: #fff; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:focus-visible, .route .stop:focus-visible, .opt:focus-visible, .mood:focus-visible, .tile:focus-visible, .swatch:focus-visible, .chip:focus-visible { outline: 4px solid var(--violet); outline-offset: 3px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+nav.bottom { display: flex; justify-content: space-between; gap: 12px; }
+nav.bottom .btn { font-size: 17px; padding: 9px 18px; }
+
+/* Mood meter */
+.moods { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.mood { border: 3px solid var(--ink); border-radius: 18px; background: var(--paper); padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-family: var(--body); font-size: 15px; color: var(--ink); min-width: 0; }
+.mood .n { font-family: var(--display); font-weight: 800; font-size: 22px; }
+.mood svg { width: 100%; max-width: 64px; height: auto; }
+.mood.picked { transform: translateY(-4px); box-shadow: 0 5px 0 var(--ink); }
+@media (max-width: 460px) { .mood span.lbl { font-size: 12px; } }
+
+/* Envelope */
+.envelope { align-self: center; width: min(100%, 420px); aspect-ratio: 3 / 2; max-width: 100%; border: 4px solid var(--ink); border-radius: 18px; background: #FFF1CC; position: relative; cursor: pointer; overflow: hidden; display: grid; place-items: center; }
+.envelope .flap { position: absolute; inset: 0 0 auto 0; height: 55%; background: #FFE08A; clip-path: polygon(0 0, 100% 0, 50% 100%); border-bottom: 0; transform-origin: top; transition: transform .6s; }
+.envelope.open .flap { transform: rotateX(180deg); }
+.envelope .seal { position: relative; z-index: 2; border: 4px solid #E23E57; color: #E23E57; font-family: var(--display); font-weight: 800; font-size: clamp(22px, 6vw, 32px); padding: 6px 18px; border-radius: 10px; transform: rotate(-7deg); background: #FFF1CC; }
+.letter { border: 3px solid var(--teal); background: #EAFBF8; border-radius: 20px; padding: 18px 22px; font-size: clamp(19px, 4.4vw, 23px); line-height: 1.95; }
+.letter .sign { font-family: var(--display); font-weight: 700; text-align: left; }
+
+/* Clue */
+.clue { border: 4px solid var(--c); border-radius: 22px; overflow: hidden; }
+.clue .band { background: var(--c); color: #fff; padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; font-family: var(--display); font-weight: 800; font-size: 22px; }
+.clue .riddle { padding: 18px 20px; font-size: clamp(22px, 5vw, 28px); line-height: 1.85; }
+.opts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 520px) { .opts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.opt { border: 3px solid var(--ink); border-radius: 18px; background: var(--paper); padding: 10px 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--ink); min-width: 0; }
+.opt svg { width: 100%; max-width: 92px; height: auto; }
+.opt.wrong { animation: wobble .45s; background: #FFF0EE; }
+.opt.right { background: #E3F4E1; border-color: var(--grass); }
+.feedback { font-family: var(--display); font-weight: 700; font-size: 22px; min-height: 1.4em; margin: 0; }
+.move { background: var(--tint); border-radius: 18px; padding: 16px 18px; font-size: clamp(21px, 4.8vw, 26px); line-height: 1.7; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.move b { font-family: var(--display); }
+.found { display: flex; align-items: center; gap: 16px; }
+.bigletter { width: 96px; height: 96px; flex: none; border-radius: 50%; border: 5px solid var(--c); color: var(--c); background: var(--paper); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 60px; animation: pop .5s; }
+
+.bag { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 3px dashed var(--line); padding-top: 14px; }
+.bag .slot { width: 46px; height: 46px; border-radius: 12px; border: 3px dashed var(--ink-soft); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 28px; }
+.bag .slot.full { border-style: solid; background: var(--sun); border-color: var(--ink); }
+
+/* Decode */
+.slots { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.slots .s { width: clamp(52px, 14vw, 78px); aspect-ratio: 4 / 5; max-width: 100%; border: 4px dashed var(--ink); border-radius: 16px; background: #F2F4FA; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: clamp(34px, 9vw, 52px); }
+.slots .s.full { border-style: solid; background: #FFF2CC; }
+.slots.win .s { background: #E3F4E1; border-color: var(--grass); animation: pop .5s; }
+.tiles { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.tile { width: clamp(56px, 15vw, 76px); height: clamp(56px, 15vw, 76px); border: 4px solid var(--ink); border-radius: 50%; background: var(--paper); font-family: var(--display); font-weight: 800; font-size: clamp(30px, 8vw, 42px); cursor: pointer; color: var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.tile[disabled] { visibility: hidden; }
+.winword { text-align: center; font-family: var(--display); font-weight: 800; font-size: clamp(26px, 6vw, 34px); color: var(--grass); }
+
+/* Writing pad */
+.pad-wrap { position: relative; border: 4px solid var(--ink); border-radius: 20px; overflow: hidden; background: #FFFEF7; }
+.pad-wrap canvas { display: block; width: 100%; height: 260px; touch-action: none; cursor: crosshair; }
+.ghost { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: clamp(64px, 18vw, 120px); color: #D7DEEC; pointer-events: none; }
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); cursor: pointer; }
+.swatch.on { box-shadow: 0 0 0 4px var(--paper), 0 0 0 7px var(--ink); }
+
+/* Comic */
+.comic { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 620px) { .comic { grid-template-columns: minmax(0, 1fr); } }
+.panel { border: 3px solid var(--ink); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; background: var(--paper); }
+.panel .tag { background: var(--ink); color: #fff; font-family: var(--display); font-weight: 700; padding: 6px 12px; font-size: 16px; }
+.panel canvas { display: block; width: 100%; height: 170px; touch-action: none; background: #FFFEF7; }
+.panel input { border: 0; border-top: 3px solid var(--ink); font-family: var(--display); font-weight: 700; font-size: 22px; padding: 10px 12px; text-align: center; background: #FFF7E0; color: var(--ink); width: 100%; }
+.panel input::placeholder { color: #A8A08A; font-weight: 500; }
+
+/* Reverse role */
+.write-in { border: 3px solid var(--ink); border-radius: 14px; font-family: var(--display); font-weight: 700; font-size: 26px; padding: 8px 14px; width: min(100%, 300px); background: #FFF7E0; color: var(--ink); }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.chip { border: 3px solid var(--ink); border-radius: 999px; padding: 8px 16px; background: var(--paper); font-family: var(--display); font-weight: 700; font-size: 19px; cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.chip svg { width: 28px; height: 28px; }
+.chip.on { background: var(--sun); }
+.secret { border: 4px solid var(--coral); background: #FFF7F5; border-radius: 22px; padding: 22px; text-align: center; animation: pop .5s; }
+.secret .t { font-family: var(--display); font-weight: 800; color: #E23E57; font-size: 22px; }
+.secret .m { font-size: clamp(26px, 6vw, 34px); line-height: 1.7; font-family: var(--display); font-weight: 700; }
+
+/* Certificate */
+.cert { border: 6px solid var(--sun); border-radius: 26px; background: #FFFBEF; padding: 26px 18px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; position: relative; }
+.cert .name { font-family: var(--display); font-weight: 800; font-size: clamp(44px, 12vw, 64px); color: var(--coral); line-height: 1.1; }
+.cert h3 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 6vw, 34px); margin: 0; }
+.cert p { font-size: 20px; line-height: 1.8; margin: 0; }
+.compare { display: flex; gap: 14px; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 20px; flex-wrap: wrap; }
+.compare .pill { border: 3px solid var(--ink); border-radius: 999px; padding: 4px 16px; background: var(--paper); }
+#confetti { position: fixed; inset: 0; pointer-events: none; width: 100%; height: 100%; }
+
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes wobble { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="18" cy="18" r="12" fill="#BEEFE9" stroke="#1E2A4A" stroke-width="4"/><circle cx="14" cy="14" r="3.5" fill="#fff"/><rect x="27" y="26" width="7" height="17" rx="3" fill="#1E2A4A" transform="rotate(-45 30 34)"/></svg>
+      <h1>הַמְּשִׂימָה שֶׁל הַסּוֹכֶנֶת יַרְדֵּן</h1>
+    </div>
+    <div class="route" id="route" aria-label="שלבי השיעור"></div>
+  </header>
+  <main class="stage" id="stage" aria-live="polite"></main>
+  <nav class="bottom">
+    <button class="btn alt" id="prev" type="button">→ הַקּוֹדֵם</button>
+    <button class="btn alt" id="next" type="button">הַבָּא ←</button>
+  </nav>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- picture icons (simple drawn shapes) ---------- */
+  const S = (inner) => '<svg viewBox="0 0 100 100" aria-hidden="true">' + inner + '</svg>';
+  const K = 'stroke="#1E2A4A" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
+  const ICONS = {
+    chair: S('<rect x="28" y="14" width="40" height="38" rx="6" fill="#FF8A75" ' + K + '/><rect x="22" y="50" width="56" height="12" rx="4" fill="#FF6B5B" ' + K + '/><line x1="28" y1="62" x2="26" y2="90" ' + K + '/><line x1="72" y1="62" x2="74" y2="90" ' + K + '/>'),
+    door: S('<rect x="26" y="8" width="48" height="86" rx="4" fill="#F2A900" ' + K + '/><rect x="34" y="18" width="32" height="26" rx="3" fill="#FFD66B" ' + K + '/><circle cx="64" cy="56" r="5" fill="#1E2A4A"/>'),
+    window: S('<rect x="14" y="14" width="72" height="72" rx="6" fill="#BEEFE9" ' + K + '/><line x1="50" y1="14" x2="50" y2="86" ' + K + '/><line x1="14" y1="50" x2="86" y2="50" ' + K + '/><circle cx="32" cy="32" r="7" fill="#FFD66B"/>'),
+    books: S('<rect x="12" y="10" width="76" height="82" rx="4" fill="#ECE8FF" ' + K + '/><line x1="12" y1="50" x2="88" y2="50" ' + K + '/><rect x="20" y="20" width="10" height="28" fill="#FF6B5B" stroke="#1E2A4A" stroke-width="3"/><rect x="32" y="24" width="10" height="24" fill="#1FB3A5" stroke="#1E2A4A" stroke-width="3"/><rect x="44" y="18" width="10" height="30" fill="#F2A900" stroke="#1E2A4A" stroke-width="3"/><rect x="22" y="58" width="10" height="30" fill="#7B61FF" stroke="#1E2A4A" stroke-width="3"/><rect x="34" y="62" width="10" height="26" fill="#4CAF50" stroke="#1E2A4A" stroke-width="3"/><rect x="58" y="60" width="22" height="10" fill="#FF8A50" stroke="#1E2A4A" stroke-width="3"/>'),
+    table: S('<rect x="8" y="36" width="84" height="14" rx="4" fill="#4CAF50" ' + K + '/><line x1="18" y1="50" x2="18" y2="90" ' + K + '/><line x1="82" y1="50" x2="82" y2="90" ' + K + '/><ellipse cx="50" cy="30" rx="16" ry="5" fill="#fff" ' + K + '/>'),
+    bed: S('<rect x="8" y="50" width="84" height="22" rx="5" fill="#7B61FF" ' + K + '/><rect x="14" y="36" width="24" height="16" rx="6" fill="#fff" ' + K + '/><line x1="12" y1="72" x2="12" y2="88" ' + K + '/><line x1="88" y1="72" x2="88" y2="88" ' + K + '/>'),
+    lamp: S('<path d="M30 46 L40 14 L60 14 L70 46 Z" fill="#FFD66B" ' + K + '/><line x1="50" y1="46" x2="50" y2="82" ' + K + '/><rect x="32" y="82" width="36" height="8" rx="4" fill="#1E2A4A"/>'),
+    plant: S('<path d="M34 62 L66 62 L60 92 L40 92 Z" fill="#FF8A50" ' + K + '/><path d="M50 62 C50 40 34 34 24 30 C30 46 40 56 50 62 Z" fill="#4CAF50" ' + K + '/><path d="M50 62 C52 38 66 28 78 24 C72 44 62 56 50 62 Z" fill="#7CCB6A" ' + K + '/>'),
+    jump: S('<circle cx="50" cy="22" r="10" fill="#FFD66B" ' + K + '/><path d="M50 32 L50 58 M50 40 L30 30 M50 40 L70 30 M50 58 L36 80 M50 58 L64 80" fill="none" ' + K + '/><path d="M20 92 Q50 74 80 92" fill="none" stroke="#1FB3A5" stroke-width="5" stroke-dasharray="6 6"/>'),
+    crawl: S('<circle cx="76" cy="44" r="10" fill="#FFD66B" ' + K + '/><path d="M66 50 L30 52 M60 51 L60 74 M36 52 L32 74" fill="none" ' + K + '/><line x1="10" y1="80" x2="90" y2="80" stroke="#1FB3A5" stroke-width="5"/>'),
+    robot: S('<rect x="30" y="16" width="40" height="30" rx="6" fill="#BEEFE9" ' + K + '/><circle cx="42" cy="30" r="4" fill="#1E2A4A"/><circle cx="58" cy="30" r="4" fill="#1E2A4A"/><rect x="34" y="50" width="32" height="28" rx="4" fill="#7B61FF" ' + K + '/><line x1="42" y1="78" x2="42" y2="92" ' + K + '/><line x1="58" y1="78" x2="58" y2="92" ' + K + '/><line x1="50" y1="8" x2="50" y2="16" ' + K + '/>')
+  };
+  const PLACES = {
+    chair: "כִּסֵּא", door: "דֶּלֶת", window: "חַלּוֹן", books: "מַדַּף סְפָרִים",
+    table: "שֻׁלְחָן", bed: "מִטָּה", lamp: "מְנוֹרָה", plant: "עָצִיץ"
+  };
+
+  /* ---------- lesson content ---------- */
+  const CLUES = [
+    { letter: "א", c: "#FF6B5B", tint: "#FFE6E2", answer: "chair", decoys: ["bed", "lamp", "plant"],
+      riddle: "יֵשׁ לִי אַרְבַּע רַגְלַיִם, אֲבָל אֲנִי אַף פַּעַם לֹא הוֹלֵךְ. כָּל הַיּוֹם יוֹשְׁבִים עָלַי.",
+      move: "קִפְצִי 5 קְפִיצוֹת צְפַרְדֵּעַ אֶל הַכִּסֵּא!" },
+    { letter: "מ", c: "#F2A900", tint: "#FFF2CC", answer: "door", decoys: ["window", "books", "bed"],
+      riddle: "יֵשׁ לִי יָדִית, אֲבָל אֵין לִי יָדַיִם. פּוֹתְחִים אוֹתִי כְּדֵי לָצֵאת וּלְהִכָּנֵס.",
+      move: "לְכִי כְּמוֹ סַרְטָן – הַצִּדָּה – אֶל הַדֶּלֶת!" },
+    { letter: "י", c: "#1FB3A5", tint: "#DDF6F3", answer: "window", decoys: ["door", "lamp", "table"],
+      riddle: "דַּרְכִּי רוֹאִים אֶת הַשָּׁמַיִם, אֲבָל אֲנִי לֹא עַיִן. אֲנִי שָׁקוּף וְעָשׂוּי מִזְּכוּכִית.",
+      move: "צְעַדִי צַעֲדֵי עֲנָק אִטִּיִּים אֶל הַחַלּוֹן!" },
+    { letter: "צ", c: "#7B61FF", tint: "#ECE8FF", answer: "books", decoys: ["plant", "chair", "bed"],
+      riddle: "יֵשׁ לִי הַרְבֵּה דַּפִּים, אֲבָל אֲנִי לֹא עֵץ. אֲנִי מָלֵא בְּסִפּוּרִים.",
+      move: "קִפְצִי עַל רֶגֶל אַחַת אֶל מַדַּף הַסְּפָרִים!" },
+    { letter: "ה", c: "#4CAF50", tint: "#E3F4E1", answer: "table", decoys: ["chair", "window", "lamp"],
+      riddle: "אוֹכְלִים עָלַי וְכוֹתְבִים עָלַי, אֲבָל אֲנִי לֹא צַלַּחַת וְלֹא מַחְבֶּרֶת.",
+      move: "זַחֲלִי כְּמוֹ סוֹכֶנֶת אֶל הַשֻּׁלְחָן – שָׁם מְחַכָּה הַפְתָּעָה!" }
+  ];
+  const SECRET = ["א", "מ", "י", "צ", "ה"];
+  const MOODS = [
+    { n: 1, t: "בִּכְלָל לֹא", c: "#FF6B5B" },
+    { n: 2, t: "קְצָת", c: "#FF8A50" },
+    { n: 3, t: "בְּאֶמְצַע", c: "#F2A900" },
+    { n: 4, t: "דֵּי מוּכָנָה", c: "#8BC34A" },
+    { n: 5, t: "מוּכָנָה לְגַמְרֵי!", c: "#4CAF50" }
+  ];
+
+  /* ---------- state ---------- */
+  const state = {
+    step: 0, moodStart: 0, moodEnd: 0, opened: false,
+    clue: 0, clueSolved: false, clueMoved: false, letters: [],
+    decode: [], decoded: false,
+    revPlace: "", revMove: "", revSent: false
+  };
+  const STEPS = ["start", "envelope", "clues", "decode", "write", "comic", "reverse", "finish"];
+
+  /* ---------- sound (starts only after a tap) ---------- */
+  let audio = null;
+  function chime(good) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const notes = good ? [523, 659, 784] : [330, 294];
+      notes.forEach((f, i) => {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.type = "triangle"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, audio.currentTime + i * 0.11);
+        g.gain.exponentialRampToValueAtTime(0.18, audio.currentTime + i * 0.11 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + i * 0.11 + 0.28);
+        o.connect(g); g.connect(audio.destination);
+        o.start(audio.currentTime + i * 0.11); o.stop(audio.currentTime + i * 0.11 + 0.3);
+      });
+    } catch (e) { /* sound is optional */ }
+  }
+
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const stage = $("#stage");
+  const h = (html) => { stage.innerHTML = html; };
+
+  function face(level, color) {
+    const mouth = [
+      "M30 70 Q50 56 70 70", "M30 68 Q50 62 70 68", "M30 66 L70 66",
+      "M30 62 Q50 72 70 62", "M28 58 Q50 80 72 58"
+    ][level - 1];
+    return '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="' + color + '" stroke="#1E2A4A" stroke-width="5"/><circle cx="36" cy="40" r="5" fill="#1E2A4A"/><circle cx="64" cy="40" r="5" fill="#1E2A4A"/><path d="' + mouth + '" fill="none" stroke="#1E2A4A" stroke-width="5" stroke-linecap="round"/></svg>';
+  }
+  function moodGrid(key) {
+    return '<div class="moods" role="group" aria-label="מד האומץ">' + MOODS.map(m =>
+      '<button type="button" class="mood' + (state[key] === m.n ? ' picked' : '') + '" data-mood="' + m.n + '" style="' + (state[key] === m.n ? 'background:' + m.c + '33' : '') + '" aria-pressed="' + (state[key] === m.n) + '">' +
+      face(m.n, m.c) + '<span class="n">' + m.n + '</span><span class="lbl">' + m.t + '</span></button>').join("") + '</div>';
+  }
+  function bindMoods(key, after) {
+    stage.querySelectorAll(".mood").forEach(b => b.addEventListener("click", () => {
+      state[key] = +b.dataset.mood; chime(true); render(); if (after) after();
+    }));
+  }
+
+  /* ---------- stages ---------- */
+  const VIEWS = {
+    start() {
+      h('<div class="eyebrow">שָׁלָב 1 · לִפְנֵי הַמְּשִׂימָה</div>' +
+        '<h2>מַד הָאֹמֶץ שֶׁלִּי</h2>' +
+        '<p class="lead">כַּמָּה אַתְּ מַרְגִּישָׁה מוּכָנָה לִקְרֹא וְלִכְתֹּב הַיּוֹם? לַחֲצִי עַל פַּרְצוּף אֶחָד.</p>' +
+        moodGrid("moodStart") +
+        (state.moodStart ? '<p class="feedback">תּוֹדָה, סוֹכֶנֶת! כָּל תְּשׁוּבָה הִיא בְּסֵדֶר.</p><div class="row"><button class="btn go" type="button" id="go">לַמְּשִׂימָה ←</button></div>' : ''));
+      bindMoods("moodStart");
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(1));
+    },
+    envelope() {
+      h('<div class="eyebrow">שָׁלָב 2 · הַמִּכְתָּב</div>' +
+        '<h2>הִגִּיעָה מַעֲטָפָה סוֹדִית!</h2>' +
+        (state.opened ?
+          '<div class="letter">סוֹכֶנֶת יַרְדֵּן,<br>הַמַּטֶּה הַסּוֹדִי זָקוּק לָךְ!<br>בַּחֶדֶר מֻסְתָּרִים חֲמִשָּׁה רְמָזִים.<br>בְּכָל רֶמֶז יֵשׁ אוֹת סוֹדִית.<br>אִסְפִי אֶת כָּל הָאוֹתִיּוֹת וְגַלִּי אֶת מִלַּת הַסּוֹד.<div class="sign">בְּהַצְלָחָה! הַמְּפַקֶּדֶת</div></div>' +
+          '<div class="row"><button class="btn go" type="button" id="go">יוֹצְאִים לַמְּשִׂימָה! ←</button></div>'
+          :
+          '<p class="lead">לַחֲצִי עַל הַמַּעֲטָפָה כְּדֵי לִפְתֹּחַ אוֹתָהּ.</p>' +
+          '<button type="button" class="envelope" id="env" aria-label="לפתוח את המעטפה"><span class="flap"></span><span class="seal">סוֹדִי בְּיוֹתֵר</span></button>'));
+      const env = $("#env");
+      if (env) env.addEventListener("click", () => {
+        env.classList.add("open"); chime(true);
+        setTimeout(() => { state.opened = true; render(); }, reduced ? 0 : 550);
+      });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(2));
+    },
+    clues() {
+      const i = state.clue, cl = CLUES[i];
+      const order = shuffledFor(i, [cl.answer].concat(cl.decoys));
+      let body = '<div class="eyebrow">שָׁלָב 3 · צֵיד רְמָזִים</div>' +
+        '<div class="clue" style="--c:' + cl.c + '"><div class="band"><span>רֶמֶז ' + (i + 1) + ' מִתּוֹךְ 5</span><span>?</span></div>' +
+        '<div class="riddle">' + cl.riddle + '</div></div>';
+      if (!state.clueSolved) {
+        body += '<p class="lead"><b>מָה אֲנִי?</b> לַחֲצִי עַל הַתְּמוּנָה הַנְּכוֹנָה.</p><div class="opts">' +
+          order.map(k => '<button type="button" class="opt" data-k="' + k + '">' + ICONS[k] + '<span>' + PLACES[k] + '</span></button>').join("") +
+          '</div><p class="feedback" id="fb"></p>';
+      } else if (!state.clueMoved) {
+        body += '<div class="move" style="--tint:' + cl.tint + '"><b>נָכוֹן! כָּל הַכָּבוֹד, סוֹכֶנֶת!</b><span>עַכְשָׁו: ' + cl.move + '</span>' +
+          '<button class="btn go" type="button" id="moved">עָשִׂיתִי! ✓</button></div>';
+      } else {
+        const last = i === CLUES.length - 1;
+        body += '<div class="move" style="--tint:' + cl.tint + '"><div class="found"><div class="bigletter" style="--c:' + cl.c + '">' + cl.letter + '</div><b>מָצָאת אוֹת סוֹדִית!</b></div>' +
+          '<button class="btn go" type="button" id="nextclue">' + (last ? 'לְלוּחַ הַפִּעְנוּחַ ←' : 'לָרֶמֶז הַבָּא ←') + '</button></div>';
+      }
+      body += bag();
+      h(body);
+      stage.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+        if (b.dataset.k === cl.answer) {
+          b.classList.add("right"); chime(true);
+          setTimeout(() => { state.clueSolved = true; render(); }, reduced ? 0 : 350);
+        } else {
+          b.classList.remove("wrong"); void b.offsetWidth; b.classList.add("wrong"); chime(false);
+          $("#fb").textContent = "כִּמְעַט! נַסִּי שׁוּב.";
+        }
+      }));
+      const mv = $("#moved");
+      if (mv) mv.addEventListener("click", () => {
+        state.clueMoved = true;
+        if (state.letters.length <= i) state.letters.push(cl.letter);
+        chime(true); render();
+      });
+      const nx = $("#nextclue");
+      if (nx) nx.addEventListener("click", () => {
+        if (i === CLUES.length - 1) { goto(3); return; }
+        state.clue++; state.clueSolved = false; state.clueMoved = false; render();
+      });
+    },
+    decode() {
+      const have = state.letters.length >= 5;
+      const pool = ["צ", "א", "ה", "י", "מ"];
+      let body = '<div class="eyebrow">שָׁלָב 4 · פִּעְנוּחַ</div><h2>לוּחַ פִּעְנוּחַ</h2>';
+      if (!have) {
+        body += '<p class="lead">עוֹד לֹא אָסַפְתְּ אֶת כָּל הָאוֹתִיּוֹת. חִזְרִי לְצֵיד הָרְמָזִים.</p><div class="row"><button class="btn" type="button" id="back">לְצֵיד הָרְמָזִים</button></div>' + bag();
+        h(body); $("#back").addEventListener("click", () => goto(2)); return;
+      }
+      body += '<p class="lead">לַחֲצִי עַל הָאוֹתִיּוֹת לְפִי הַסֵּדֶר, וְגַלִּי אֶת מִלַּת הַסּוֹד!</p>' +
+        '<div class="slots' + (state.decoded ? ' win' : '') + '">' + [0, 1, 2, 3, 4].map(k =>
+          '<div class="s' + (state.decode[k] ? ' full' : '') + '">' + (state.decode[k] || '') + '</div>').join("") + '</div>';
+      if (state.decoded) {
+        body += '<div class="winword">אַמִּיצָה! בְּדִיּוּק כְּמוֹ שֶׁאַתְּ.</div><div class="row" style="justify-content:center"><button class="btn go" type="button" id="go">לְמַעְבֶּדֶת הַכְּתִיבָה ←</button></div>';
+      } else {
+        const used = state.decode.slice();
+        body += '<div class="tiles">' + pool.map(l => {
+          const idx = used.indexOf(l); const off = idx > -1; if (off) used[idx] = null;
+          return '<button type="button" class="tile" data-l="' + l + '"' + (off ? ' disabled' : '') + '>' + l + '</button>';
+        }).join("") + '</div><p class="feedback" id="fb" style="text-align:center"></p>' +
+          '<div class="row" style="justify-content:center"><button class="btn alt" type="button" id="reset">מֵחָדָשׁ</button><button class="btn alt" type="button" id="hint">רֶמֶז קָטָן</button></div>';
+      }
+      h(body);
+      stage.querySelectorAll(".tile").forEach(b => b.addEventListener("click", () => {
+        state.decode.push(b.dataset.l);
+        if (state.decode.length === 5) {
+          if (state.decode.join("") === SECRET.join("")) { state.decoded = true; chime(true); render(); burst(); return; }
+          chime(false); render(); $("#fb").textContent = "כִּמְעַט! נַסִּי סֵדֶר אַחֵר.";
+          setTimeout(() => { state.decode = []; render(); }, 1300); return;
+        }
+        render();
+      }));
+      const r = $("#reset"); if (r) r.addEventListener("click", () => { state.decode = []; render(); });
+      const hi = $("#hint"); if (hi) hi.addEventListener("click", () => { $("#fb").textContent = "הַמִּלָּה מַתְחִילָה בָּאוֹת א."; });
+      const go = $("#go"); if (go) go.addEventListener("click", () => goto(4));
+    },
+    write() {
+      h('<div class="eyebrow">שָׁלָב 5 · כְּתִיבָה</div><h2>מַעְבֶּדֶת הַכְּתִיבָה הַסּוֹדִית</h2>' +
+        '<p class="lead">כִּתְבִי בָּאֶצְבַּע אֶת מִלַּת הַסּוֹד. אֶפְשָׁר לִבְחֹר צֶבַע!</p>' +
+        '<div class="row"><div class="swatches" id="sw"></div><button class="btn alt" type="button" id="ghostbtn">הַרְאִי לִי אֶת הַמִּלָּה</button></div>' +
+        '<div class="pad-wrap"><div class="ghost" id="ghost" hidden>אַמִּיצָה</div><canvas id="pad" aria-label="לוח כתיבה"></canvas></div>' +
+        '<div class="row"><button class="btn alt" type="button" id="clear">מַחֲקִי</button><button class="btn go" type="button" id="done">סִיַּמְתִּי! ✓</button></div><p class="feedback" id="fb"></p>');
+      const pad = makePad($("#pad"), 9);
+      swatches($("#sw"), pad);
+      $("#ghostbtn").addEventListener("click", () => { const g = $("#ghost"); g.hidden = !g.hidden; });
+      $("#clear").addEventListener("click", () => pad.clear());
+      $("#done").addEventListener("click", () => { chime(true); burst(); $("#fb").textContent = "וָאוּ! כָּתַבְתְּ אֶת מִלַּת הַסּוֹד!"; setTimeout(() => goto(5), reduced ? 900 : 1600); });
+    },
+    comic() {
+      const tags = ["בַּהַתְחָלָה", "בָּאֶמְצַע", "בַּסּוֹף"];
+      h('<div class="eyebrow">שָׁלָב 6 · קוֹמִיקְס</div><h2>הַמְּשִׂימָה שֶׁלִּי</h2>' +
+        '<p class="lead">צַיְּרִי מָה קָרָה בַּמְּשִׂימָה. מִתַּחַת לְכָל צִיּוּר – מִלָּה אַחַת.</p>' +
+        '<div class="swatches" id="sw"></div>' +
+        '<div class="comic">' + tags.map((t, k) =>
+          '<div class="panel"><div class="tag">' + t + '</div><canvas id="cv' + k + '" aria-label="ציור ' + t + '"></canvas><input id="w' + k + '" type="text" placeholder="מִלָּה אַחַת" autocomplete="off" dir="rtl" aria-label="מילה ' + t + '"></div>').join("") +
+        '</div><div class="row"><button class="btn go" type="button" id="go">סִיַּמְתִּי אֶת הַקּוֹמִיקְס ←</button></div>');
+      const pads = [0, 1, 2].map(k => makePad($("#cv" + k), 5));
+      swatches($("#sw"), { setColor: c => pads.forEach(p => p.setColor(c)) });
+      $("#go").addEventListener("click", () => { chime(true); goto(6); });
+    },
+    reverse() {
+      const moves = [["jump", "בִּקְפִיצוֹת"], ["crawl", "בִּזְחִילָה"], ["robot", "כְּמוֹ רוֹבּוֹט"]];
+      if (state.revSent) {
+        h('<div class="eyebrow">שָׁלָב 7 · הִפּוּךְ תַּפְקִידִים</div><h2>הָרֶמֶז שֶׁלָּךְ מוּכָן!</h2>' +
+          '<div class="secret"><div class="t">הוֹדָעָה סוֹדִית מֵהַסּוֹכֶנֶת יַרְדֵּן</div>' +
+          '<div class="m">חַפְּשִׂי אוֹתִי לְיַד: ' + esc(state.revPlace) + '<br>לְכִי לְשָׁם ' + state.revMove + '!</div></div>' +
+          '<p class="lead">תְּנִי לַמּוֹרָה לִקְרֹא. אִם הִיא טוֹעָה – תַּקְּנִי אוֹתָהּ!</p>' +
+          '<div class="row"><button class="btn alt" type="button" id="again">עוֹד רֶמֶז</button><button class="btn go" type="button" id="go">לַסִּיּוּם ←</button></div>');
+        $("#again").addEventListener("click", () => { state.revSent = false; state.revPlace = ""; state.revMove = ""; render(); });
+        $("#go").addEventListener("click", () => goto(7));
+        return;
+      }
+      h('<div class="eyebrow">שָׁלָב 7 · הִפּוּךְ תַּפְקִידִים</div><h2>עַכְשָׁו אַתְּ הַמְּפַקֶּדֶת!</h2>' +
+        '<p class="lead">הַחְבִּיאִי מַשֶּׁהוּ בַּחֶדֶר, וְכִתְבִי לַמּוֹרָה אֵיפֹה לְחַפֵּשׂ.</p>' +
+        '<label class="lead" for="place"><b>חַפְּשִׂי אוֹתִי לְיַד:</b></label>' +
+        '<input class="write-in" id="place" type="text" autocomplete="off" dir="rtl" value="' + esc(state.revPlace) + '">' +
+        '<div class="eyebrow">צְרִיכָה עֶזְרָה? הִנֵּה מִלִּים שֶׁאֶפְשָׁר לְהַעְתִּיק:</div>' +
+        '<div class="chips">' + Object.keys(PLACES).map(k => '<span class="chip" style="cursor:default">' + ICONS[k] + PLACES[k] + '</span>').join("") + '</div>' +
+        '<div class="lead"><b>אֵיךְ הִיא תָּזוּז?</b></div>' +
+        '<div class="chips">' + moves.map(m => '<button type="button" class="chip' + (state.revMove === m[1] ? ' on' : '') + '" data-m="' + m[1] + '" aria-pressed="' + (state.revMove === m[1]) + '">' + ICONS[m[0]] + m[1] + '</button>').join("") + '</div>' +
+        '<div class="row"><button class="btn go" type="button" id="send">שִׁלְחִי אֶת הָרֶמֶז ←</button></div><p class="feedback" id="fb"></p>');
+      const input = $("#place");
+      input.addEventListener("input", () => { state.revPlace = input.value; });
+      stage.querySelectorAll("button.chip").forEach(b => b.addEventListener("click", () => { state.revMove = b.dataset.m; state.revPlace = input.value; render(); $("#place").focus(); }));
+      $("#send").addEventListener("click", () => {
+        state.revPlace = input.value.trim();
+        if (!state.revPlace) { $("#fb").textContent = "כִּתְבִי מִלָּה אַחַת – אֵיפֹה לְחַפֵּשׂ?"; return; }
+        if (!state.revMove) { $("#fb").textContent = "בַּחֲרִי אֵיךְ הִיא תָּזוּז."; return; }
+        state.revSent = true; chime(true); render();
+      });
+    },
+    finish() {
+      const done = state.moodEnd > 0;
+      let body = '<div class="eyebrow">שָׁלָב 8 · סִיּוּם</div>';
+      if (!done) {
+        body += '<h2>מַד הָאֹמֶץ – עַכְשָׁו</h2><p class="lead">אַחֲרֵי הַמְּשִׂימָה, כַּמָּה אַתְּ מַרְגִּישָׁה מוּכָנָה לִקְרֹא וְלִכְתֹּב?</p>' + moodGrid("moodEnd");
+        h(body); bindMoods("moodEnd", burst); return;
+      }
+      const s = state.moodStart, e = state.moodEnd;
+      body += '<div class="cert">' +
+        '<svg width="90" height="90" viewBox="0 0 150 150" aria-hidden="true"><polygon points="75,8 93,52 140,55 104,85 116,132 75,106 34,132 46,85 10,55 57,52" fill="#F2A900" stroke="#1E2A4A" stroke-width="7" stroke-linejoin="round"/><circle cx="75" cy="72" r="18" fill="#fff" stroke="#1E2A4A" stroke-width="5"/></svg>' +
+        '<h3>תְּעוּדַת סוֹכֶנֶת אַמִּיצָה</h3><p>מוּעֶנֶקֶת לַסּוֹכֶנֶת</p><div class="name">יַרְדֵּן</div>' +
+        '<p>עַל שֶׁפִּעְנְחָה אֶת הַקּוֹד הַסּוֹדִי,<br>קָרְאָה חֲמִשָּׁה רְמָזִים וְכָתְבָה בְּאֹמֶץ!</p>' +
+        (s ? '<div class="compare"><span>מַד הָאֹמֶץ:</span><span class="pill">בַּהַתְחָלָה ' + s + '</span><span>←</span><span class="pill" style="background:#E3F4E1">עַכְשָׁו ' + e + '</span></div>' : '') +
+        '</div><div class="row" style="justify-content:center"><button class="btn alt" type="button" id="redo">לְשַׁנּוֹת אֶת הַמַּד</button><button class="btn" type="button" id="party">עוֹד קוֹנְפֶטִי!</button></div>';
+      h(body);
+      $("#redo").addEventListener("click", () => { state.moodEnd = 0; render(); });
+      $("#party").addEventListener("click", () => { chime(true); burst(); });
+    }
+  };
+
+  function bag() {
+    return '<div class="bag"><span class="eyebrow">הָאוֹתִיּוֹת שֶׁלִּי:</span>' + [0, 1, 2, 3, 4].map(k =>
+      '<span class="slot' + (state.letters[k] ? ' full' : '') + '">' + (state.letters[k] || '') + '</span>').join("") + '</div>';
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch])); }
+  const orders = {};
+  function shuffledFor(i, arr) {
+    if (!orders[i]) { orders[i] = arr.slice().sort(() => Math.random() - 0.5); }
+    return orders[i];
+  }
+
+  /* ---------- drawing pads ---------- */
+  function makePad(canvas, width) {
+    const ctx = canvas.getContext("2d");
+    let color = "#1E2A4A", drawing = false, last = null;
+    function size() {
+      const r = canvas.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+      const img = canvas.width ? ctx.getImageData(0, 0, canvas.width, canvas.height) : null;
+      canvas.width = Math.max(1, Math.round(r.width * d)); canvas.height = Math.max(1, Math.round(r.height * d));
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+      if (img) ctx.putImageData(img, 0, 0);
+    }
+    size();
+    const pt = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    canvas.addEventListener("pointerdown", e => { drawing = true; last = pt(e); try { canvas.setPointerCapture(e.pointerId); } catch (x) {} dot(last); });
+    canvas.addEventListener("pointermove", e => { if (!drawing) return; const p = pt(e); line(last, p); last = p; });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => canvas.addEventListener(t, () => { drawing = false; }));
+    function style() { ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width; ctx.lineCap = "round"; ctx.lineJoin = "round"; }
+    function dot(p) { style(); ctx.beginPath(); ctx.arc(p.x, p.y, width / 2, 0, Math.PI * 2); ctx.fill(); }
+    function line(a, b) { style(); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    return {
+      setColor(c) { color = c; },
+      clear() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore(); }
+    };
+  }
+  function swatches(el, pad) {
+    const cols = ["#1E2A4A", "#FF6B5B", "#F2A900", "#1FB3A5", "#7B61FF", "#4CAF50"];
+    const names = ["כחול כהה", "כתום-אדום", "צהוב", "טורקיז", "סגול", "ירוק"];
+    el.innerHTML = cols.map((c, i) => '<button type="button" class="swatch' + (i === 0 ? ' on' : '') + '" style="background:' + c + '" data-c="' + c + '" aria-label="' + names[i] + '"></button>').join("");
+    el.querySelectorAll(".swatch").forEach(b => b.addEventListener("click", () => {
+      el.querySelectorAll(".swatch").forEach(x => x.classList.remove("on")); b.classList.add("on"); pad.setColor(b.dataset.c);
+    }));
+  }
+
+  /* ---------- confetti ---------- */
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cf = $("#confetti"), cx = cf.getContext("2d");
+  let parts = [], raf = 0;
+  function burst() {
+    if (reduced) return;
+    const d = window.devicePixelRatio || 1;
+    cf.width = innerWidth * d; cf.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0);
+    const cols = ["#FF6B5B", "#F2A900", "#1FB3A5", "#7B61FF", "#4CAF50"];
+    for (let i = 0; i < 140; i++) parts.push({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - 0.5) * 12, vy: Math.random() * -12 - 3, r: Math.random() * 6 + 4, c: cols[i % 5], a: Math.random() * 6, life: 0 });
+    if (!raf) tick();
+  }
+  function tick() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => { p.vy += 0.35; p.x += p.vx; p.y += p.vy; p.a += 0.2; p.life++;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.a); cx.fillStyle = p.c; cx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); cx.restore(); });
+    parts = parts.filter(p => p.y < innerHeight + 20 && p.life < 240);
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  /* ---------- navigation ---------- */
+  function goto(n) {
+    state.step = Math.max(0, Math.min(STEPS.length - 1, n));
+    render();
+    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  }
+  function route() {
+    const r = $("#route");
+    r.innerHTML = STEPS.map((s, i) =>
+      (i ? '<span class="path" aria-hidden="true"></span>' : '') +
+      '<button type="button" class="stop' + (i < state.step ? ' done' : '') + (i === state.step ? ' now' : '') + '" data-i="' + i + '" aria-label="שלב ' + (i + 1) + '"' + (i === state.step ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>').join("");
+    r.querySelectorAll(".stop").forEach(b => b.addEventListener("click", () => goto(+b.dataset.i)));
+  }
+  function render() {
+    route();
+    VIEWS[STEPS[state.step]]();
+    $("#prev").disabled = state.step === 0;
+    $("#next").disabled = state.step === STEPS.length - 1;
+  }
+  $("#prev").addEventListener("click", () => goto(state.step - 1));
+  $("#next").addEventListener("click", () => goto(state.step + 1));
+
+  render();
+})();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

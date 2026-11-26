@@ -1,0 +1,186 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>בינגו שורשים לכיתה ד׳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap">
+<style>
+/* layout: game bar on top; draw station (root card + buttons) beside a 4x4 stamp board; stacks on narrow screens */
+:root{
+  --bg:#eef3f8;--panel:#ffffff;--fg:#1d2a44;--muted:#5d6a85;--line:#cdd8e6;
+  --accent:#2563c9;--accent-ink:#ffffff;--hit:#1f9d5c;--miss:#d4483d;--gold:#f2b632;--hint:#ffe58a;
+  --font:"Rubik","Arial Hebrew","Arial",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111827;--panel:#1b2437;--fg:#e9eef7;--muted:#9ba8c2;--line:#2e3a55;--accent:#5b9bf0;--accent-ink:#0d1526;--hit:#3cc07c;--miss:#f0706a;--gold:#f5c451;--hint:#5c4d14;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111827;--panel:#1b2437;--fg:#e9eef7;--muted:#9ba8c2;--line:#2e3a55;--accent:#5b9bf0;--accent-ink:#0d1526;--hit:#3cc07c;--miss:#f0706a;--gold:#f5c451;--hint:#5c4d14;color-scheme:dark}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);direction:rtl;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-weight:900;font-size:clamp(1.6rem,4vw,2.3rem);color:var(--accent);flex:1 1 auto;text-wrap:balance}
+.chip{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;gap:6px;align-items:center}
+.chip b{font-weight:800}
+button{font-family:var(--font);cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.icon{background:var(--panel);border:2px solid var(--line);color:var(--fg);border-radius:999px;width:42px;height:42px;font-size:1.2rem}
+.game{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.game{grid-template-columns:1fr}}
+.station{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.label{color:var(--muted);font-size:.95rem;letter-spacing:.02em}
+.rootcard{perspective:600px;height:120px}
+.rootinner{height:100%;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:900;letter-spacing:.12em;transition:transform .45s}
+.rootinner.flip{transform:rotateX(90deg)}
+.rootinner.idle{background:var(--line);color:var(--muted);font-size:1.4rem;letter-spacing:0}
+#msg{min-height:3em;font-weight:600;font-size:1.05rem;display:flex;align-items:center;justify-content:center}
+#msg.ok{color:var(--hit)}#msg.bad{color:var(--miss)}
+.btn{font-weight:800;font-size:1.15rem;padding:12px 16px;border-radius:12px;border:3px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.alt{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.pulse{animation:pulse 1s infinite;background:var(--hint);color:var(--fg);border-color:var(--gold)}
+@keyframes pulse{50%{transform:scale(1.05)}}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cell{position:relative;aspect-ratio:1/0.8;max-width:100%;border:3px solid var(--line);background:var(--panel);color:var(--fg);border-radius:14px;font:800 clamp(1.05rem,2.6vw,1.7rem) var(--font);display:flex;align-items:center;justify-content:center;padding:4px;transition:transform .15s,border-color .15s}
+.cell:not(:disabled):hover{border-color:var(--accent);transform:translateY(-2px)}
+.cell .rt{color:var(--gold)}
+.cell.on{border-color:var(--hit);cursor:default}
+.cell.on::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3.2rem;color:var(--hit);opacity:.22;animation:stamp .35s ease-out}
+@keyframes stamp{from{transform:scale(2.2) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:.22}}
+.cell.win{background:var(--hit);color:var(--accent-ink);border-color:var(--hit)}
+.cell.win .rt{color:var(--accent-ink);text-decoration:underline}
+.cell.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.cell.glow{animation:glow 1s infinite;border-color:var(--gold)}
+@keyframes glow{50%{background:var(--hint)}}
+.how{color:var(--muted);font-size:.95rem;line-height:1.6;max-width:70ch}
+.overlay{position:fixed;inset:0;background:rgba(10,16,30,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.modal{background:var(--panel);border-radius:20px;padding:26px 24px;max-width:380px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;animation:pop .4s}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.modal h2{margin:0;font-size:2.4rem;font-weight:900;color:var(--hit)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:var(--bg);border-radius:10px;padding:8px 4px;font-variant-numeric:tabular-nums}
+.stats b{display:block;font-size:1.4rem}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:6}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="fx"></canvas>
+<div class="wrap">
+  <div class="bar">
+    <h1>בינגו שורשים</h1>
+    <div class="chip">⏱ <b id="time">0:00</b></div>
+    <div class="chip">⭐ <b id="score">0</b></div>
+    <div class="chip">שיא: <b id="best">—</b></div>
+    <button class="icon" id="mute" aria-label="השתקה">🔊</button>
+  </div>
+
+  <div class="game">
+    <div class="station">
+      <div class="label">השורש שהוגרל</div>
+      <div class="rootcard"><div class="rootinner idle" id="root">לחצו "התחל"</div></div>
+      <div id="msg">מוצאים בלוח מילה מהשורש ולוחצים עליה</div>
+      <button class="btn" id="start">▶ התחל משחק</button>
+      <button class="btn alt" id="none" disabled>אין בלוח!</button>
+      <div class="label" id="left"></div>
+    </div>
+    <div class="board" id="board"></div>
+  </div>
+
+  <p class="how"><b>איך משחקים:</b> מוגרל שורש. מחפשים בלוח מילה מאותו שורש ולוחצים עליה. אם אין בלוח מילה מהשורש, לוחצים "אין בלוח!". מילה נכונה = 10 נקודות. אחרי 2 טעויות, הלוח נותן רמז. בינגו = שורה, טור או אלכסון מלאים. בכל משחק יש לוח חדש.</p>
+</div>
+
+<div class="overlay" id="win" hidden>
+  <div class="modal">
+    <h2>בינגו! 🎉</h2>
+    <div id="winmsg"></div>
+    <div class="stats">
+      <div>זמן<b id="wtime"></b></div>
+      <div>נקודות<b id="wscore"></b></div>
+      <div>טעויות<b id="werr"></b></div>
+    </div>
+    <button class="btn" id="again">משחק חדש</button>
+  </div>
+</div>
+
+<script>
+const BANK=[["מכתב","כתב"],["תלמיד","למד"],["שומר","שמר"],["ספרייה","ספר"],["מגדל","גדל"],["מזכרת","זכר"],["עבודה","עבד"],["דיבור","דבר"],["מפתח","פתח"],["שליח","שלח"],["ריקוד","רקד"],["מסגרת","סגר"],["מחברת","חבר"],["משחק","שחק"],["מטבח","טבח"],["תלבושת","לבש"],["מחשב","חשב"],["שאלה","שאל"],["צחוק","צחק"],["אוכל","אכל"],["כביסה","כבס"],["משקל","שקל"],["מדבקה","דבק"],["חלום","חלם"],["מבחן","בחן"],["משפחה","שפח"],["מסעדה","סעד"],["מברשת","ברש"],["מצלמה","צלם"],["מנעול","נעל"],["מדפסת","דפס"],["מקלדת","קלד"],["מדרכה","דרך"],["מנהל","נהל"],["שבירה","שבר"],["כניסה","כנס"],["קפיצה","קפץ"],["נשיקה","נשק"]];
+const FIN={"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"},TOFIN={"כ":"ך","מ":"ם","נ":"ן","פ":"ף","צ":"ץ"};
+const norm=c=>FIN[c]||c;
+const showRoot=r=>{const a=r.split("").map(norm);a[2]=TOFIN[a[2]]||a[2];return a.join("-")};
+function markRoot(w,r){const rr=r.split("").map(norm);let k=0,out="";for(const ch of w){if(k<3&&norm(ch)===rr[k]){out+=`<span class="rt">${ch}</span>`;k++}else out+=ch}return out}
+const $=id=>document.getElementById(id);
+const B=$("board"),R=$("root"),M=$("msg"),S=$("start"),N=$("none");
+let words,deck,cur,marked,score,errs,turnErr,t0,tick,busy,playing,muted=false;
+try{muted=localStorage.getItem("rb4-mute")==="1"}catch(e){}
+$("mute").textContent=muted?"🔇":"🔊";
+function best(){try{return +localStorage.getItem("rb4-best")||0}catch(e){return 0}}
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+function showBest(){const b=best();$("best").textContent=b?fmt(b):"—"}
+showBest();
+
+/* ---- sound ---- */
+let ac;
+function tone(f,d,type="sine",when=0,vol=.18){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;const t=ac.currentTime+when;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+const sfx={
+  draw:()=>{tone(520,.08,"triangle");tone(700,.1,"triangle",.07)},
+  ok:()=>{tone(660,.12);tone(880,.12,"sine",.1);tone(1320,.2,"sine",.2)},
+  bad:()=>{tone(180,.25,"sawtooth",0,.12);tone(140,.3,"sawtooth",.12,.1)},
+  win:()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.25,"triangle",i*.13))
+};
+
+/* ---- confetti ---- */
+const cv=$("fx"),cx=cv.getContext("2d");let parts=[],raf;
+function confetti(){cv.width=innerWidth;cv.height=innerHeight;const cols=["#2563c9","#1f9d5c","#f2b632","#d4483d","#8b5cf6"];parts=Array.from({length:160},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.5,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,s:6+Math.random()*6,r:Math.random()*6,c:cols[Math.floor(Math.random()*5)]}));cancelAnimationFrame(raf);(function f(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.r+=.1;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});parts=parts.filter(p=>p.y<cv.height+20);if(parts.length)raf=requestAnimationFrame(f);else cx.clearRect(0,0,cv.width,cv.height)})()}
+
+/* ---- game ---- */
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function say(t,c){M.textContent=t;M.className=c||""}
+function upd(){$("score").textContent=score;$("left").textContent=playing?`נשארו ${deck.length} שורשים בערימה`:""}
+function newBoard(){
+  const pool=shuffle(BANK.slice());words=pool.slice(0,16);const traps=pool.slice(16,20).map(w=>w[1]);
+  deck=shuffle(words.map(w=>w[1]).concat(traps));cur=null;marked=new Set();score=0;errs=0;turnErr=0;busy=false;playing=false;
+  clearInterval(tick);$("time").textContent="0:00";B.innerHTML="";
+  words.forEach(([w],i)=>{const b=document.createElement("button");b.className="cell";b.id="c"+i;b.textContent=w;b.disabled=true;b.onclick=()=>pick(i);B.appendChild(b)});
+  R.className="rootinner idle";R.textContent='לחצו "התחל"';S.hidden=false;N.disabled=true;say("מוצאים בלוח מילה מהשורש ולוחצים עליה");upd();
+}
+function start(){
+  playing=true;S.hidden=true;t0=Date.now();
+  tick=setInterval(()=>$("time").textContent=fmt(Math.floor((Date.now()-t0)/1000)),500);
+  [...B.children].forEach((b,i)=>b.disabled=marked.has(i));next();
+}
+function next(){
+  if(!deck.length)return;
+  cur=deck.pop();turnErr=0;busy=true;R.classList.add("flip");
+  setTimeout(()=>{R.className="rootinner";R.textContent=showRoot(cur);sfx.draw();busy=false;N.disabled=false},230);
+  say("איזו מילה מהשורש הזה?");upd();
+}
+function clearHints(){document.querySelectorAll(".glow").forEach(e=>e.classList.remove("glow"));N.classList.remove("pulse")}
+function good(t){score+=10;say(t,"ok");sfx.ok();clearHints();upd();busy=true;N.disabled=true;if(!checkWin())setTimeout(next,1000)}
+function wrong(t,el){errs++;turnErr++;say(t,"bad");sfx.bad();if(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}
+  if(turnErr>=2){const i=words.findIndex(w=>w[1]===cur);if(i>=0)$("c"+i).classList.add("glow");else N.classList.add("pulse");say("רמז: תסתכלו על מה שמהבהב","bad")}}
+function pick(i){
+  if(!playing||busy||marked.has(i))return;const el=$("c"+i);
+  if(words[i][1]===cur){marked.add(i);el.classList.add("on");el.disabled=true;el.innerHTML=markRoot(words[i][0],cur);good(`נכון! ${words[i][0]} מהשורש ${showRoot(cur)}`)}
+  else wrong(`לא, ${words[i][0]} לא מהשורש הזה. נסו שוב`,el);
+}
+function none(){
+  if(!playing||busy)return;
+  if(words.some(w=>w[1]===cur))wrong("יש בלוח מילה מהשורש הזה. חפשו שוב");
+  else good(`נכון! אין בלוח מילה מהשורש ${showRoot(cur)}`);
+}
+function checkWin(){
+  const L=[];for(let r=0;r<4;r++){L.push([0,1,2,3].map(c=>r*4+c));L.push([0,1,2,3].map(c=>c*4+r))}L.push([0,5,10,15],[3,6,9,12]);
+  const line=L.find(l=>l.every(i=>marked.has(i)));if(!line)return false;
+  playing=false;clearInterval(tick);const secs=Math.floor((Date.now()-t0)/1000);
+  line.forEach((i,k)=>setTimeout(()=>$("c"+i).classList.add("win"),k*120));
+  [...B.children].forEach(b=>b.disabled=true);N.disabled=true;
+  const b=best();let rec=false;if(!b||secs<b){rec=true;try{localStorage.setItem("rb4-best",secs)}catch(e){}}showBest();
+  setTimeout(()=>{sfx.win();confetti();$("wtime").textContent=fmt(secs);$("wscore").textContent=score;$("werr").textContent=errs;
+    $("winmsg").textContent=rec&&b?"שיא חדש! 🏆":(rec?"השיא הראשון שלך!":"כל הכבוד!");$("win").hidden=false;$("again").focus()},600);
+  return true;
+}
+S.onclick=start;N.onclick=none;
+$("again").onclick=()=>{$("win").hidden=true;newBoard()};
+$("mute").onclick=()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊";try{localStorage.setItem("rb4-mute",muted?"1":"0")}catch(e){}};
+newBoard();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>

@@ -1,0 +1,367 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>מערת הגאות</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: מסע במערה – פס שלבים דביק, תחנה אחת בכל פעם; תחנות רענון מקבלות רקע חולי וכוכב */
+:root{
+  --paper:#edf1f0; --card:#f8faf9; --ink:#17282b; --muted:#566a6d; --line:#c3d0cf;
+  --sea:#1f6f78; --accent:#c4572a; --sand:#f3e6c8; --tamar:#d99a1e; --ido:#2f6fb5;
+  --blue:#2f6fb5; --green:#2f7a4f; --orange:#b8641c; --purple:#6b4a9a; --red:#b0303a;
+  --display:"Secular One","Assistant",system-ui,sans-serif; --body:"Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11191b; --card:#1a2427; --ink:#e4ecea; --muted:#9fb1b2; --line:#30403f;
+  --sea:#5fbcc6; --accent:#f08a5d; --sand:#3a3222; --tamar:#f2c25a; --ido:#7fb0ea;
+  --blue:#7fb0ea; --green:#7cc79a; --orange:#e7a462; --purple:#b597e0; --red:#f0808a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11191b; --card:#1a2427; --ink:#e4ecea; --muted:#9fb1b2; --line:#30403f;
+  --sea:#5fbcc6; --accent:#f08a5d; --sand:#3a3222; --tamar:#f2c25a; --ido:#7fb0ea;
+  --blue:#7fb0ea; --green:#7cc79a; --orange:#e7a462; --purple:#b597e0; --red:#f0808a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6;direction:rtl;text-align:right}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;padding-block:10px}
+h1{font-family:var(--display);font-weight:400;font-size:1.5rem;margin:0;line-height:1.2}
+.sub{color:var(--muted);font-size:.9rem}
+.clock{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.clock b{font-size:1.25rem}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px}
+button:hover{border-color:var(--sea)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.word:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+button.primary{background:var(--sea);color:var(--paper);border-color:var(--sea);font-weight:700}
+.trail{display:flex;gap:4px;overflow-x:auto;padding-block:0 10px}
+.trail button{flex:1 0 auto;border-radius:20px;font-size:.85rem;padding:4px 12px;white-space:nowrap}
+.trail button.rf{background:var(--sand)}
+.trail button[aria-current="step"]{background:var(--sea);color:var(--paper);border-color:var(--sea)}
+.trail button.done{border-style:dashed;color:var(--muted)}
+main{padding-top:20px}
+main.refresh{background:var(--sand);border-radius:0 0 16px 16px}
+.stage-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:12px}
+h2{font-family:var(--display);font-weight:400;font-size:1.9rem;margin:0;text-wrap:balance}
+h3{margin:0;font-size:1.15rem}
+.mins{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.kind{font-size:.85rem;border:1px solid var(--line);border-radius:12px;padding:1px 10px;color:var(--muted)}
+.goal{color:var(--muted);margin:0 0 16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.tip{border-right:4px solid var(--accent);padding:6px 12px;background:var(--card);border-radius:4px;font-size:.95rem}
+.tip b{color:var(--accent)}
+label{font-weight:600;display:block;margin-bottom:4px}
+input[type=text],textarea,select{width:100%;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);text-align:right}
+textarea{min-height:60px;resize:vertical}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px}
+.reveal{font-size:.92rem;color:var(--muted);margin-top:6px}
+.link{background:none;border:none;color:var(--sea);text-decoration:underline;padding:0;font-size:.9rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.grid2>*{min-width:0}
+.teacher{font-size:.9rem;color:var(--muted)}
+.chans{display:flex;flex-wrap:wrap;gap:8px}
+.chan{border:1px solid var(--line);border-radius:20px;padding:4px 14px;background:var(--card);font-weight:600}
+/* story */
+.modes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.modes .mt[aria-pressed="true"]{background:var(--tamar);border-color:var(--tamar);color:#1b1404;font-weight:700}
+.modes .mi[aria-pressed="true"]{background:var(--ido);border-color:var(--ido);color:var(--paper);font-weight:700}
+.para{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.para .n{font-family:var(--display);color:var(--sea);min-width:2ch}
+.para .who{font-size:.8rem;color:var(--muted);display:block}
+.para p{margin:0;min-width:0}
+.word{cursor:pointer;border-radius:3px}
+.word.t{background:color-mix(in srgb,var(--tamar) 38%,transparent)}
+.word.i{background:color-mix(in srgb,var(--ido) 30%,transparent)}
+.stop{margin:10px 0;padding:12px;border:2px solid var(--accent);border-radius:10px;background:var(--paper)}
+.stop h3{color:var(--accent);margin-bottom:6px;font-size:1.05rem}
+/* waves */
+.waves{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.orb{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--sea) 55%,var(--card)),var(--sea));transform:scale(.55);transition:transform 4s ease-in-out}
+.orb.in{transform:scale(1)}
+.wavecount{font-family:var(--display);font-size:1.4rem}
+@media (prefers-reduced-motion:reduce){.orb{transition:none}}
+/* statues */
+.statue{background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.statue .who2{font-weight:700}
+.statue.t .who2{color:var(--tamar)} .statue.i .who2{color:var(--ido)}
+/* figures */
+.figs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.figs{grid-template-columns:1fr}}
+.fig{border:2px solid var(--c);border-radius:14px;padding:12px;background:var(--card);display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.fig h3{color:var(--c)}
+.fig svg{display:block}
+.notes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%}
+.note{background:color-mix(in srgb,var(--c) 22%,var(--card));border:1px solid var(--c);border-radius:4px;padding:6px 10px;max-width:100%;font-size:.95rem;box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 15%,transparent)}
+.note b{display:block}
+.note small{color:var(--muted)}
+.note button{font-size:.75rem;padding:0 6px;margin-top:4px}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.bank button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.adder{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;align-items:end}
+@media (max-width:620px){.adder{grid-template-columns:1fr}}
+.adder>*{min-width:0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:right;vertical-align:top}
+th{background:var(--paper)}
+/* change path */
+.tape{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:28px}
+.tape::before{content:"";position:absolute;top:12px;right:4%;left:4%;height:6px;background:repeating-linear-gradient(90deg,var(--accent) 0 14px,transparent 14px 22px);border-radius:3px}
+.pt{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;position:relative}
+.pt .dot{position:absolute;top:-24px;width:22px;height:22px;border-radius:50%;background:var(--card);border:3px solid var(--accent)}
+.pt.on .dot{background:var(--accent)}
+.pt button{font-size:.9rem}
+@media (max-width:620px){.tape{grid-template-columns:1fr 1fr}.tape::before{display:none}.pt .dot{position:static}}
+/* detective & cards */
+.formula{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:end}
+.formula .op{font-family:var(--display);font-size:1.6rem;color:var(--accent);padding-bottom:4px}
+@media (max-width:640px){.formula{grid-template-columns:1fr}.formula .op{text-align:center;padding:0}}
+.decks{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.deck{border-width:2px;padding:12px 10px;font-weight:700;border-radius:12px}
+.flip{min-height:150px;border-radius:14px;border:3px solid var(--c,var(--line));background:var(--card);padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.flip .cat{font-weight:700;color:var(--c)}
+.flip .q{font-size:1.2rem;font-weight:600}
+.flip .a{color:var(--muted)}
+.steps{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sd{width:22px;height:22px;border-radius:50%;border:2px solid var(--sea)}
+.sd.on{background:var(--sea)}
+.exit{width:26px;height:22px;border-radius:13px 13px 0 0;background:var(--accent)}
+/* post */
+.phone{max-width:360px;border:2px solid var(--line);border-radius:22px;padding:14px;background:var(--paper);display:flex;flex-direction:column;gap:8px}
+.phone .grp{font-weight:700;text-align:center;border-bottom:1px solid var(--line);padding-bottom:6px}
+.bubble{align-self:flex-start;background:color-mix(in srgb,var(--tamar) 30%,var(--card));border-radius:14px 14px 14px 4px;padding:8px 12px;max-width:90%;white-space:pre-wrap;min-height:40px}
+.bubble small{display:block;font-weight:700;color:var(--orange)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button[aria-pressed="true"],.rate button[aria-pressed="true"]{background:var(--sea);color:var(--paper);border-color:var(--sea)}
+.rate{display:flex;gap:8px}
+.rate button{width:48px;height:48px;font-size:1.2rem;font-weight:700;border-radius:50%}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div><h1>מערת הגאות</h1><div class="sub">שיעור · 45 דקות · אפיון דמות + תחנות רענון</div></div>
+      <div class="clock">
+        <span>זמן שיעור</span><b id="clk">00:00</b><span class="sub">/ 45:00</span>
+        <button id="clkBtn" class="primary" type="button">התחל</button>
+        <button id="clkReset" type="button" aria-label="אפס שעון">אפס</button>
+      </div>
+    </div>
+    <nav class="trail" id="trail" aria-label="שלבי השיעור"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<script>
+(function(){
+const P='eyalcave-';
+const store={get(k,d){try{const v=localStorage.getItem(P+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(P+k,JSON.stringify(v))}catch(e){}}};
+
+const story=[
+ 'תמר תמיד הייתה הראשונה. ראשונה לקפוץ למים, ראשונה לטפס על הסלע הגבוה, ראשונה להרים יד בכיתה – גם כשלא הייתה בטוחה בתשובה. "מי שמחכה, מפסיד," נהגה לומר לאחיה הקטן, עידו, שתמיד קרא את ההוראות פעמיים.',
+ 'בחופשת סוכות שכרה המשפחה צימר ליד חוף סלעי בצפון. כבר בבוקר הראשון גילתה תמר, מעבר לסלעים, פתח של מערה. המים הגיעו רק עד הקרסוליים, ובפנים נצצו קירות לחים בצבע ירוק כהה. "אנחנו נכנסים," הודיעה. זו לא הייתה שאלה.',
+ 'עידו הוציא מהכיס את הדף שקיבלו בכניסה לחוף. "כתוב פה שהגאות מתחילה בשתיים," אמר בשקט. תמר הציצה בשעון: אחת ועשרים. "יש לנו המון זמן. בוא כבר, פחדן." עידו התכווץ קצת, אבל הלך אחריה.',
+ 'המערה הייתה עמוקה יותר ממה שנראה מבחוץ. אור הפנס של הטלפון גילה מעבר צר, ומעבר לו אולם קטן שתקרתו מלאה צדפים מאובנים. תמר צילמה הכול ודמיינה את התגובות בקבוצת הכיתה. עידו, לעומת זאת, הביט ברצפה. "תמר, המים עלו. הם כבר בשוקיים."',
+ '"אלה רק גלים, זה עולה ויורד," ענתה בלי להסתובב. היא רצתה להגיע לסוף האולם, שם נראה סדק שדרכו חדר אור. אבל כשחזרה אל המעבר הצר, המים כבר הגיעו לברכיים, והזרם משך בחוזקה פנימה.',
+ 'בפעם הראשונה תמר לא ידעה מה לעשות. ליבה הלם, והמחשבות רצו: אמא תכעס, זה בגללי, אני הבאתי אותו לפה. היא ניסתה לעבור בכוח, מעדה וכמעט נפלה. עידו תפס בחולצתה.',
+ '"חכי," אמר עידו. קולו רעד, אבל הוא דיבר לאט. "ראיתי שהמים נכנסים בגלים. בין גל לגל יש כמה שניות שהם יורדים. נספור, ונעבור כשהם יורדים." תמר הביטה בו כאילו ראתה אותו בפעם הראשונה.',
+ 'הם עמדו צמודים לקיר וספרו. גל, ירידה, אחת, שתיים, שלוש. בגל הרביעי לחש עידו "עכשיו", והם עברו את המעבר הצר כשידיהם אחוזות. בחוץ סינוורה אותם השמש, והמים כבר כיסו את הסלעים שעליהם הלכו קודם.',
+ 'הם חזרו בדרך עוקפת, על הצוקים. הידיים של תמר היו שרוטות, והטלפון שלה, עם כל התמונות, נפל למים ונעלם. מוזר, אבל זה כמעט לא הפריע לה.',
+ 'בערב, ליד המדורה, אבא שאל איך היה היום. תמר הסתכלה על עידו. בדרך כלל היא זו שמספרת את הסיפורים, והיא גם הגיבורה שלהם. הפעם אמרה: "עידו הציל אותנו. הוא שם לב לדברים שאני רצה לידם."',
+ 'עידו הסמיק והסתכל באש. מאוחר יותר, כשכולם נכנסו לישון, ישבה תמר עם הדף מהכניסה לחוף וקראה אותו מההתחלה ועד הסוף. פעמיים.'
+];
+const channels=['עושה','אומר','חושב'];
+const bankTraits=['נמהר','זהיר','תחרותי','שקט','שתלטן','שם לב לפרטים','אמיץ','צנוע','מזלזל','אחראי','מחפש תשומת לב'];
+const answers={
+ tamar:[['נמהרת','"ראשונה להרים יד – גם כשלא הייתה בטוחה" (1)','עושה'],['תחרותית','"מי שמחכה, מפסיד" (1)','אומרת'],['שתלטנית','"אנחנו נכנסים" (2)','אומרת'],['מזלזלת','"בוא כבר, פחדן" (3)','אומרת'],['מחפשת תשומת לב','צילמה ודמיינה את התגובות (4)','עושה, חושבת'],['אחראית','"זה בגללי, אני הבאתי אותו לפה" (6)','חושבת']],
+ ido:[['זהיר','"תמיד קרא את ההוראות פעמיים" (1)','עושה'],['שקט','"אמר בשקט" (3)','אומר'],['שם לב לפרטים','"ראיתי שהמים נכנסים בגלים" (7)','אומר'],['אמיץ','"קולו רעד, אבל הוא דיבר לאט" (7)','עושה'],['צנוע','"הסמיק והסתכל באש" (11)','עושה']]
+};
+const charades=[['קופצת ראשונה, מרימה יד מהר בלי לחשוב','נמהרת / אימפולסיבית'],['בודקת דף פעמיים, מסתכלת שמאלה וימינה','זהיר / יסודי'],['מסתכלת על הרצפה, מסמיקה כשמחמיאים לה','צנוע / ביישן']];
+const statues=[['t','תמר, פסקה 2','"אנחנו נכנסים."','בטוחה / שתלטנית'],['t','תמר, פסקה 6','מועדת במים, ליבה הולם','מפחדת / אשמה'],['i','עידו, פסקה 7','"חכי."','רועד אבל רגוע / אמיץ']];
+const pathPts=[['התחלה','"מי שמחכה, מפסיד"'],['הכניסה למערה','"אנחנו נכנסים"'],['המעבר הצר','"זה בגללי"'],['המדורה','"עידו הציל אותנו"']];
+const detective=[['למה תמר קראה לעידו "פחדן"?','פסקה 3','כדי שיפסיק להזהיר ויבוא איתה.'],['למה אובדן הטלפון כמעט לא הפריע לתמר?','פסקאות 4 ו-9','היא הבינה מה באמת חשוב; התמונות כבר לא עניינו אותה.']];
+const decks=[
+ {k:'פרט',c:'--blue',q:[['באיזו שעה מתחילה הגאות?','בשתיים (3)'],['מה עשתה תמר באולם?','צילמה הכול (4)']]},
+ {k:'רצף',c:'--green',q:[['מה קרה מיד אחרי שתמר מעדה?','עידו תפס אותה והציע לספור גלים (6–7)'],['סדר: מדורה / ספירת גלים / הדף מהכיס','הדף ← ספירה ← מדורה']]},
+ {k:'רעיון מרכזי',c:'--orange',q:[['מה הסיפור מלמד אותנו? משפט אחד.','אומץ הוא גם לעצור ולחשוב']]},
+ {k:'אפיון',c:'--purple',q:[['תכונה של עידו + ראיה אחת.','למשל: זהיר – "קרא את ההוראות פעמיים"'],['מה תמר חושבת בפסקה 6? מה זה מלמד?','"זה בגללי" – אחראית']]},
+ {k:'חיבור אישי',c:'--red',q:[['למי אתה דומה יותר, לתמר או לעידו?','תשובה אישית'],['מה עוזר לך לעצור ולחשוב כשאתה לחוץ?','תשובה אישית']]}
+];
+const tools=['ניחוש מהכותרת','מטרת קריאה','סימון בשני צבעים','עצירה ושאלה','בנק תכונות','תכונה + ראיה','בלש: רמז + ידע = מסקנה'];
+const refreshes=['גאות ושפל','פסל דמות','שביל השינוי'];
+
+const stages=[
+ {id:'open',name:'שחקן התכונות',min:'0–4',kind:'תנועה',title:'פתיחה: שחקן התכונות',goal:'להסיק תכונה ממה שמישהו עושה.',render:renderOpen},
+ {id:'before',name:'לפני קריאה',min:'4–7',kind:'כלי',title:'לפני הקריאה',goal:'ניחוש, שלוש דרכים להכיר דמות ומטרת קריאה.',render:renderBefore},
+ {id:'readA',name:'קריאה א\'',min:'7–14',kind:'קריאה',title:'קריאה – חלק א\' (פסקאות 1–4)',goal:'קריאה משותפת וסימון בשני צבעים.',render:()=>renderRead(0,4,'A')},
+ {id:'r1',name:'★ גאות ושפל',min:'14–16',kind:'עצירה ורענון',rf:1,title:'★ עצירה ורענון: גאות ושפל',goal:'לנשום, לזוז ולחזור לסיפור.',render:renderWaves},
+ {id:'readB',name:'קריאה ב\'',min:'16–23',kind:'קריאה',title:'קריאה – חלק ב\' (פסקאות 5–8)',goal:'קריאה משותפת וסימון.',render:()=>renderRead(4,8,'B')},
+ {id:'r2',name:'★ פסל דמות',min:'23–25',kind:'עצירה ורענון',rf:1,title:'★ עצירה ורענון: פסל דמות',goal:'להראות בגוף מה הדמות מרגישה.',render:renderStatue},
+ {id:'readC',name:'קריאה ג\'',min:'25–27',kind:'קריאה',title:'קריאה – חלק ג\' (פסקאות 9–11)',goal:'המורה קוראת, התלמיד מסמן.',render:()=>renderRead(8,11,'C')},
+ {id:'char',name:'דמויות הנייר',min:'27–35',kind:'יצירה',title:'אפיון דמות: דמויות הנייר',goal:'תכונה + ראיה מהטקסט, לכל דמות.',render:renderChar},
+ {id:'r3',name:'★ שביל השינוי',min:'35–37',kind:'עצירה ורענון',rf:1,title:'★ עצירה ורענון: שביל השינוי',goal:'ללכת עם תמר מההתחלה עד הסוף ולראות איך השתנתה.',render:renderPath},
+ {id:'quiz',name:'בלש + כרטיסיות',min:'37–41',kind:'הבנה + תנועה',title:'בלש וכרטיסיות',goal:'הסקת מסקנות ושאלות מכל הסוגים.',render:renderQuiz},
+ {id:'end',name:'הפוסט של תמר',min:'41–45',kind:'יצירה + רפלקציה',title:'סיכום: הפוסט של תמר',goal:'לכתוב בקולה של תמר ולבחור מה עזר לי.',render:renderEnd}
+];
+let cur=Math.min(store.get('stage',0),stages.length-1);
+if(location.hash){const i=stages.findIndex(s=>s.id===location.hash.slice(1));if(i>=0)cur=i}
+
+const $=(t,a={},...kids)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}kids.flat().forEach(c=>c!=null&&e.append(c));return e};
+function field(key,lbl,multi,ph){const id='f-'+key;const el=$(multi?'textarea':'input',{id,type:'text',placeholder:ph||''});el.value=store.get(key,'');el.addEventListener('input',()=>store.set(key,el.value));return $('div',{},$('label',{for:id,text:lbl}),el)}
+function reveal(content,lbl){const r=$('div',{class:'reveal'});r.append(content);r.hidden=true;return $('div',{},$('button',{type:'button',class:'link',text:lbl||'הצג תשובה למורה',onclick:()=>{r.hidden=!r.hidden}}),r)}
+
+const trail=document.getElementById('trail');
+function drawTrail(){trail.innerHTML='';stages.forEach((s,i)=>{const b=$('button',{type:'button',class:s.rf?'rf':'',text:(i+1)+'. '+s.name,onclick:()=>go(i)});if(i===cur)b.setAttribute('aria-current','step');else if(i<cur)b.classList.add('done');trail.append(b)})}
+let cleanup=null;
+function go(i,keep){cur=i;store.set('stage',i);drawTrail();draw();if(!keep)window.scrollTo({top:0});const a=trail.querySelector('[aria-current]');a&&a.scrollIntoView({block:'nearest',inline:'center'})}
+const main=document.getElementById('main');
+function draw(){if(cleanup){cleanup();cleanup=null}const s=stages[cur];main.innerHTML='';main.classList.toggle('refresh',!!s.rf);
+ main.append($('div',{class:'stage-head'},$('h2',{text:s.title}),$('span',{class:'mins',text:'דקות '+s.min}),$('span',{class:'kind',text:s.kind})),$('p',{class:'goal',text:'מטרה: '+s.goal}));
+ main.append(s.render());
+ main.append($('div',{class:'nav'},
+  cur>0?$('button',{type:'button',text:'→ שלב קודם',onclick:()=>go(cur-1)}):$('span'),
+  cur<stages.length-1?$('button',{type:'button',class:'primary',text:'לשלב הבא ←',onclick:()=>go(cur+1)}):$('span')));
+}
+
+/* 1 */
+function renderOpen(){
+ const g=$('div',{class:'grid2'});
+ charades.forEach(([act,ans],i)=>g.append($('div',{class:'panel stack'},$('div',{class:'teacher',text:'פעולה '+(i+1)+' – המורה משחקת:'}),$('div',{style:'font-weight:600',text:act}),field('ch'+i,'איזו תכונה זו?'),reveal('תשובה: '+ans))));
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'בתנועה: '}),'המורה משחקת בלי מילים ואייל מנחש. אחר כך מתחלפים: התלמיד בוחר תכונה ומשחק, והמורה מנחשת.'),g,
+  $('div',{class:'tip'},$('b',{text:'מסקנה: '}),'מכירים דמות ממה שהיא עושה, אומרת וחושבת. בדיוק כך נכיר את תמר ואת עידו.'));
+}
+/* 2 */
+function renderBefore(){
+ return $('div',{class:'stack'},
+  $('div',{class:'panel stack'},$('div',{},$('div',{class:'sub',text:'הכותרת'}),$('div',{style:'font-family:var(--display);font-size:1.6rem',text:'מערת הגאות'})),
+   field('reminds','הכותרת מזכירה לי:'),field('guess','אני מנחש שיקרה:',true)),
+  $('div',{class:'panel stack'},$('h3',{text:'שלוש דרכים להכיר דמות'}),$('div',{class:'chans'},['מה הדמות עושה','מה הדמות אומרת','מה הדמות חושבת'].map(c=>$('span',{class:'chan',text:c}))),
+   $('div',{class:'teacher',text:'שתי דמויות בסיפור: תמר (צהוב) ועידו, אחיה הקטן (כחול).'})),
+  field('goalRead','המטרה שלי בקריאה: להכיר את תמר ואת עידו ולגלות...'));
+}
+/* reading */
+function renderRead(from,to,part){
+ const marks=store.get('marks',{});let mode=store.get('mode','t');
+ const bt=$('button',{type:'button',class:'mt','aria-pressed':String(mode==='t'),text:'מסמן: תמר'}),bi=$('button',{type:'button',class:'mi','aria-pressed':String(mode==='i'),text:'מסמן: עידו'});
+ const setM=m=>{mode=m;store.set('mode',m);bt.setAttribute('aria-pressed',m==='t');bi.setAttribute('aria-pressed',m==='i')};bt.onclick=()=>setM('t');bi.onclick=()=>setM('i');
+ const panel=$('div',{class:'panel'});
+ for(let pi=from;pi<to;pi++){const n=pi+1;const p=$('p');let wi=0;
+  story[pi].split(/(\s+)/).forEach(w=>{if(/^\s+$/.test(w)){p.append(w);return}const key=pi+'_'+(wi++);const s=$('span',{class:'word'+(marks[key]?' '+marks[key]:''),tabindex:'0',role:'button',text:w});
+   const tog=()=>{s.classList.remove('t','i');if(marks[key]===mode)delete marks[key];else{marks[key]=mode;s.classList.add(mode)}store.set('marks',marks)};
+   s.addEventListener('click',tog);s.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}});p.append(s)});
+  const reader=part==='C'?'מורה':(pi%2===0?'מורה':'התלמיד');
+  panel.append($('div',{class:'para'},$('span',{class:'n'},String(n),$('span',{class:'who',text:reader})),p));
+  if(n===6)panel.append($('div',{class:'stop'},$('h3',{text:'עצירה קצרה: מה תמר מרגישה עכשיו? איפה כתוב מה שהיא חושבת?'}),field('stop6','התשובה של התלמיד:',true)));
+ }
+ const tipTxt=part==='C'?'המורה קוראת ואייל מסמן.':'קריאה משותפת: פסקה מורה, פסקה התלמיד (רשום ליד מספר הפסקה).';
+ const after=part==='A'?'בסוף החלק: תחנת רענון "גאות ושפל".':part==='B'?'בסוף החלק: תחנת רענון "פסל דמות".':'סוף הסיפור. עכשיו בונים את דמויות הנייר.';
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'קריאה: '}),tipTxt+' לחיצה על מילה מסמנת אותה בצבע של הדמות.'),$('div',{class:'modes'},bt,bi),panel,$('div',{class:'teacher',text:after}));
+}
+/* refresh 1 */
+function renderWaves(){
+ const orb=$('div',{class:'orb','aria-hidden':'true'});const cnt=$('div',{class:'wavecount',text:'4 גלים'});const hint=$('div',{class:'sub',text:'כשהעיגול גדל – שואפים ומרימים ידיים. כשהוא קטן – נושפים ומורידים.'});
+ let timer=null,phase=0;
+ const btn=$('button',{type:'button',class:'primary',text:'התחל גלים'});
+ function stop(){clearInterval(timer);timer=null;orb.classList.remove('in')}
+ btn.onclick=()=>{if(timer){stop();btn.textContent='התחל גלים';cnt.textContent='4 גלים';return}phase=0;btn.textContent='עצור';
+  const stepF=()=>{phase++;const wave=Math.ceil(phase/2);if(phase>8){stop();btn.textContent='עוד פעם';cnt.textContent='גל רביעי! עמוד על קצות האצבעות וספור עד 3.';return}
+   if(phase%2===1){orb.classList.add('in');cnt.textContent='גל '+wave+' – שאיפה, ידיים למעלה'}else{orb.classList.remove('in');cnt.textContent='גל '+wave+' – נשיפה, ידיים למטה'}};
+  stepF();timer=setInterval(stepF,4000)};
+ cleanup=stop;
+ return $('div',{class:'stack'},$('div',{class:'panel waves'},orb,cnt,hint,btn),
+  $('div',{class:'panel stack'},field('r1q','שאלת חזרה: מי משני האחים שם לב שהמים עולים? מה זה מלמד עליו?',true),reveal('עידו (פסקה 4). הוא זהיר ושם לב לפרטים.')));
+}
+/* refresh 2 */
+function renderStatue(){
+ const g=$('div',{class:'grid2'});
+ statues.forEach(([c,who,moment,ans],i)=>g.append($('div',{class:'statue '+c},$('div',{class:'who2',text:who}),$('div',{text:moment}),field('st'+i,'במילה אחת – מה הדמות מרגישה?'),reveal('אפשרות: '+ans))));
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'בתנועה: '}),'המורה מקריאה את הרגע, ואייל קופא כמו פסל של הדמות. אחר כך מתחלפים: המורה קופאת ואייל מנחש מי הדמות ואיזה רגע זה.'),g);
+}
+/* character */
+function figSVG(hair){return '<svg width="90" height="120" viewBox="0 0 90 120" aria-hidden="true"><circle cx="45" cy="26" r="18" fill="var(--card)" stroke="var(--c)" stroke-width="3"/>'+(hair?'<path d="M27 24c2-14 34-14 36 0" fill="var(--c)"/><path d="M63 24c6 10 4 22 0 26" fill="none" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/>':'<path d="M28 20c4-10 30-10 34 0" fill="var(--c)"/>')+'<path d="M45 44v40M45 56l-22 14M45 56l22 14M45 84l-16 30M45 84l16 30" fill="none" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></svg>'}
+function renderChar(){
+ const notes=store.get('notes',{tamar:[],ido:[]});let sel=store.get('selTrait','');
+ const figs=$('div',{class:'figs'});
+ function drawFigs(){figs.innerHTML='';[['tamar','תמר','--tamar',true],['ido','עידו','--ido',false]].forEach(([k,n,c,h])=>{
+  const f=$('div',{class:'fig',style:'--c:var('+c+')'});f.append($('h3',{text:n}));const s=$('div');s.innerHTML=figSVG(h);f.append(s);
+  const ns=$('div',{class:'notes'});if(!notes[k].length)ns.append($('div',{class:'sub',text:'עוד אין פתקים.'}));
+  notes[k].forEach((o,i)=>ns.append($('div',{class:'note'},$('b',{text:o.t}),o.e?$('small',{text:o.e}):null,o.w?$('small',{text:' · '+o.w}):null,$('div',{},$('button',{type:'button','aria-label':'הסר פתק',text:'הסר',onclick:()=>{notes[k].splice(i,1);store.set('notes',notes);drawFigs()}})))));
+  f.append(ns);figs.append(f)})}
+ const bank=$('div',{class:'bank'});
+ function drawBank(){bank.innerHTML='';bankTraits.forEach(t=>bank.append($('button',{type:'button','aria-pressed':String(sel===t),text:t,onclick:()=>{sel=sel===t?'':t;store.set('selTrait',sel);drawBank()}})))}
+ const ev=$('input',{id:'f-ev',type:'text',placeholder:'ציטוט + מספר פסקה'});const way=$('select',{id:'f-way','aria-label':'איך יודעים'});way.append($('option',{value:'',text:'איך יודעים?'}));channels.forEach(c=>way.append($('option',{value:c,text:c})));
+ const msg=$('div',{class:'sub',role:'status'});
+ function add(k){if(!sel){msg.textContent='קודם בחר תכונה מהבנק.';return}notes[k].push({t:sel,e:ev.value.trim(),w:way.value});store.set('notes',notes);ev.value='';way.value='';sel='';store.set('selTrait','');msg.textContent='הפתק הודבק.';drawBank();drawFigs()}
+ drawBank();drawFigs();
+ const tbl=w=>$('div',{class:'tbl'},$('table',{},$('thead',{},$('tr',{},$('th',{text:'תכונה'}),$('th',{text:'ראיה'}),$('th',{text:'איך'}))),$('tbody',{},answers[w].map(r=>$('tr',{},r.map(c=>$('td',{text:c})))))));
+ return $('div',{class:'stack'},
+  $('div',{class:'tip'},$('b',{text:'יצירה: '}),'על הדמויות המודפסות מדביקים פתקים: תכונה בצד אחד, ראיה בגב. את הפתק הראשון עושים יחד, לדוגמה: תמר תחרותית – "מי שמחכה, מפסיד" (1) – אומרת.'),
+  $('div',{class:'panel stack'},$('label',{text:'1. בחר תכונה מהבנק'}),bank,
+   $('div',{class:'adder'},$('div',{},$('label',{for:'f-ev',text:'2. ראיה מהטקסט'}),ev),$('div',{},$('label',{for:'f-way',text:'3. איך יודעים'}),way),
+    $('div',{class:'steps'},$('button',{type:'button',class:'primary',style:'background:var(--tamar);border-color:var(--tamar);color:#1b1404',text:'הדבק על תמר',onclick:()=>add('tamar')}),$('button',{type:'button',class:'primary',style:'background:var(--ido);border-color:var(--ido)',text:'הדבק על עידו',onclick:()=>add('ido')}))),msg),
+  figs,
+  $('div',{class:'panel'},reveal($('div',{class:'stack'},$('b',{text:'תמר'}),tbl('tamar'),$('b',{text:'עידו'}),tbl('ido')),'הצג תשובות למורה')),
+  $('div',{class:'panel stack'},field('why2','שאלת הרחבה: למה הכותב בחר בשתי דמויות שונות כל כך?',true),reveal('כדי להראות שאומץ הוא לא רק להיות ראשון; דווקא הזהירות של עידו הצילה אותם.')));
+}
+/* refresh 3 */
+function renderPath(){
+ let at=store.get('pathAt',-1);const tape=$('div',{class:'tape'});const box=$('div',{class:'stack'});
+ function d(){tape.innerHTML='';box.innerHTML='';pathPts.forEach(([n,q],i)=>{const pt=$('div',{class:'pt'+(i<=at?' on':'')},$('span',{class:'dot'}),$('button',{type:'button',text:n,'aria-pressed':String(i===at),onclick:()=>{at=i;store.set('pathAt',i);d()}}),$('small',{class:'sub',text:q}));tape.append(pt)});
+  if(at>=0){const [n,q]=pathPts[at];box.append($('div',{class:'panel stack'},$('h3',{text:'עומדים ב: '+n}),$('div',{class:'teacher',text:q}),field('path'+at,'מה תמר מרגישה או חושבת כאן?',true)))}
+  if(at===pathPts.length-1)box.append($('div',{class:'panel stack'},field('pathEnd','מה הדבר שהכי השתנה בתמר?',true),field('pathWhy','מה גרם לשינוי?',true),reveal('בהתחלה: "מי שמחכה, מפסיד", קוראת לעידו "פחדן". בסוף: "עידו הציל אותנו" וקוראת את הדף פעמיים. השינוי: הפחד במעבר הצר וההצלה של עידו.')))}
+ d();
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'בתנועה: '}),'מדביקים קו סרט על הרצפה. התלמיד צועד לאורכו ועוצר בכל נקודה. כאן לוחצים על הנקודה שבה הוא עומד.'),$('div',{class:'panel'},tape),box);
+}
+/* quiz */
+function renderQuiz(){
+ let steps=store.get('steps',0);const total=6;const used=store.get('used',{});
+ const dots=$('div',{class:'steps'});
+ function dd(){dots.innerHTML='';for(let i=0;i<total;i++)dots.append($('span',{class:'sd'+(i<steps?' on':'')}));dots.append($('span',{class:'exit',title:'יציאה'}));dots.append($('span',{class:'sub',text:steps>=total?' יצאת מהמערה!':' '+steps+' מתוך '+total+' צעדים'}))}
+ const step=e=>{if(steps<total){steps++;store.set('steps',steps);dd()}e.target.disabled=true};
+ const det=$('div',{class:'stack'});detective.forEach(([q,w,a],i)=>det.append($('div',{class:'panel stack'},$('div',{style:'font-weight:700;font-size:1.15rem',text:'בלש '+(i+1)+': '+q}),$('div',{class:'teacher',text:'איפה לחפש: '+w}),
+  $('div',{class:'formula'},field('d'+i+'c','רמז'),$('span',{class:'op',text:'+'}),field('d'+i+'k','מה שאני יודע'),$('span',{class:'op',text:'='}),field('d'+i+'m','מסקנה')),
+  $('div',{class:'steps'},reveal('תשובה: '+a),$('button',{type:'button',class:'primary',text:'נכון – צעד קדימה',onclick:step})))));
+ const card=$('div',{class:'flip'},$('div',{class:'sub',text:'בחר צבע ושלוף כרטיס.'}));
+ function pull(di){const dk=decks[di];let u=used[di]||[];let pool=dk.q.map((_,i)=>i).filter(i=>!u.includes(i));if(!pool.length){u=[];pool=dk.q.map((_,i)=>i)}const qi=pool[Math.floor(Math.random()*pool.length)];used[di]=u.concat(qi);store.set('used',used);
+  const [q,a]=dk.q[qi];card.style.setProperty('--c','var('+dk.c+')');card.innerHTML='';const ans=$('div',{class:'a',text:'תשובה: '+a});ans.hidden=true;
+  card.append($('div',{class:'cat',text:dk.k}),$('div',{class:'q',text:q}),ans,$('div',{class:'steps'},$('button',{type:'button',text:'הפוך כרטיס',onclick:()=>{ans.hidden=!ans.hidden}}),$('button',{type:'button',class:'primary',text:'נכון – צעד קדימה',onclick:step})))}
+ const dk=$('div',{class:'decks'});decks.forEach((d,i)=>dk.append($('button',{type:'button',class:'deck',style:'border-color:var('+d.c+');color:var('+d.c+')',text:d.k,onclick:()=>pull(i)})));
+ dd();
+ return $('div',{class:'stack'},$('div',{class:'tip'},$('b',{text:'בתנועה: '}),'6 צעדים מסומנים על הרצפה עד "היציאה מהמערה". על כל תשובה נכונה התלמיד מתקדם צעד.'),
+  $('div',{class:'panel stack'},$('label',{text:'הדרך החוצה'}),dots,$('button',{type:'button',class:'link',text:'אפס',onclick:()=>{steps=0;store.set('steps',0);dd()}})),det,dk,card);
+}
+/* end */
+function renderEnd(){
+ const ta=$('textarea',{id:'f-post',placeholder:'למשל: היום במערה...'});ta.value=store.get('post','');
+ const bub=$('div',{class:'bubble'},$('small',{text:'תמר'}));const txt=document.createTextNode(ta.value||'...');bub.append(txt);
+ ta.addEventListener('input',()=>{store.set('post',ta.value);txt.textContent=ta.value||'...'});
+ const chipGroup=(list,key)=>{const pick=new Set(store.get(key,[]));const ch=$('div',{class:'chips'});list.forEach(t=>{const b=$('button',{type:'button','aria-pressed':String(pick.has(t)),text:t,onclick:()=>{pick.has(t)?pick.delete(t):pick.add(t);b.setAttribute('aria-pressed',pick.has(t));store.set(key,[...pick])}});ch.append(b)});return ch};
+ let rate=store.get('rate',0);const rt=$('div',{class:'rate',role:'group','aria-label':'כמה הבנתי'});
+ function dr(){rt.innerHTML='';for(let i=1;i<=5;i++)rt.append($('button',{type:'button','aria-pressed':String(i===rate),text:i,onclick:()=>{rate=i;store.set('rate',i);dr()}}))}dr();
+ return $('div',{class:'stack'},
+  $('div',{class:'grid2'},
+   $('div',{class:'panel stack'},$('label',{for:'f-post',text:'מה תמר כותבת לקבוצת הכיתה בערב?'}),ta,$('div',{class:'teacher',text:'צריך שיהיו בהודעה מילים שמראות שהיא השתנתה. אפשר גם לצייר את המסך על דף.'}),reveal('לדוגמה: "אין לי תמונות מהמערה – הטלפון טבע אבל למדתי משהו: לפעמים כדאי לעצור ולהקשיב. תודה עידו."','הצג דוגמה')),
+   $('div',{class:'phone'},$('div',{class:'grp',text:'כיתה ה\' 2'}),bub)),
+  $('div',{class:'panel stack'},
+   $('div',{},$('label',{text:'אילו כלים עזרו לי היום?'}),chipGroup(tools,'tools')),
+   $('div',{},$('label',{text:'איזו תחנת רענון הכי עזרה לי להתרכז?'}),chipGroup(refreshes,'refr')),
+   $('div',{},$('label',{text:'כמה הבנתי את הסיפור? 1–5'}),rt),
+   field('nextTime','בפעם הבאה שאקרא סיפור, אשים לב ל:'),
+   $('button',{type:'button',class:'link',text:'נקה את כל התשובות לשיעור חדש',onclick:clearAll})));
+}
+let armed=false;
+function clearAll(e){if(!armed){armed=true;e.target.textContent='לחץ שוב כדי לאשר מחיקה';setTimeout(()=>{armed=false;e.target.textContent='נקה את כל התשובות לשיעור חדש'},4000);return}
+ try{Object.keys(localStorage).filter(k=>k.startsWith(P)).forEach(k=>localStorage.removeItem(k))}catch(_){}armed=false;run=false;clearInterval(t);sec=0;tick();go(0)}
+
+let sec=store.get('sec',0),run=false,t=null;const clk=document.getElementById('clk'),cb=document.getElementById('clkBtn');
+function tick(){const m=String(Math.floor(sec/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');clk.textContent=m+':'+s;clk.style.color=sec>=2700?'var(--accent)':'';cb.textContent=run?'השהה':(sec?'המשך':'התחל')}
+cb.onclick=()=>{run=!run;clearInterval(t);if(run)t=setInterval(()=>{sec++;if(sec%5===0)store.set('sec',sec);tick()},1000);tick()};
+document.getElementById('clkReset').onclick=()=>{run=false;clearInterval(t);sec=0;store.set('sec',0);tick()};
+tick();drawTrail();draw();
+})();
+</script>
+
+<a href="../../" aria-label="חזרה לעולם המשחקים" style="position:fixed;bottom:16px;left:16px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#ffc93c;color:#1b2a5e;display:grid;place-items:center;font-size:26px;text-decoration:none;box-shadow:0 4px 0 #d89c12,0 6px 14px #0003">🏠</a>
+</body></html>
